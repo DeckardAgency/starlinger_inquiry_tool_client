@@ -1,0 +1,18 @@
+<div class="sidebar" [class.sidebar--collapsed]="isCollapsed()">
+<!--  <button class="sidebar__toggle" (click)="toggleSidebar()">-->
+<!--    <span class="sidebar__toggle-icon" [class.sidebar__toggle-icon&#45;&#45;rotated]="isCollapsed()">❯</span>-->
+<!--  </button>-->
+
+  <div class="sidebar__content">
+    <nav class="sidebar__nav">
+      <ul class="sidebar__list">
+        <li class="sidebar__item">
+          <a routerLink="/dashboard" routerLinkActive="sidebar__link--active" class="sidebar__link">Dashboard</a>
+        </li>
+        <li class="sidebar__item">
+          <a routerLink="/shop" routerLinkActive="sidebar__link--active" class="sidebar__link">Shop</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+.shop {
+  padding: 24px;
+  margin-top: 64px; // Account for top-bar height
+
+  &__title {
+    margin: 0 0 24px;
+    font-size: 1.5rem;
+    color: #2c3e50;
+  }
+}

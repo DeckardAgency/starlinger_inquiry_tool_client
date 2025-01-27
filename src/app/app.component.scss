@@ -1,0 +1,17 @@
+.app {
+  display: block;
+  height: calc(100vh - 64px);
+  background-color: #FAF5FF;
+
+  &__main {
+    margin-left: 250px;
+    margin-top: 64px; // Account for top-bar height
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+    min-height: calc(100vh - 64px); // Subtract top-bar height
+
+    &--collapsed {
+      margin-left: 50px;
+    }
+  }
+}
