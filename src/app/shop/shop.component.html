@@ -243,92 +243,29 @@
       </div>
 
       @if (selectedProduct && viewMode === 'list') {
-        <div class="shop__details">
-          <!-- Same details content as above -->
-          <div class="shop__details-header">
-            <button class="shop__back-btn" (click)="closeDetails()">
-              <span class="material-icons">
-                <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14M7.5 4.27l9 5.15M3.29 7 12 12m0 0 8.71-5M12 12v10m8.27-4.73L22 19m-1-3.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-            </button>
-            <h2 class="shop__details-title">Product details</h2>
-            <button class="shop__wishlist-btn">
-              <span class="material-icons">
-                <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.333 8h9.334M8 3.333v9.334" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              Add to Wishlist
-            </button>
-          </div>
-
-          <div class="shop__details-content">
-            <div class="shop__details-image">
-              <img src="https://via.assets.so/img.jpg?w=600&h=400" alt="Product detail image">
-            </div>
-
-            <div class="shop__details-info">
-              <div class="shop__details-meta">
-                <div class="shop__meta-item">
-                  <span class="shop__meta-icon material-icons">sell</span>
-                  <div class="shop__meta-content">
-                    <span class="shop__meta-label">Part no.</span>
-                    <span class="shop__meta-value">{{ selectedProduct.partNo }}</span>
-                  </div>
-                </div>
-                <div class="shop__meta-item">
-                  <span class="shop__meta-icon material-icons">label</span>
-                  <div class="shop__meta-content">
-                    <span class="shop__meta-label">Statistic</span>
-                    <span class="shop__meta-value">ET</span>
-                  </div>
-                </div>
-                <div class="shop__meta-item">
-                  <span class="shop__meta-icon material-icons">scale</span>
-                  <div class="shop__meta-content">
-                    <span class="shop__meta-label">Weight</span>
-                    <span class="shop__meta-value">0.4 kg</span>
-                  </div>
-                </div>
-              </div>
-
-              <h1 class="shop__details-title">{{ selectedProduct.name }}</h1>
-
-              <p class="shop__details-description">{{ selectedProduct.shortDescription }}</p>
-
-              <div class="shop__details-price">
-                <span class="shop__price-original">€ 695,21</span>
-                <span class="shop__price-discount">-20%</span>
-                <span class="shop__price-final">€ 556,17</span>
-              </div>
-
-              <div class="shop__details-specs">
-                <div class="shop__specs-item">
-                  <span class="shop__specs-icon material-icons">precision_manufacturing</span>
-                  <div class="shop__specs-content">
-                    <span class="shop__specs-label">Machine</span>
-                    <span class="shop__specs-value">Weawing machine / starEX machine</span>
-                  </div>
-                </div>
-                <div class="shop__specs-item">
-                  <span class="shop__specs-icon material-icons">settings</span>
-                  <div class="shop__specs-content">
-                    <span class="shop__specs-label">Technical description</span>
-                    <span class="shop__specs-value">{{ selectedProduct.technicalDescription }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="shop__details-actions">
-                <div class="shop__quantity">
-                  <button class="shop__quantity-decrease" (click)="decrementQuantity()">−</button>
-                  <input type="number" [formControl]="quantityControl" class="shop__quantity-input">
-                  <button class="shop__quantity-increase" (click)="incrementQuantity()">+</button>
-                </div>
-                <button class="shop__add-cart">
-                  Add to Cart
+        <div>
+            <div class="shop__details">
+              <div class="shop__details-header">
+                <button class="shop__back-btn" (click)="closeDetails()">
+                  <span class="material-icons">
+                    <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14M7.5 4.27l9 5.15M3.29 7 12 12m0 0 8.71-5M12 12v10m8.27-4.73L22 19m-1-3.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </button>
+                <h2 class="shop__details-title">Product details</h2>
+                <button class="shop__wishlist-btn">
+                  <span class="material-icons">
+                    <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.333 8h9.334M8 3.333v9.334" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  Add to Wishlist
                 </button>
               </div>
             </div>
-          </div>
+
+            <div>
+              @if (selectedProduct) {
+                <app-product-card [product]="selectedProduct"></app-product-card>
+              }
+            </div>
         </div>
       }
     </div>

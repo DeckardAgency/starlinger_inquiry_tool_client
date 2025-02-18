@@ -1,17 +1,18 @@
 // src/app/shop/shop.component.ts
 import { Component, OnInit } from '@angular/core';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
+import {CommonModule} from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import {ProductCardComponent} from '../components/product-card/product-card.component';
 
 @Component({
   selector: 'app-shop',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent, NgOptimizedImage],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent, ProductCardComponent],
   templateUrl: './shop.component.html',
   styleUrls: ['./shop.component.scss']
 })

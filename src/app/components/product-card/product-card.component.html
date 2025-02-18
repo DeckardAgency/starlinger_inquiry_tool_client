@@ -1,0 +1,91 @@
+<div class="product-card">
+  <div class="product-card__image">
+    <img src="https://via.assets.so/img.jpg?w=600&h=400" [alt]="product.name" class="product-card__img">
+  </div>
+
+  <div class="product-card__specs">
+    <div class="product-card__spec">
+      <span class="product-card__spec-icon">
+        <i class="icon-hex"></i>
+      </span>
+      <div class="product-card__spec-content">
+        <span class="product-card__spec-label">Part no.</span>
+        <span class="product-card__spec-value">{{ product.partNo }}</span>
+      </div>
+    </div>
+
+    <div class="product-card__spec">
+      <span class="product-card__spec-icon">
+        <i class="icon-document"></i>
+      </span>
+      <div class="product-card__spec-content">
+        <span class="product-card__spec-label">Statistic</span>
+        <span class="product-card__spec-value">ET</span>
+      </div>
+    </div>
+
+    <div class="product-card__spec">
+      <span class="product-card__spec-icon">
+        <i class="icon-weight"></i>
+      </span>
+      <div class="product-card__spec-content">
+        <span class="product-card__spec-label">Weight</span>
+        <span class="product-card__spec-value">0.4 kg</span>
+      </div>
+    </div>
+  </div>
+
+  <h1 class="product-card__title">{{ product.name }}</h1>
+  <p class="product-card__description">{{ product.shortDescription }}</p>
+
+  @if (product.price > 0) {
+    <div class="product-card__price">
+      <span class="product-card__price-original">€ {{ formatPrice(product.price) }}</span>
+      <span class="product-card__price-discount">-20%</span>
+      <span class="product-card__price-final">€ {{ formatPrice(product.price * 0.8) }}</span>
+    </div>
+  }
+
+  <div class="product-card__details">
+    <div class="product-card__detail">
+      <span class="product-card__detail-icon">
+        <i class="icon-machine"></i>
+      </span>
+      <div class="product-card__detail-content">
+        <span class="product-card__detail-label">Machine</span>
+        <span class="product-card__detail-value">{{ product.name }}</span>
+      </div>
+    </div>
+
+    <div class="product-card__detail">
+      <span class="product-card__detail-icon">
+        <i class="icon-tech"></i>
+      </span>
+      <div class="product-card__detail-content">
+        <span class="product-card__detail-label">Technical description</span>
+        <span class="product-card__detail-value">{{ product.technicalDescription }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-card__actions">
+    <div class="product-card__quantity">
+      <button
+        class="product-card__quantity-btn product-card__quantity-btn--minus"
+        (click)="decrementQuantity()"
+      >-</button>
+      <input
+        type="number"
+        class="product-card__quantity-input"
+        [ngModel]="quantity"
+        (ngModelChange)="updateQuantity($event)"
+        min="1"
+      >
+      <button
+        class="product-card__quantity-btn product-card__quantity-btn--plus"
+        (click)="incrementQuantity()"
+      >+</button>
+    </div>
+    <button class="product-card__add-btn">Add to Cart</button>
+  </div>
+</div>
