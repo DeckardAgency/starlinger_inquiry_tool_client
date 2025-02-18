@@ -3,7 +3,7 @@
   position: fixed;
   left: 0;
   top: 0;
-  height: 100vh;
+  height: calc(100vh - 80px);
   width: 250px;
   background-color: white;
   transition: all 0.3s ease;

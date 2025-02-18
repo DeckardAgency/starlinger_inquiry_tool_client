@@ -38,7 +38,9 @@
             </li>
             <li class="sidebar__item">
               <a routerLink="/inquiry-tool" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                <i class="icon-inquiry-tool sidebar__icon"></i>
+                <span class="icon-inquiry-tool sidebar__icon">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><path d="M8.667 4.667 5.8 1.8a1.607 1.607 0 0 0-2.267 0L1.8 3.533a1.607 1.607 0 0 0 0 2.267l2.867 2.867M5.333 4l1.334-1.333m5.333 8 1.333-1.334m-2-2L14.2 10.2c.627.627.627 1.64 0 2.267L12.467 14.2a1.602 1.602 0 0 1-2.267 0l-2.867-2.867m2.667-8L12.667 6m1.449-1.459a1.88 1.88 0 0 0-2.657-2.658l-8.898 8.9c-.155.154-.269.344-.333.553l-.88 2.901a.334.334 0 0 0 .415.415l2.902-.88c.208-.063.398-.177.553-.331l8.898-8.9Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+                </span>
                 <span class="sidebar__link-text">Inquiry Tool</span>
               </a>
             </li>
@@ -46,7 +48,9 @@
               <button class="sidebar__link sidebar__submenu-toggle"
                       (click)="toggleInquiriesMenu()"
                       [class.sidebar__submenu-toggle--expanded]="isInquiriesExpanded()">
-                <i class="icon-folder sidebar__icon"></i>
+                <span class="icon-folder sidebar__icon">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.333 13.333A1.333 1.333 0 0 0 14.667 12V5.333A1.333 1.333 0 0 0 13.333 4H8.067a1.333 1.333 0 0 1-1.127-.6l-.54-.8A1.333 1.333 0 0 0 5.287 2h-2.62a1.333 1.333 0 0 0-1.334 1.333V12a1.333 1.333 0 0 0 1.334 1.333h10.666Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
                 <span class="sidebar__link-text">My Inquiries</span>
                 <i class="icon-chevron sidebar__icon sidebar__submenu-icon"
                    [class.sidebar__submenu-icon--rotated]="isInquiriesExpanded()"></i>
@@ -55,13 +59,16 @@
                 <ul class="sidebar__nested-list">
                   <li class="sidebar__item sidebar__item--indented">
                     <a routerLink="/active-inquiries" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                      <i class="icon-active sidebar__icon"></i>
+                      <span class="icon-active sidebar__icon">
+                      </span>
                       <span class="sidebar__link-text">Active</span>
                     </a>
                   </li>
                   <li class="sidebar__item sidebar__item--indented">
                     <a routerLink="/inquiry-history" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                      <i class="icon-history sidebar__icon"></i>
+                      <span class="icon-history sidebar__icon">
+
+                      </span>
                       <span class="sidebar__link-text">History</span>
                     </a>
                   </li>
@@ -76,13 +83,17 @@
           <ul class="sidebar__sub-list">
             <li class="sidebar__item">
               <a routerLink="/my-machines" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                <i class="icon-machine sidebar__icon"></i>
+                <span class="icon-machine sidebar__icon">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 5.333V2.667H5.333m-4 6.666h1.334m10.666 0h1.334M10 8.667V10M6 8.667V10M4 5.333h8c.736 0 1.333.597 1.333 1.334V12c0 .736-.597 1.333-1.333 1.333H4A1.333 1.333 0 0 1 2.667 12V6.667c0-.737.597-1.334 1.333-1.334Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
                 <span class="sidebar__link-text">My Machines</span>
               </a>
             </li>
             <li class="sidebar__item">
               <a routerLink="/all-machines" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                <i class="icon-view-all sidebar__icon"></i>
+                <span class="icon-view-all sidebar__icon">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 2.667H14M9.333 6H14m-4.667 4H14m-4.667 3.333H14M2.667 2H6c.368 0 .667.298.667.667V6A.667.667 0 0 1 6 6.667H2.667A.667.667 0 0 1 2 6V2.667C2 2.298 2.298 2 2.667 2Zm0 7.333H6c.368 0 .667.299.667.667v3.333A.667.667 0 0 1 6 14H2.667A.667.667 0 0 1 2 13.333V10c0-.368.298-.667.667-.667Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
                 <span class="sidebar__link-text">View All Machines</span>
               </a>
             </li>
@@ -95,20 +106,26 @@
       <ul class="sidebar__list">
         <li class="sidebar__item">
           <a routerLink="/support" routerLinkActive="sidebar__link--active" class="sidebar__link">
-            <i class="icon-support sidebar__icon"></i>
+            <span class="icon-support sidebar__icon">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><path d="m3.287 3.287 2.826 2.826m3.774 0 2.826-2.826m-2.826 6.6 2.826 2.826m-6.6-2.826-2.826 2.826M14.667 8A6.667 6.667 0 1 1 1.333 8a6.667 6.667 0 0 1 13.334 0Zm-4 0a2.667 2.667 0 1 1-5.334 0 2.667 2.667 0 0 1 5.334 0Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+            </span>
             <span class="sidebar__link-text">Support</span>
           </a>
         </li>
         <li class="sidebar__item">
           <a routerLink="/documentation" routerLinkActive="sidebar__link--active" class="sidebar__link">
-            <i class="icon-documentation sidebar__icon"></i>
+            <span class="icon-documentation sidebar__icon">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 4.667A2.667 2.667 0 0 0 5.333 2h-4v10H6a2 2 0 0 1 2 2m0-9.333V14m0-9.333A2.667 2.667 0 0 1 10.667 2h4v10H10a2 2 0 0 0-2 2" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
             <span class="sidebar__link-text">Documentation</span>
           </a>
         </li>
         <li class="sidebar__divider"></li>
         <li class="sidebar__item">
           <div class="sidebar__user">
-            <i class="icon-user sidebar__icon"></i>
+            <span class="icon-user sidebar__icon">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.667 14v-1.333A2.667 2.667 0 0 0 10 10H6a2.667 2.667 0 0 0-2.667 2.667V14m7.334-9.333a2.667 2.667 0 1 1-5.334 0 2.667 2.667 0 0 1 5.334 0Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
             <div class="sidebar__user-info">
               <span class="sidebar__user-name">Anes</span>
               <span class="sidebar__user-role">Administrator</span>
