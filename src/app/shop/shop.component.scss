@@ -100,6 +100,7 @@
     position: relative;
 
     .filter-arrow {
+      display: flex;
       margin-left: 8px;
       transition: transform 0.3s ease;
 

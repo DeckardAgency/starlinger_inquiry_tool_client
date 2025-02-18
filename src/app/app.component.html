@@ -4,4 +4,5 @@
   <main class="app__main" [class.app__main--collapsed]="sidebarService.isCollapsed()">
     <router-outlet></router-outlet>
   </main>
+  <app-quick-cart [isOpen]="(quickCartService.isOpen$ | async) ?? false"></app-quick-cart>
 </div>
