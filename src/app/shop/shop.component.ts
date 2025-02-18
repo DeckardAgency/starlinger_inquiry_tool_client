@@ -1,13 +1,19 @@
 // src/app/shop/shop.component.ts
-import { Component, OnInit } from '@angular/core';
-import {CommonModule} from '@angular/common';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import {ProductCardComponent} from '../components/product-card/product-card.component';
+import { ProductCardComponent } from '../components/product-card/product-card.component';
+
+export interface Machine {
+  id: string;
+  name: string;
+  checked: boolean;
+}
 
 @Component({
   selector: 'app-shop',
@@ -30,6 +36,14 @@ export class ShopComponent implements OnInit {
   discountedControl = new FormControl(false);
   quantityControl = new FormControl(1);
 
+  machines: Machine[] = [
+    { id: '1', name: '200XE Winding Machine', checked: false },
+    { id: '2', name: 'starEX Machine', checked: false },
+    { id: '3', name: 'ad*starKON Machine', checked: false },
+    { id: '4', name: 'Alpha 6.0 Machine', checked: false },
+    { id: '5', name: 'starEX 1600 ES Machine', checked: false }
+  ];
+  isFilterOpen = false;
   activeFilters: string[] = [];
   breadcrumbs: Breadcrumb[] = [
     { label: 'Shop', link: '/shop' },
@@ -69,17 +83,15 @@ export class ShopComponent implements OnInit {
   selectProduct(product: Product): void {
     this.selectedProduct = product;
     if (product) {
-      // Update breadcrumbs
       this.breadcrumbs = [
         { label: 'Shop', link: '/shop' },
         { label: 'All machines', link: '/shop/machines' },
         { label: product.name }
       ];
 
-      // Load related products (excluding current product)
       this.relatedProducts = this.products
         .filter(p => p.id !== product.id)
-        .slice(0, 6); // Show only 6 related products
+        .slice(0, 6);
     }
   }
 
@@ -92,7 +104,15 @@ export class ShopComponent implements OnInit {
   }
 
   removeFilter(filter: string): void {
+    // Remove from activeFilters
     this.activeFilters = this.activeFilters.filter(f => f !== filter);
+
+    // Update machine checked state
+    const machine = this.machines.find(m => m.name === filter);
+    if (machine) {
+      machine.checked = false;
+    }
+
     this.filterProducts();
   }
 
@@ -106,6 +126,26 @@ export class ShopComponent implements OnInit {
     }
   }
 
+  toggleFilter(): void {
+    this.isFilterOpen = !this.isFilterOpen;
+  }
+
+  toggleMachine(machine: Machine): void {
+    machine.checked = !machine.checked;
+
+    if (machine.checked) {
+      // Add to activeFilters if not already present
+      if (!this.activeFilters.includes(machine.name)) {
+        this.activeFilters.push(machine.name);
+      }
+    } else {
+      // Remove from activeFilters
+      this.activeFilters = this.activeFilters.filter(filter => filter !== machine.name);
+    }
+
+    this.filterProducts();
+  }
+
   private filterProducts(): void {
     let filtered = this.products;
 
@@ -117,16 +157,25 @@ export class ShopComponent implements OnInit {
       );
     }
 
-    if (this.discountedControl.value) {
-      filtered = filtered.filter(product => product.price > 0);
-    }
-
+    // Use activeFilters for machine filtering
     if (this.activeFilters.length > 0) {
       filtered = filtered.filter(product =>
         this.activeFilters.some(filter => product.name.includes(filter))
       );
     }
 
+    if (this.discountedControl.value) {
+      filtered = filtered.filter(product => product.price > 0);
+    }
+
     this.filteredProducts = filtered;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const filterElement = document.querySelector('.shop__machine-filter');
+    if (!filterElement?.contains(event.target as Node)) {
+      this.isFilterOpen = false;
+    }
   }
 }

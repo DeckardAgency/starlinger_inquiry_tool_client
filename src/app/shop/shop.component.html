@@ -14,8 +14,8 @@
         <h2 class="shop__details-title">Product details</h2>
         <button class="shop__wishlist-btn">
           <span class="material-icons">
-                <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.333 8h9.334M8 3.333v9.334" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
+            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.333 8h9.334M8 3.333v9.334" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
           Add to Wishlist
         </button>
       </div>
@@ -156,9 +156,9 @@
 
   <div class="shop__filters">
     <div class="shop__search">
-                <span class="material-icons">
-                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m14 14-2.867-2.867m1.534-3.8A5.333 5.333 0 1 1 2 7.333a5.333 5.333 0 0 1 10.667 0Z" stroke="#71717A" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </span>
+        <span class="material-icons">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m14 14-2.867-2.867m1.534-3.8A5.333 5.333 0 1 1 2 7.333a5.333 5.333 0 0 1 10.667 0Z" stroke="#71717A" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
       <input
         type="text"
         [formControl]="searchControl"
@@ -168,22 +168,55 @@
     </div>
 
     <div class="shop__machine-filter">
-      <button class="shop__filter-btn">
-            <span class="material-icons">
-              <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 4h12M5.167 8h6.666m-4.666 4h2.666" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
+      <button class="shop__filter-btn" (click)="toggleFilter()">
+        <span class="material-icons">
+          <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 4h12M5.167 8h6.666m-4.666 4h2.666"
+                  stroke="#232323"
+                  stroke-width="1.33"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+          </svg>
+        </span>
         Filter by machine
+        <span class="material-icons filter-arrow" [class.open]="isFilterOpen">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="m4 6 4 4 4-4" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
       </button>
+
+      @if (isFilterOpen) {
+        <div class="shop__filter-dropdown">
+          @for (machine of machines; track machine.id) {
+            <label class="shop__filter-option">
+              <input
+                type="checkbox"
+                [checked]="machine.checked"
+                (change)="toggleMachine(machine)"
+              >
+              <span class="shop__filter-checkbox"></span>
+              <span class="shop__filter-label">{{ machine.name }}</span>
+            </label>
+          }
+        </div>
+      }
+
     </div>
   </div>
 
   @if (activeFilters.length > 0) {
     <div class="shop__active-filters">
+      <span>Active filters:</span>
       @for (filter of activeFilters; track filter) {
         <div class="shop__filter-tag">
           {{ filter }}
           <button class="shop__filter-remove" (click)="removeFilter(filter)">
-            <span class="material-icons">close</span>
+            <span class="material-icons">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#71717A" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
           </button>
         </div>
       }

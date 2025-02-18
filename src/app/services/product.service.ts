@@ -7,7 +7,7 @@ import { ProductResponse } from '../interfaces/product.interface';
   providedIn: 'root'
 })
 export class ProductService {
-  private apiUrl = 'https://127.0.0.1:8002/api/v1/products';
+  private apiUrl = 'https://127.0.0.1:8002/api/v1/products?itemsPerPage=300';
 
   constructor(private http: HttpClient) {}
 

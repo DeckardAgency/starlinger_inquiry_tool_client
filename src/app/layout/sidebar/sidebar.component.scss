@@ -32,7 +32,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
   }
 
   &__nav {
@@ -90,7 +89,17 @@
   }
 
   &__nested-list {
+    position: relative;
     margin-top: 4px;
+    &::before {
+      content: "";
+      width: 1px;
+      height: 100%;
+      background-color: #E5E7EB;
+      position: absolute;
+      left: 25px;
+      top: 0;
+    }
   }
 
   &__item {
@@ -112,7 +121,7 @@
     text-decoration: none;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    width: 100%;
+    width: auto;
     border: none;
     background: none;
     text-align: left;

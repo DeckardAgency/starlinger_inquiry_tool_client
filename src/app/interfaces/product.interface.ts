@@ -17,6 +17,7 @@ export interface Product {
   shortDescription: string;
   technicalDescription: string;
   price: number;
+  weight: string;
   createdAt: string;
   updatedAt: string;
 }
