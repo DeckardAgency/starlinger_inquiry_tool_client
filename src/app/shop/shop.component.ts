@@ -159,9 +159,42 @@ export class ShopComponent implements OnInit {
 
     // Use activeFilters for machine filtering
     if (this.activeFilters.length > 0) {
-      filtered = filtered.filter(product =>
-        this.activeFilters.some(filter => product.name.includes(filter))
-      );
+      // Check if "200XE Winding Machine" is selected
+      if (this.activeFilters.includes('200XE Winding Machine')) {
+        // Create demo products array
+        const demoProducts = [
+          {
+            id: '1',
+            name: 'Power Control 200XE',
+            partNo: 'PC-200XE-001',
+            price: 599.99,
+            shortDescription: 'Power control unit for 200XE Winding Machine',
+            technicalDescription: '24V DC, 500W, IP65'
+          },
+          {
+            id: '2',
+            name: 'Sensor Module 200XE',
+            partNo: 'SM-200XE-002',
+            price: 299.99,
+            shortDescription: 'High-precision sensor module for 200XE',
+            technicalDescription: 'Accuracy ±0.01mm, Response time 1ms'
+          },
+          {
+            id: '3',
+            name: 'Control Panel 200XE',
+            partNo: 'CP-200XE-003',
+            price: 449.99,
+            shortDescription: 'Touch control panel for 200XE series',
+            technicalDescription: '7" TFT, IP54, Multi-touch'
+          }
+        ] as Product[];
+
+        filtered = demoProducts;
+      } else {
+        filtered = filtered.filter(product =>
+          this.activeFilters.some(filter => product.name.includes(filter))
+        );
+      }
     }
 
     if (this.discountedControl.value) {
