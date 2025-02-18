@@ -1,18 +1,121 @@
+<!-- src/app/layout/sidebar/sidebar.component.html -->
 <div class="sidebar" [class.sidebar--collapsed]="isCollapsed()">
-<!--  <button class="sidebar__toggle" (click)="toggleSidebar()">-->
-<!--    <span class="sidebar__toggle-icon" [class.sidebar__toggle-icon&#45;&#45;rotated]="isCollapsed()">❯</span>-->
-<!--  </button>-->
-
   <div class="sidebar__content">
     <nav class="sidebar__nav">
       <ul class="sidebar__list">
-        <li class="sidebar__item">
-          <a routerLink="/dashboard" routerLinkActive="sidebar__link--active" class="sidebar__link">Dashboard</a>
+        <li class="sidebar__item sidebar__top">
+          <a routerLink="/dashboard" routerLinkActive="sidebar__link--active" class="sidebar__link">
+            <span class="icon-home sidebar__icon">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14.667V8h4v6.667M2 6l6-4.667L14 6v7.333a1.334 1.334 0 0 1-1.333 1.334H3.333A1.334 1.334 0 0 1 2 13.333V6Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="sidebar__link-text">Dashboard</span>
+          </a>
+          <button class="sidebar__toggle" (click)="toggleSidebar()">
+            <span class="icon-collapse sidebar__icon" [class.sidebar__icon--rotated]="isCollapsed()">
+              <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 2v12m4.667-4-2-2 2-2M3.333 2h9.334C13.403 2 14 2.597 14 3.333v9.334c0 .736-.597 1.333-1.333 1.333H3.333A1.333 1.333 0 0 1 2 12.667V3.333C2 2.597 2.597 2 3.333 2Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </button>
         </li>
-        <li class="sidebar__item">
-          <a routerLink="/shop" routerLinkActive="sidebar__link--active" class="sidebar__link">Shop</a>
+
+        <li class="sidebar__section">
+          <h2 class="sidebar__section-title">Inquiry hub</h2>
+          <ul class="sidebar__sub-list">
+            <li class="sidebar__item">
+              <a routerLink="/shop" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                <span class="icon-shop sidebar__icon">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><path d="m1.333 4.667 2.94-2.94a1.333 1.333 0 0 1 .947-.394h5.56a1.334 1.334 0 0 1 .947.394l2.94 2.94m-13.334 0h13.334m-13.334 0v2A1.333 1.333 0 0 0 2.667 8m12-3.333v2A1.333 1.333 0 0 1 13.333 8M2.667 8v5.333A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V8M2.667 8a1.8 1.8 0 0 0 1.06-.42.467.467 0 0 1 .546 0 1.8 1.8 0 0 0 1.06.42 1.8 1.8 0 0 0 1.06-.42.467.467 0 0 1 .547 0A1.8 1.8 0 0 0 8 8a1.8 1.8 0 0 0 1.06-.42.467.467 0 0 1 .547 0 1.8 1.8 0 0 0 1.06.42 1.8 1.8 0 0 0 1.06-.42.467.467 0 0 1 .546 0 1.8 1.8 0 0 0 1.06.42M10 14.667V12a1.333 1.333 0 0 0-1.333-1.333H7.333A1.333 1.333 0 0 0 6 12v2.667" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
+                </span>
+                <span class="sidebar__link-text">Shop</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a routerLink="/manual-entry" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                <span class="icon-manual-entry sidebar__icon">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 10v2.667A1.334 1.334 0 0 1 12.667 14H3.333A1.334 1.334 0 0 1 2 12.667V10m9.333-4.667L8 2m0 0L4.667 5.333M8 2v8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="sidebar__link-text">Manual entry</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a routerLink="/inquiry-tool" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                <i class="icon-inquiry-tool sidebar__icon"></i>
+                <span class="sidebar__link-text">Inquiry Tool</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <button class="sidebar__link sidebar__submenu-toggle"
+                      (click)="toggleInquiriesMenu()"
+                      [class.sidebar__submenu-toggle--expanded]="isInquiriesExpanded()">
+                <i class="icon-folder sidebar__icon"></i>
+                <span class="sidebar__link-text">My Inquiries</span>
+                <i class="icon-chevron sidebar__icon sidebar__submenu-icon"
+                   [class.sidebar__submenu-icon--rotated]="isInquiriesExpanded()"></i>
+              </button>
+              @if (isInquiriesExpanded()) {
+                <ul class="sidebar__nested-list">
+                  <li class="sidebar__item sidebar__item--indented">
+                    <a routerLink="/active-inquiries" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                      <i class="icon-active sidebar__icon"></i>
+                      <span class="sidebar__link-text">Active</span>
+                    </a>
+                  </li>
+                  <li class="sidebar__item sidebar__item--indented">
+                    <a routerLink="/inquiry-history" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                      <i class="icon-history sidebar__icon"></i>
+                      <span class="sidebar__link-text">History</span>
+                    </a>
+                  </li>
+                </ul>
+              }
+            </li>
+          </ul>
+        </li>
+
+        <li class="sidebar__section">
+          <h2 class="sidebar__section-title">Machine hub</h2>
+          <ul class="sidebar__sub-list">
+            <li class="sidebar__item">
+              <a routerLink="/my-machines" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                <i class="icon-machine sidebar__icon"></i>
+                <span class="sidebar__link-text">My Machines</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a routerLink="/all-machines" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                <i class="icon-view-all sidebar__icon"></i>
+                <span class="sidebar__link-text">View All Machines</span>
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>
+
+    <div class="sidebar__footer">
+      <ul class="sidebar__list">
+        <li class="sidebar__item">
+          <a routerLink="/support" routerLinkActive="sidebar__link--active" class="sidebar__link">
+            <i class="icon-support sidebar__icon"></i>
+            <span class="sidebar__link-text">Support</span>
+          </a>
+        </li>
+        <li class="sidebar__item">
+          <a routerLink="/documentation" routerLinkActive="sidebar__link--active" class="sidebar__link">
+            <i class="icon-documentation sidebar__icon"></i>
+            <span class="sidebar__link-text">Documentation</span>
+          </a>
+        </li>
+        <li class="sidebar__divider"></li>
+        <li class="sidebar__item">
+          <div class="sidebar__user">
+            <i class="icon-user sidebar__icon"></i>
+            <div class="sidebar__user-info">
+              <span class="sidebar__user-name">Anes</span>
+              <span class="sidebar__user-role">Administrator</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>

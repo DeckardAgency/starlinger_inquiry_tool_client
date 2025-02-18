@@ -1,0 +1,13 @@
+<nav class="breadcrumbs">
+  <a [routerLink]="['/']" class="breadcrumbs__home">
+    <span class="material-icons">home</span>
+  </a>
+  @for (item of items; track $index) {
+    <span class="breadcrumbs__separator">/</span>
+    @if (item.link) {
+      <a [routerLink]="[item.link]" class="breadcrumbs__link">{{ item.label }}</a>
+    } @else {
+      <span class="breadcrumbs__current">{{ item.label }}</span>
+    }
+  }
+</nav>
