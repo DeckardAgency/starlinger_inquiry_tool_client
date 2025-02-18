@@ -118,7 +118,6 @@ $spacing-xl: 24px;
   // Details Section
   &__details {
     display: flex;
-    flex-direction: column;
     gap: $spacing-lg;
     padding: $spacing-xl 0;
     border-top: 1px solid $color-border;
@@ -130,14 +129,20 @@ $spacing-xl: 24px;
     display: flex;
     align-items: flex-start;
     gap: $spacing-md;
+    width: 50%;
+    background-color: #F4F4F5;
+    padding: 12px;
+    border-radius: 6px;
 
     &-icon {
+      padding: 6px;
       width: 24px;
       height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: $color-text-medium;
+      background-color: #ffffff;
     }
 
     &-content {
