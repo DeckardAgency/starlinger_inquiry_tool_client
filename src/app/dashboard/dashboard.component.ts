@@ -1,4 +1,3 @@
-// src/app/dashboard/dashboard.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {QuickActionsComponent} from '../components/quick-actions/quick-actions.component';
@@ -16,17 +15,7 @@ import {BreadcrumbsComponent} from '../components/breadcrumbs/breadcrumbs.compon
     ActivityHistoryComponent,
     BreadcrumbsComponent
   ],
-  template: `
-    <div class="dashboard">
-      <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-      <div class="dashboard__content">
-        <app-quick-actions></app-quick-actions>
-        <app-active-inquiries></app-active-inquiries>
-        <app-activity-history></app-activity-history>
-      </div>
-    </div>
-  `,
+  templateUrl: "dashboard.component.html",
   styles: [`
     .dashboard {
       min-height: 100%;
