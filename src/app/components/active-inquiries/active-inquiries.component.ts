@@ -18,16 +18,12 @@ interface Inquiry {
     <section class="active-inquiries">
       <div class="active-inquiries__header">
         <h2 class="active-inquiries__title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 7.5v3.333m0 3.334h.008m2.492-12.5H5a1.667 1.667 0 0 0-1.667 1.666v13.334A1.666 1.666 0 0 0 5 18.333h10a1.666 1.666 0 0 0 1.667-1.666V5.833L12.5 1.667Z" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Active Inquiries
         </h2>
         <a routerLink="/inquiries" class="active-inquiries__view-all">
           View all
-          <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4.167 10h11.666m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m6 12 4-4-4-4" stroke="#DC2626" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
 
@@ -36,18 +32,14 @@ interface Inquiry {
           <a [routerLink]="['/inquiries', inquiry.id]" class="inquiry-card">
             <div class="inquiry-card__header">
               <div class="inquiry-card__icon">
-                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15.833 4.167H4.167C3.247 4.167 2.5 4.913 2.5 5.833v8.334c0 .92.746 1.666 1.667 1.666h11.666c.92 0 1.667-.746 1.667-1.666V5.833c0-.92-.746-1.666-1.667-1.666Z" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13.333 13.333 15 15l3.333-3.333M17.5 8.333V6.667a1.667 1.667 0 0 0-.833-1.442l-5.834-3.333a1.666 1.666 0 0 0-1.666 0L3.333 5.225A1.667 1.667 0 0 0 2.5 6.667v6.666a1.667 1.667 0 0 0 .833 1.442l5.834 3.333a1.666 1.666 0 0 0 1.666 0l1.667-.95m-6.25-13.6 7.5 4.292M2.742 5.833 10 10m0 0 7.258-4.167M10 10v8.333" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
               <span class="inquiry-card__id">Inquiry #{{ inquiry.id }}</span>
             </div>
 
             <div class="inquiry-card__machine">
               <div class="inquiry-card__machine-icon">
-                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.583 7.083 7.5 10l-2.917 2.917L1.667 10l2.916-2.917ZM10 1.667l2.917 2.916L10 7.5 7.083 4.583 10 1.667ZM15.417 7.083 18.333 10l-2.916 2.917L12.5 10l2.917-2.917ZM10 12.5l2.917 2.917L10 18.333l-2.917-2.916L10 12.5Z"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h20v20H0z"/></clipPath></defs></svg>
               </div>
               <div class="inquiry-card__machine-info">
                 <span class="inquiry-card__label">Machine model</span>
@@ -58,9 +50,7 @@ interface Inquiry {
             <div class="inquiry-card__details">
               <div class="inquiry-card__detail">
                 <div class="inquiry-card__detail-icon">
-                  <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13.333 2.5H6.667A1.667 1.667 0 0 0 5 4.167v11.666A1.667 1.667 0 0 0 6.667 17.5h6.666a1.667 1.667 0 0 0 1.667-1.667V4.167A1.667 1.667 0 0 0 13.333 2.5Z" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                  <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.667 1.667V5m6.666-3.333V5M2.5 8.333h15M6.667 11.667h.008m3.325 0h.008m3.325 0h.009M6.667 15h.008M10 15h.008m3.325 0h.009M4.167 3.333h11.666c.92 0 1.667.746 1.667 1.667v11.667c0 .92-.746 1.666-1.667 1.666H4.167c-.92 0-1.667-.746-1.667-1.666V5c0-.92.746-1.667 1.667-1.667Z" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div class="inquiry-card__detail-info">
                   <span class="inquiry-card__label">Date created</span>
@@ -70,9 +60,7 @@ interface Inquiry {
 
               <div class="inquiry-card__detail">
                 <div class="inquiry-card__detail-icon">
-                  <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.5 5h15M6.667 5V3.333A1.667 1.667 0 0 1 8.333 1.667h3.334a1.667 1.667 0 0 1 1.666 1.666V5m2.5 0v11.667a1.667 1.667 0 0 1-1.666 1.666H5.833a1.667 1.667 0 0 1-1.666-1.666V5h11.666Z" stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
+                  <svg width="21" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke="#71717A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13.333V6.667a1.667 1.667 0 0 0-.833-1.442l-5.834-3.333a1.666 1.666 0 0 0-1.666 0L3.833 5.225A1.667 1.667 0 0 0 3 6.667v6.666a1.667 1.667 0 0 0 .833 1.442l5.834 3.333a1.666 1.666 0 0 0 1.666 0l5.834-3.333A1.668 1.668 0 0 0 18 13.333Z"/><path d="M10.5 13.333a3.333 3.333 0 1 0 0-6.666 3.333 3.333 0 0 0 0 6.666Z"/></g></svg>
                 </div>
                 <div class="inquiry-card__detail-info">
                   <span class="inquiry-card__label">Parts ordered</span>
@@ -85,9 +73,11 @@ interface Inquiry {
               <span class="inquiry-card__status-badge" [class]="'inquiry-card__status-badge--' + inquiry.status.toLowerCase()">
                 {{ inquiry.status }}
               </span>
-              <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4.167 10h11.666m0 0-5-5m5 5-5 5" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+              <span class="inquiry-card__status-arrow">
+                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.167 10h11.666m0 0-5-5m5 5-5 5" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
             </div>
           </a>
         }
@@ -137,10 +127,11 @@ interface Inquiry {
 
     .inquiry-card {
       background: white;
-      border-radius: 1rem;
       padding: 1.5rem;
       text-decoration: none;
       transition: all 0.2s;
+      border-radius: 6px;
+      border: 1px solid #E4E4E7;
 
       &:hover {
         transform: translateY(-2px);
@@ -253,6 +244,16 @@ interface Inquiry {
           background: #DCFCE7;
           color: #16A34A;
         }
+      }
+
+      &__status-arrow {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        border: 1px solid #E4E4E7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   `]

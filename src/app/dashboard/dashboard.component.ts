@@ -22,7 +22,7 @@ import {BreadcrumbsComponent} from '../components/breadcrumbs/breadcrumbs.compon
       background: #FAFAFA;
 
       &__content {
-        padding: 1.5rem;
+        padding: 16px 1.5rem;
       }
     }
   `]

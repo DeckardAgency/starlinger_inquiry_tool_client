@@ -1,3 +1,14 @@
+export interface MediaItem {
+  '@id': string;
+  '@type': string;
+  id: string;
+  filename: string;
+  mimeType: string;
+  filePath: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProductResponse {
   '@context': string;
   '@id': string;
@@ -18,6 +29,7 @@ export interface Product {
   technicalDescription: string;
   price: number;
   weight: string;
+  featuredImage: MediaItem;
   createdAt: string;
   updatedAt: string;
 }

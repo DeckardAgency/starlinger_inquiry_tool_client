@@ -30,9 +30,7 @@ interface InquiryHistory {
         </h2>
         <a routerLink="/history" class="activity-history__view-all">
           View all
-          <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4.167 10h11.666m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m6 12 4-4-4-4" stroke="#DC2626" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
 
