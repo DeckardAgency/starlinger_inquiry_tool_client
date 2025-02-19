@@ -208,8 +208,10 @@ $spacing-xl: 24px;
   }
 
   &__add-btn {
-    flex: 1;
+    margin-left: auto;
     height: 42px;
+    padding-left: 16px;
+    padding-right: 16px;
     background: $color-primary;
     color: $color-white;
     border: none;
@@ -222,9 +224,18 @@ $spacing-xl: 24px;
     justify-content: center;
     gap: $spacing-sm;
     transition: background-color 0.2s;
+    width: fit-content;
 
     &:hover {
       background: $color-primary-dark;
+    }
+
+    &__add-btn-icon {
+
+      margin-left: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }
