@@ -14,7 +14,7 @@
   z-index: 80;
 
   &--collapsed {
-    width: 60px;
+    width: 52px;
 
     #{$self}__link-text,
     #{$self}__section-title,
@@ -25,6 +25,10 @@
 
     #{$self}__nested-list {
       display: none;
+    }
+
+    .sidebar__toggle {
+      right: -14px;
     }
   }
 
