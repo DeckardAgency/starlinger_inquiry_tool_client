@@ -61,12 +61,12 @@
     flex: 1;
     height: 32px;
     padding: 8px 120px 8px 40px;
-    background: #27272A;
-    border: 1px solid #3F3F46;
-    border-radius: 6px;
     color: #F4F4F5;
     font-size: 14px;
     width: 100%;
+    border-radius: 12px;
+    border: 1px solid #232323;
+    background-color: #232323;
 
     &::placeholder {
       color: #71717A;

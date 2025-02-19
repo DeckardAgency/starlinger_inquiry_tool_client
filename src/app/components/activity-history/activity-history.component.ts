@@ -51,12 +51,7 @@ interface InquiryHistory {
             <tr>
               <th>Inquiry ID</th>
               <th>Machine model</th>
-              <th>
-                Date Created
-                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 7.5h10M5 12.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-              </th>
+              <th>Date Created</th>
               <th>Customer</th>
               <th>Parts ordered</th>
               <th>Status</th>
@@ -101,15 +96,12 @@ interface InquiryHistory {
   `,
   styles: [`
     .activity-history {
-      background: white;
-      border-radius: 1rem;
-      padding: 1.5rem;
 
       &__header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0;
       }
 
       &__title {
@@ -138,19 +130,18 @@ interface InquiryHistory {
       &__tabs {
         display: flex;
         gap: 1rem;
-        margin-bottom: 1.5rem;
         border-bottom: 1px solid #E4E4E7;
-        padding-bottom: 1rem;
       }
 
       &__tab {
-        padding: 0.5rem 1rem;
+        padding: 1rem 2rem;
         border: none;
         background: none;
         color: #71717A;
-        font-weight: 500;
+        font-weight: 400;
         cursor: pointer;
         transition: all 0.2s;
+        opacity: 0.5;
 
         &:hover {
           color: #18181B;
@@ -159,11 +150,12 @@ interface InquiryHistory {
         &--active {
           color: #DC2626;
           position: relative;
+          opacity: 1;
 
           &::after {
             content: '';
             position: absolute;
-            bottom: -1rem;
+            bottom: 0;
             left: 0;
             width: 100%;
             height: 2px;
@@ -180,10 +172,14 @@ interface InquiryHistory {
         width: 100%;
         border-collapse: collapse;
 
+        thead {
+          background-color: #ffffff;
+        }
+
         th {
           text-align: left;
           padding: 1rem;
-          font-weight: 500;
+          font-weight: 400;
           color: #71717A;
           border-bottom: 1px solid #E4E4E7;
 
@@ -194,7 +190,7 @@ interface InquiryHistory {
         }
 
         td {
-          padding: 1rem;
+          padding: 0.5rem 1rem;
           border-bottom: 1px solid #E4E4E7;
           color: #18181B;
         }

@@ -26,7 +26,7 @@ import { CommonModule } from '@angular/common';
       <div class="quick-cart__content">
         <div class="cart-item">
           <div class="cart-item__image">
-            <img src="/api/placeholder/80/80" alt="Product" />
+            <img src="https://via.assets.so/img.jpg?w=80&h=80" alt="Product" />
           </div>
           <div class="cart-item__details">
             <div class="cart-item__info">
