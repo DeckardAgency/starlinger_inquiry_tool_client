@@ -2,7 +2,7 @@
   <div class="product-card__image">
     <img
       class="product-card__img"
-      [src]="'https://127.0.0.1:8002/' + product.featuredImage?.filePath"
+      [src]="environment.apiBaseUrl + product.featuredImage?.filePath"
       [alt]="product.name"
       onerror="this.src='https://via.assets.so/img.jpg?w=600&h=400'"
     >

@@ -8,6 +8,7 @@ import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ProductCardComponent } from '../components/product-card/product-card.component';
+import { environment } from '../../../environment';
 
 export interface Machine {
   id: string;
@@ -19,10 +20,11 @@ export interface Machine {
   selector: 'app-shop',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent, ProductCardComponent],
-  templateUrl: './shop.component.html',
-  styleUrls: ['./shop.component.scss']
+  templateUrl: 'shop.component.html',
+  styleUrls: ['shop.component.scss']
 })
 export class ShopComponent implements OnInit {
+  environment = environment;
   products: Product[] = [];
   filteredProducts: Product[] = [];
   selectedProduct: Product | null = null;

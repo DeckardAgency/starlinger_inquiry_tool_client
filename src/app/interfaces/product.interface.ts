@@ -29,7 +29,7 @@ export interface Product {
   technicalDescription: string;
   price: number;
   weight: string;
-  featuredImage: MediaItem;
+  featuredImage: MediaItem | null; // Explicitly allow null
   createdAt: string;
   updatedAt: string;
 }

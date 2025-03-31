@@ -258,7 +258,7 @@
               >
                 <div class="shop__product-image">
                   <img
-                    [src]="'https://127.0.0.1:8002/' + product.featuredImage?.filePath"
+                    [src]="environment.apiBaseUrl + product.featuredImage?.filePath"
                     [alt]="product.name"
                     onerror="this.src='https://via.assets.so/img.jpg?w=270&h=160'"
                   >

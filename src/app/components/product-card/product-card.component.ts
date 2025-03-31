@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../interfaces/product.interface';
+import { environment } from '../../../../environment';
 
 @Component({
   selector: 'app-product-card',
@@ -11,6 +12,7 @@ import { Product } from '../../interfaces/product.interface';
   templateUrl: './product-card.component.html',
 })
 export class ProductCardComponent implements OnInit {
+  environment = environment;
   @Input() product!: Product;
   quantity: number = 1;
 
