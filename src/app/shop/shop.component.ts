@@ -5,10 +5,13 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../services/product.service';
+import { QuickCartService } from '../services/quick-cart.service';
+import { CartService } from '../services/cart.service';
 import { Product } from '../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ProductCardComponent } from '../components/product-card/product-card.component';
 import { environment } from '../../../environment';
+import { ArticleItemComponent } from '../components/article-item/article-item.component';
 
 export interface Machine {
   id: string;
@@ -19,7 +22,14 @@ export interface Machine {
 @Component({
   selector: 'app-shop',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent, ProductCardComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    BreadcrumbsComponent,
+    ProductCardComponent,
+    ArticleItemComponent
+  ],
   templateUrl: 'shop.component.html',
   styleUrls: ['shop.component.scss']
 })
@@ -52,7 +62,11 @@ export class ShopComponent implements OnInit {
     { label: 'All machines', link: '/shop/machines' }
   ];
 
-  constructor(private productService: ProductService) {
+  constructor(
+    private productService: ProductService,
+    private quickCartService: QuickCartService,
+    private cartService: CartService
+  ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -94,6 +108,9 @@ export class ShopComponent implements OnInit {
       this.relatedProducts = this.products
         .filter(p => p.id !== product.id)
         .slice(0, 6);
+
+      // Reset quantity when selecting a new product
+      this.quantityControl.setValue(1);
     }
   }
 
@@ -146,6 +163,17 @@ export class ShopComponent implements OnInit {
     }
 
     this.filterProducts();
+  }
+
+  // Add selected product to cart from the detail view
+  addSelectedProductToCart(): void {
+    if (this.selectedProduct) {
+      const quantity = this.quantityControl.value || 1;
+      this.quickCartService.addToCart(this.selectedProduct, quantity);
+
+      // Reset quantity after adding to cart
+      this.quantityControl.setValue(1);
+    }
   }
 
   private filterProducts(): void {

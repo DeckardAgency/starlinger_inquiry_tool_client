@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../interfaces/product.interface';
 import { environment } from '../../../../environment';
+import { QuickCartService } from '../../services/quick-cart.service';
 
 @Component({
   selector: 'app-product-card',
@@ -15,6 +16,8 @@ export class ProductCardComponent implements OnInit {
   environment = environment;
   @Input() product!: Product;
   quantity: number = 1;
+
+  constructor(private quickCartService: QuickCartService) {}
 
   ngOnInit() {
     // Validate product data
@@ -42,5 +45,15 @@ export class ProductCardComponent implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+  }
+
+  // Method to add the product to cart
+  addToCart(): void {
+    console.log('addToCart')
+    if (this.product) {
+      this.quickCartService.addToCart(this.product, this.quantity);
+      // Reset quantity after adding to cart
+      this.quantity = 1;
+    }
   }
 }

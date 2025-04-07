@@ -3,6 +3,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ShopComponent } from './shop/shop.component';
 import {ManualEntryComponent} from './manual-entry/manual-entry.component';
 import {InquiryToolComponent} from './inquiry-tool/inquiry-tool.component';
+import {CartComponent} from './cart/cart.component';
 
 export const routes: Routes = [
   {
@@ -29,5 +30,10 @@ export const routes: Routes = [
     path: 'inquiry-tool',
     component: InquiryToolComponent,
     title: 'Inquiry Tool | Inquiry Tool'
+  },
+  {
+    path: 'cart',
+    component: CartComponent,
+    title: 'Inquiry Tool | Cart'
   }
 ];

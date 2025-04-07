@@ -1,0 +1,71 @@
+<div
+  class="quick-cart"
+  [class.quick-cart--open]="isOpen"
+  (click)="$event.stopPropagation()"
+>
+  <div class="quick-cart__header">
+    <div class="quick-cart__title">
+      <h2>Cart overview</h2>
+      <span class="quick-cart__count">{{ quickCartService.getTotalItems() }}</span>
+    </div>
+    <button class="quick-cart__close" (click)="onClose()">
+      <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="quick-cart__content">
+    @if ((cartItems$ | async)?.length === 0) {
+      <div class="quick-cart__empty">
+        <p>Your cart is empty</p>
+      </div>
+    } @else {
+      @for (item of cartItems$ | async; track item.product.id) {
+        <div class="cart-item">
+          <div class="cart-item__image">
+            <img src="https://via.assets.so/img.jpg?w=80&h=80" alt="{{ item.product.name }}" />
+          </div>
+          <div class="cart-item__details">
+            <div class="cart-item__info">
+              <div class="cart-item__name">{{ item.product.name }}</div>
+              <div class="cart-item__part-number">{{ item.product.partNo }}</div>
+            </div>
+            <div class="cart-item__quantity">
+              <button class="cart-item__qty-btn" (click)="decrementItemQuantity(item.product.id, item.quantity)">-</button>
+              <input type="text" class="cart-item__qty-input" [value]="item.quantity" (change)="updateItemQuantity(item.product.id, $event)" />
+              <button class="cart-item__qty-btn" (click)="incrementItemQuantity(item.product.id, item.quantity)">+</button>
+              <div class="cart-item__price">€ {{ formatPrice(item.product.price * 0.8 * item.quantity) }}</div>
+              <button class="cart-item__remove" (click)="removeItem(item.product.id)">
+                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2.5 5h15M6.667 5V3.333A1.667 1.667 0 0 1 8.333 1.667h3.334a1.667 1.667 0 0 1 1.666 1.666V5m2.5 0v11.667a1.667 1.667 0 0 1-1.666 1.666H5.833a1.667 1.667 0 0 1-1.666-1.666V5h11.666Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <div class="quick-cart__footer">
+    <div class="quick-cart__shipping">
+      <span>Shipping & handling</span>
+      <span>€ 49,00</span>
+    </div>
+    <div class="quick-cart__total">
+      <span>Total</span>
+      <span>€ {{ calculateTotal() }}</span>
+    </div>
+    <div class="quick-cart__actions">
+      <button class="quick-cart__back" (click)="onClose()">Back to product list</button>
+      <button class="quick-cart__order" [disabled]="(quickCartService.getTotalItems() === 0)">Place order</button>
+    </div>
+  </div>
+</div>
+
+<div
+  class="quick-cart-overlay"
+  [class.quick-cart-overlay--visible]="isOpen"
+  (click)="onClose()"
+></div>
