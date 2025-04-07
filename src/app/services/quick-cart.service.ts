@@ -16,7 +16,7 @@ export class QuickCartService {
     return this.openStateSubject.value;
   }
 
-  constructor(private cartService: CartService) {}
+  constructor(public cartService: CartService) {}
 
   // Open the cart
   public open(): void {

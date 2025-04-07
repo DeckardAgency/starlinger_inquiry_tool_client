@@ -1,1 +1,125 @@
-<h2>Cart page</h2>
+<div class="cart">
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+  <div class="cart__header">
+    <h1 class="cart__title">Your Cart</h1>
+  </div>
+
+  @if (cartItems.length > 0) {
+    <div class="cart__container">
+      <div class="cart__items">
+        <div class="cart__table-header">
+          <div class="cart__header-product">Product</div>
+          <div class="cart__header-price">Price</div>
+          <div class="cart__header-quantity">Quantity</div>
+          <div class="cart__header-total">Total</div>
+          <div class="cart__header-actions"></div>
+        </div>
+
+        @for (item of cartItems; track item.product.id) {
+          <div class="cart__item">
+            <div class="cart__product-info">
+              <div class="cart__product-image">
+                <img src="/assets/images/placeholder.png" alt="{{ item.product.name }}">
+              </div>
+              <div class="cart__product-details">
+                <h3 class="cart__product-name">{{ item.product.name }}</h3>
+                <p class="cart__product-id">Part No: {{ item.product.partNo }}</p>
+                @if (item.product.shortDescription) {
+                  <p class="cart__product-description">{{ item.product.shortDescription }}</p>
+                }
+              </div>
+            </div>
+
+            <div class="cart__price">
+              <div class="cart__original-price">€{{ item.product.price.toFixed(2) }}</div>
+              <div class="cart__discounted-price">€{{ getDiscountedPrice(item.product.price).toFixed(2) }}</div>
+              <div class="cart__discount-tag">-20%</div>
+            </div>
+
+            <div class="cart__quantity-controls">
+              <button class="cart__quantity-btn" (click)="decrementQuantity(item.product.id)">
+                <span class="material-icons">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.333 8h9.334" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </button>
+              <input
+                type="number"
+                class="cart__quantity-input"
+                [value]="item.quantity"
+                (change)="updateQuantity(item.product.id, $event)"
+                min="1"
+              >
+              <button class="cart__quantity-btn" (click)="incrementQuantity(item.product.id)">
+                <span class="material-icons">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.333 8h9.334M8 3.333v9.334" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </button>
+            </div>
+
+            <div class="cart__item-total">
+              €{{ getItemTotal(item).toFixed(2) }}
+            </div>
+
+            <div class="cart__item-actions">
+              <button class="cart__remove-btn" (click)="removeItem(item.product.id)">
+                <span class="material-icons">
+                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 4h12m-9.333 0V2.667c0-.354.14-.693.39-.943s.59-.39.943-.39h2c.354 0 .693.14.943.39s.39.59.39.943V4m1.334 0v8c0 .354-.14.693-.39.943s-.59.39-.943.39h-4c-.354 0-.693-.14-.943-.39s-.39-.59-.39-.943V4" stroke="#DC2626" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="cart__summary">
+        <h2 class="cart__summary-title">Order Summary</h2>
+
+        <div class="cart__summary-row">
+          <span>Subtotal</span>
+          <span>€{{ cartSubtotal.toFixed(2) }}</span>
+        </div>
+
+        <div class="cart__summary-row">
+          <span>Discount</span>
+          <span class="cart__discount">-€{{ discountAmount.toFixed(2) }}</span>
+        </div>
+
+        <div class="cart__summary-row">
+          <span>Shipping</span>
+          <span>€{{ shippingCost.toFixed(2) }}</span>
+        </div>
+
+        <div class="cart__summary-total">
+          <span>Total</span>
+          <span>€{{ totalAmount.toFixed(2) }}</span>
+        </div>
+
+        <button class="cart__checkout-btn" (click)="checkout()">
+          Proceed to Checkout
+        </button>
+
+        <button class="cart__continue-btn" routerLink="/shop">
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="cart__empty">
+      <div class="cart__empty-icon">
+        <svg width="64" height="64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 56c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm24 0c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM5.01 8h5.42c1.23 0 2.28.88 2.5 2.08l6.06 31.92H47.1" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="cart__empty-title">Your cart is empty</h2>
+      <p class="cart__empty-text">Looks like you haven't added any products to your cart yet.</p>
+      <button class="cart__shop-btn" routerLink="/shop">Browse Products</button>
+    </div>
+  }
+</div>

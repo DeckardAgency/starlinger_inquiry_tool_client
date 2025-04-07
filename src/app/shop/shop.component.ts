@@ -5,7 +5,6 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/breadcrumbs.component';
 import { ProductService } from '../services/product.service';
-import { QuickCartService } from '../services/quick-cart.service';
 import { CartService } from '../services/cart.service';
 import { Product } from '../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -64,7 +63,6 @@ export class ShopComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private quickCartService: QuickCartService,
     private cartService: CartService
   ) {
     this.searchControl.valueChanges.pipe(
@@ -169,7 +167,7 @@ export class ShopComponent implements OnInit {
   addSelectedProductToCart(): void {
     if (this.selectedProduct) {
       const quantity = this.quantityControl.value || 1;
-      this.quickCartService.addToCart(this.selectedProduct, quantity);
+      this.cartService.addToCart(this.selectedProduct, quantity);
 
       // Reset quantity after adding to cart
       this.quantityControl.setValue(1);

@@ -31,7 +31,7 @@ export class QuickCartComponent implements OnInit, OnDestroy {
 
     // Subscribe to the final total with shipping
     this.subscriptions.push(
-      this.quickCartService['cartService'].getFinalTotal().subscribe(total => {
+      this.quickCartService.cartService.getFinalTotal().subscribe(total => {
         this.totalPrice = total;
       })
     );
@@ -76,16 +76,21 @@ export class QuickCartComponent implements OnInit, OnDestroy {
     this.quickCartService.removeFromCart(productId);
   }
 
+  // Calculate item price with discount
+  calculateItemPrice(price: number, quantity: number): number {
+    // Apply 20% discount
+    const discountedPrice = price * 0.8;
+    return discountedPrice * quantity;
+  }
+
   // Calculate total price including shipping
   calculateTotal(): string {
     // Get cart items to ensure we're working with the actual data
     let itemTotal = 0;
-    // @ts-ignore
-    const items = this.quickCartService['cartItems'];
 
     // Calculate manually if we have access to the items
-    if (items && items.length > 0) {
-      for (const item of items) {
+    if (this.cartItems && this.cartItems.length > 0) {
+      for (const item of this.cartItems) {
         const discountedPrice = item.product.price * 0.8;
         itemTotal += (discountedPrice * item.quantity);
       }

@@ -16,6 +16,10 @@ export class CartService {
   private shippingCost = 49.00; // Default shipping cost
   private isBrowser: boolean;
 
+  // Quick cart panel state
+  private readonly openStateSubject = new BehaviorSubject<boolean>(false);
+  public readonly isOpen$ = this.openStateSubject.asObservable();
+
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
 
@@ -28,6 +32,24 @@ export class CartService {
     }
   }
 
+  // Cart panel UI methods
+  public get isOpen(): boolean {
+    return this.openStateSubject.value;
+  }
+
+  public openCart(): void {
+    this.openStateSubject.next(true);
+  }
+
+  public closeCart(): void {
+    this.openStateSubject.next(false);
+  }
+
+  public toggleCart(): void {
+    this.openStateSubject.next(!this.openStateSubject.value);
+  }
+
+  // Cart data methods
   getCartItems(): Observable<CartItem[]> {
     return this.cartItems.asObservable();
   }
@@ -55,6 +77,34 @@ export class CartService {
     );
   }
 
+  // Calculate discounted price (20% discount)
+  getDiscountedPrice(originalPrice: number): number {
+    // Ensure price is a valid number
+    const price = Number(originalPrice) || 0;
+    return price * 0.8;
+  }
+
+  // Format price to two decimal places
+  formatPrice(price: number): string {
+    // Ensure price is a valid number
+    const validPrice = Number(price) || 0;
+    return validPrice.toFixed(2);
+  }
+
+  // Calculate and format the discounted total for an item
+  getFormattedItemTotal(item: CartItem): string {
+    if (!item || !item.product || typeof item.product.price !== 'number') {
+      console.warn('Invalid cart item or missing price:', item);
+      return '0.00';
+    }
+
+    const quantity = Number(item.quantity) || 0;
+    const discountedPrice = this.getDiscountedPrice(item.product.price);
+    const total = discountedPrice * quantity;
+    return this.formatPrice(total);
+  }
+
+  // Cart manipulation methods
   addToCart(product: Product, quantity: number = 1): void {
     const currentItems = this.cartItems.value;
     const existingItem = currentItems.find(item => item.product.id === product.id);
@@ -67,6 +117,8 @@ export class CartService {
     }
 
     this.saveCartToStorage();
+    // Automatically open the cart when adding items
+    this.openCart();
   }
 
   updateQuantity(productId: string, quantity: number): void {
