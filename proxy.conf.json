@@ -1,7 +1,7 @@
 {
   "/api": {
     "target": "https://phpstack-675879-5400964.cloudwaysapps.com",
-    "secure": false,
+    "secure": true,
     "changeOrigin": true,
     "logLevel": "debug"
   }
