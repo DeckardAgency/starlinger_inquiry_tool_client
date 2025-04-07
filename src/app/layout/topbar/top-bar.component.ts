@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CartService } from '../../services/cart.service';
+import { QuickCartService } from '../../services/quick-cart.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -11,6 +12,7 @@ import { Router } from '@angular/router';
 export class TopBarComponent {
   constructor(
     public cartService: CartService,
+    public quickCartService: QuickCartService,
     private router: Router
   ) {}
 

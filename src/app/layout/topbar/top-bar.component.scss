@@ -116,6 +116,7 @@
     color: #E4E4E7;
     cursor: pointer;
     transition: all 0.2s;
+    position: relative;
 
     &:hover {
       background: #27272A;
@@ -125,5 +126,27 @@
       width: 20px;
       height: 20px;
     }
+  }
+
+  &__cart-btn {
+    // Additional positioning for the cart button to handle the badge
+    position: relative;
+  }
+
+  &__cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #DC2626;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 }

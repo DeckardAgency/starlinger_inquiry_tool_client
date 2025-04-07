@@ -35,7 +35,7 @@
 }
 
 .quick-cart__header {
-  padding: 24px;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid #E5E7EB;
   display: flex;
   justify-content: space-between;
@@ -55,10 +55,10 @@
 }
 
 .quick-cart__count {
-  background-color: #DC2626;
-  color: white;
+  background-color: #F4F4F5;
+  color: #71717A;
   padding: 2px 8px;
-  border-radius: 16px;
+  border-radius: 6px;
   font-size: 14px;
 }
 

@@ -16,16 +16,7 @@ import {BreadcrumbsComponent} from '../components/breadcrumbs/breadcrumbs.compon
     BreadcrumbsComponent
   ],
   templateUrl: "dashboard.component.html",
-  styles: [`
-    .dashboard {
-      min-height: 100%;
-      background: #FAFAFA;
-
-      &__content {
-        padding: 16px 1.5rem;
-      }
-    }
-  `]
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
   breadcrumbs = [

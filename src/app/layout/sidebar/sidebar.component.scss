@@ -13,6 +13,10 @@
   margin-top: 80px;
   z-index: 80;
 
+  @media screen and (max-width: 834px) {
+    display: none;
+  }
+
   &--collapsed {
     width: 52px;
 

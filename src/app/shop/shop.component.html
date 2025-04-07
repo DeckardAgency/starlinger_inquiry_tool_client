@@ -4,14 +4,14 @@
 
   <div class="shop__header">
     <div class="shop__header-left">
-      <h1 class="shop__title">Products in Stock {{ totalItems }}</h1>
+      <h1 class="shop__title">Availible parts <span class="shop__title--total-items">{{ totalItems }}</span></h1>
     </div>
 
     <div class="shop__header-right">
       <div class="shop__controls">
         <div class="shop__view-controls">
           <button
-            class="shop__view-btn"
+            class="shop__view-btn shop__view-btn--disabled"
             [class.active]="viewMode === 'grid'"
             (click)="viewMode = 'grid'"
           >
