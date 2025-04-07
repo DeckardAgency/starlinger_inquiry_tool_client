@@ -3,15 +3,16 @@
   <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
   <div class="cart__header">
-    <h1 class="cart__title">Your Cart</h1>
+    <h1 class="cart__title">Cart overview</h1>
   </div>
 
   @if (cartItems.length > 0) {
     <div class="cart__container">
       <div class="cart__items">
         <div class="cart__table-header">
-          <div class="cart__header-product">Product</div>
+          <div class="cart__header-product">Item</div>
           <div class="cart__header-price">Price</div>
+          <div class="cart__header-price">Discount</div>
           <div class="cart__header-quantity">Quantity</div>
           <div class="cart__header-total">Total</div>
           <div class="cart__header-actions"></div>
@@ -34,8 +35,10 @@
 
             <div class="cart__price">
               <div class="cart__original-price">€{{ item.product.price.toFixed(2) }}</div>
+            </div>
+
+            <div class="cart__discount">
               <div class="cart__discounted-price">€{{ getDiscountedPrice(item.product.price).toFixed(2) }}</div>
-              <div class="cart__discount-tag">-20%</div>
             </div>
 
             <div class="cart__quantity-controls">

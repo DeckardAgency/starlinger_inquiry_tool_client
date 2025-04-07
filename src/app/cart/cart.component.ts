@@ -23,7 +23,6 @@ export class CartComponent implements OnInit, OnDestroy {
   private cartSubscription: Subscription | null = null;
 
   breadcrumbs: Breadcrumb[] = [
-    { label: 'Home', link: '/' },
     { label: 'Cart' }
   ];
 
