@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/breadcrumbs.component';
 import { CartService, CartItem } from '../services/cart.service';
 import { Subscription } from 'rxjs';
+import {QuickCartService} from '../services/quick-cart.service';
 
 @Component({
   selector: 'app-cart',
@@ -26,7 +27,10 @@ export class CartComponent implements OnInit, OnDestroy {
     { label: 'Cart' }
   ];
 
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    public quickCartService: QuickCartService,
+  ) {}
 
   ngOnInit(): void {
     // Subscribe to cart changes
