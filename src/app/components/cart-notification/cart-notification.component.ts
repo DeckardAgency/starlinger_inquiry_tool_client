@@ -23,6 +23,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 export class CartNotificationComponent implements OnInit, OnDestroy {
   @Input() visible = false;
   @Input() message = 'Product added to cart.';
+  @Input() type: 'success' | 'remove' = 'success';
   @Output() viewCart = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 
@@ -60,7 +61,7 @@ export class CartNotificationComponent implements OnInit, OnDestroy {
     this.clearAutoCloseTimer();
     this.timeoutId = setTimeout(() => {
       this.close.emit();
-    }, 50000); // Auto close after 5 seconds
+    }, 3000); // Auto close after 3 seconds
   }
 
   private clearAutoCloseTimer(): void {

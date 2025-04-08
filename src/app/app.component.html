@@ -12,6 +12,7 @@
   <app-cart-notification
     [visible]="(quickCartService.notificationVisible$ | async) ?? false"
     [message]="(quickCartService.lastAddedProduct$ | async) ?? 'Product added to cart.'"
+    [type]="(quickCartService.notificationType$ | async) ?? 'success'"
     (viewCart)="onViewCart()"
     (close)="hideNotification()"
   ></app-cart-notification>

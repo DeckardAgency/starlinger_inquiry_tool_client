@@ -23,6 +23,11 @@ export class QuickCartService {
     return this.cartService.lastAddedProduct$;
   }
 
+  // Access notification type
+  public get notificationType$(): Observable<'success' | 'remove'> {
+    return this.cartService.notificationType$;
+  }
+
   constructor(public cartService: CartService) {}
 
   // Open the cart
@@ -41,8 +46,13 @@ export class QuickCartService {
   }
 
   // Show notification
-  public showNotification(message?: string): void {
-    this.cartService.showNotification(message);
+  public showNotification(message?: string, type: 'success' | 'remove' = 'success'): void {
+    this.cartService.showNotification(message, type);
+  }
+
+  // Show remove notification
+  public showRemoveNotification(message?: string): void {
+    this.cartService.showRemoveNotification(message);
   }
 
   // Hide notification

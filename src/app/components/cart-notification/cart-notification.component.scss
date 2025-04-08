@@ -16,6 +16,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    &--remove {
+      background-color: #DC2626; // Red background for removal notification
+    }
   }
 
   &__message {

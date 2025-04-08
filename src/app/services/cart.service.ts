@@ -28,6 +28,10 @@ export class CartService {
   private lastAddedProductSubject = new BehaviorSubject<string>('Product added to cart.');
   public readonly lastAddedProduct$ = this.lastAddedProductSubject.asObservable();
 
+  // Notification type (success or remove)
+  private notificationTypeSubject = new BehaviorSubject<'success' | 'remove'>('success');
+  public readonly notificationType$ = this.notificationTypeSubject.asObservable();
+
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
 
@@ -62,11 +66,16 @@ export class CartService {
   }
 
   // Notification methods
-  public showNotification(message?: string): void {
+  public showNotification(message?: string, type: 'success' | 'remove' = 'success'): void {
     if (message) {
       this.lastAddedProductSubject.next(message);
     }
+    this.notificationTypeSubject.next(type);
     this.notificationVisibleSubject.next(true);
+  }
+
+  public showRemoveNotification(message: string = 'Product removed from cart.'): void {
+    this.showNotification(message, 'remove');
   }
 
   public hideNotification(): void {
@@ -171,9 +180,16 @@ export class CartService {
 
   removeFromCart(productId: string): void {
     const currentItems = this.cartItems.value;
+    // Find product name before removal
+    const product = currentItems.find(item => item.product.id === productId);
+    const productName = product?.product.name || 'Product';
+
     const updatedItems = currentItems.filter(item => item.product.id !== productId);
     this.cartItems.next(updatedItems);
     this.saveCartToStorage();
+
+    // Show removal notification
+    this.showRemoveNotification(`${productName} removed from cart.`);
   }
 
   clearCart(): void {
