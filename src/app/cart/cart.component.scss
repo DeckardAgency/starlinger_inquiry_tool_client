@@ -55,9 +55,9 @@
 
   &__items {
     flex: 1;
-    //background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius-default, 6px);
+    border: 1px solid var(--base-border, #E4E4E7);
+    height: fit-content;
   }
 
   &__table-header {
@@ -337,6 +337,26 @@
       background-color: #FEF2F2;
       border-radius: 4px;
     }
+  }
+
+  &__reference-number {
+    margin-bottom: 32px;
+    padding: 16px;
+    border-radius: 6px;
+    background: linear-gradient(0deg, var(--alpha-invert-90, rgba(9, 9, 11, 0.10)) 0%, var(--alpha-invert-90, rgba(9, 9, 11, 0.10)) 100%), var(--base-muted, #F4F4F5);
+  }
+
+  &__reference-number-title {
+    font-size: 0.875rem;
+  }
+
+  &__reference-number-input {
+    margin-top: 8px;
+    width: calc(100% - 16px);
+    padding: 8px;
+    border-radius: var(--border-radius-md, 6px);
+    border: 1px solid var(--base-input, #E4E4E7);
+    background: var(--base-background, #FFF);
   }
 
   // Order summary styles
