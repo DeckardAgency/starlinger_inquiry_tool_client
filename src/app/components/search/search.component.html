@@ -1,0 +1,59 @@
+<div class="search">
+  <div class="search__wrapper">
+    <span class="search__icon">
+      <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="m18 18-4.075-4.075m1.741-4.758a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" stroke="#71717A" stroke-width="1.667" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <input
+      #searchInput
+      type="text"
+      class="search__input"
+      [placeholder]="searchPlaceholder"
+      [(ngModel)]="searchQuery"
+      (input)="search()"
+      (keyup.enter)="search()"
+    >
+    <button class="search__button" (click)="search()">
+      Search
+    </button>
+  </div>
+  <div class="search__results" *ngIf="showResults">
+    <div class="search__results-header">
+      <span class="search__results-title">Results</span>
+      <div class="search__results-counts">
+        <span class="search__count">Machines <span class="search__count-number">3</span></span>
+        <span class="search__count">Machine parts <span class="search__count-number">10</span></span>
+        <span class="search__count">Inquiries <span class="search__count-number">5</span></span>
+        <span class="search__count">Files <span class="search__count-number">1</span></span>
+        <span class="search__count">Photos <span class="search__count-number">2</span></span>
+      </div>
+    </div>
+    <div class="search__results-list">
+      <div class="search__result-item"
+           *ngFor="let result of mockResults | filterResults:searchQuery"
+           [class.search__result-item--active]="result.active"
+           (click)="selectResult(result)">
+        <div class="search__result-content">
+          <div class="search__result-title">{{ result.title }}</div>
+          <div class="search__result-type">{{ result.type }}</div>
+        </div>
+        <div class="search__result-badge" *ngIf="result.badge">
+          <span class="search__badge" [class.search__badge--photo]="result.badge === 'Photo'"
+                [class.search__badge--file]="result.badge === 'File'"
+                [class.search__badge--machine]="result.badge === 'Machine'"
+                [class.search__badge--order]="result.badge === 'Order'">
+            {{ result.badge }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="search__results-footer">
+      <div class="search__navigation-help">
+        <span class="search__help-item">↑ To Navigate</span>
+        <span class="search__help-item">↵ To Select</span>
+        <span class="search__help-item">Esc To exit</span>
+      </div>
+    </div>
+  </div>
+</div>
