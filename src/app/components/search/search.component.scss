@@ -3,6 +3,10 @@
   width: 100%;
   max-width: 640px;
 
+  @media (max-width: 768px) {
+    display: none;
+  }
+
   &__wrapper {
     position: relative;
     display: flex;

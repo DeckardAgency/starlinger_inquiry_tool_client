@@ -45,12 +45,20 @@
     border-radius: 0;
     border-bottom: 1px solid #E4E4E7;
 
+    @media (max-width: 768px) {
+      //display: none;
+    }
+
     &-left {
       flex: 1;
     }
 
     &-right {
       flex-shrink: 0;
+
+      @media (max-width: 768px) {
+        display: none;
+      }
     }
   }
 
@@ -624,5 +632,16 @@
     &__related {
       display: none;
     }
+  }
+}
+
+.product-details {
+  @media (max-width: 480px) {
+    position: absolute;
+    top: 145px;
+    left: 0;
+    width: 100%;
+    z-index: 80;
+    background-color: #fafafa;
   }
 }
