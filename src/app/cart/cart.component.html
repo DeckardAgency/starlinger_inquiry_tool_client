@@ -11,9 +11,9 @@
       </span>
       Cart overview
     </h1>
-    <span>
-      {{ quickCartService.getTotalItems() }}
-    </span>
+<!--    <span>-->
+<!--      {{ quickCartService.getTotalItems() }}-->
+<!--    </span>-->
   </div>
 
   @if (cartItems.length > 0) {
@@ -47,7 +47,7 @@
             </div>
 
             <div class="cart__price">
-              <div class="cart__original-price">€{{ item.product.price.toFixed(2) }}</div>
+              <div class="cart__original-price">€ {{ item.product.price.toFixed(2) }}</div>
             </div>
 
             <div class="cart__discount">
@@ -79,7 +79,7 @@
             </div>
 
             <div class="cart__item-total">
-              €{{ getItemTotal(item).toFixed(2) }}
+              € {{ getItemTotal(item).toFixed(2) }}
             </div>
 
             <div class="cart__item-actions">
@@ -117,7 +117,7 @@
             </span>
             Shipping & handling
           </span>
-          <span>€{{ shippingCost.toFixed(2) }}</span>
+          <span>€ {{ shippingCost.toFixed(2) }}</span>
         </div>
 
         <div class="cart__summary-row">
@@ -129,7 +129,7 @@
             </span>
             Total
           </span>
-          <span>€{{ totalAmount.toFixed(2) }}</span>
+          <span>€ {{ totalAmount.toFixed(2) }}</span>
         </div>
 
 <!--        <div class="cart__summary-total">-->
