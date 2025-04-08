@@ -368,6 +368,15 @@
     color: #52525B;
   }
 
+  &__summary-col {
+    display: flex;
+    align-items: center;
+  }
+
+  &__summary-row-icon {
+    margin-right: 8px;
+  }
+
   &__discount {
     color: #DC2626;
   }
