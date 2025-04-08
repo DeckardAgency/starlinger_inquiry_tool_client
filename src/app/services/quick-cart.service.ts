@@ -1,6 +1,6 @@
 // src/app/services/quick-cart.service.ts
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CartService, CartItem } from './cart.service';
 import { Product } from '../interfaces/product.interface';
 
@@ -8,29 +8,46 @@ import { Product } from '../interfaces/product.interface';
   providedIn: 'root'
 })
 export class QuickCartService {
-  // Cart open state
-  private readonly openStateSubject = new BehaviorSubject<boolean>(false);
-  public readonly isOpen$ = this.openStateSubject.asObservable();
+  // Access cart open state from CartService
+  public get isOpen$(): Observable<boolean> {
+    return this.cartService.isOpen$;
+  }
 
-  public get isOpen(): boolean {
-    return this.openStateSubject.value;
+  // Access notification state from CartService
+  public get notificationVisible$(): Observable<boolean> {
+    return this.cartService.notificationVisible$;
+  }
+
+  // Access last added product message
+  public get lastAddedProduct$(): Observable<string> {
+    return this.cartService.lastAddedProduct$;
   }
 
   constructor(public cartService: CartService) {}
 
   // Open the cart
   public open(): void {
-    this.openStateSubject.next(true);
+    this.cartService.openCart();
   }
 
   // Close the cart
   public close(): void {
-    this.openStateSubject.next(false);
+    this.cartService.closeCart();
   }
 
   // Toggle cart visibility
   public toggle(): void {
-    this.openStateSubject.next(!this.openStateSubject.value);
+    this.cartService.toggleCart();
+  }
+
+  // Show notification
+  public showNotification(message?: string): void {
+    this.cartService.showNotification(message);
+  }
+
+  // Hide notification
+  public hideNotification(): void {
+    this.cartService.hideNotification();
   }
 
   // Alias for toggle() to maintain compatibility with existing code
@@ -41,8 +58,7 @@ export class QuickCartService {
   // Add a product to the cart - delegates to CartService
   public addToCart(product: Product, quantity: number): void {
     this.cartService.addToCart(product, quantity);
-    // Open the cart panel
-    this.open();
+    // Now shows notification instead of directly opening the cart
   }
 
   // Update the quantity of a cart item - delegates to CartService

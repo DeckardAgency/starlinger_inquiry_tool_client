@@ -4,5 +4,15 @@
   <main class="app__main" [class.app__main--collapsed]="sidebarService.isCollapsed()">
     <router-outlet></router-outlet>
   </main>
+
+  <!-- Quick Cart Component -->
   <app-quick-cart [isOpen]="(quickCartService.isOpen$ | async) ?? false"></app-quick-cart>
+
+  <!-- Cart Notification Component -->
+  <app-cart-notification
+    [visible]="(quickCartService.notificationVisible$ | async) ?? false"
+    [message]="(quickCartService.lastAddedProduct$ | async) ?? 'Product added to cart.'"
+    (viewCart)="onViewCart()"
+    (close)="hideNotification()"
+  ></app-cart-notification>
 </div>

@@ -62,7 +62,10 @@
     </div>
     <div class="quick-cart__actions">
       <button class="quick-cart__back" (click)="onClose()">Back to product list</button>
-      <button class="quick-cart__order" [disabled]="(quickCartService.getTotalItems() === 0)">Place order</button>
+      <div class="quick-cart__actions-col-r">
+        <button class="quick-cart__save-draft">Save draft</button>
+        <button class="quick-cart__order" [disabled]="(quickCartService.getTotalItems() === 0)">Checkout</button>
+      </div>
     </div>
   </div>
 </div>

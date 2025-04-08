@@ -20,6 +20,14 @@ export class CartService {
   private readonly openStateSubject = new BehaviorSubject<boolean>(false);
   public readonly isOpen$ = this.openStateSubject.asObservable();
 
+  // Notification state
+  private readonly notificationVisibleSubject = new BehaviorSubject<boolean>(false);
+  public readonly notificationVisible$ = this.notificationVisibleSubject.asObservable();
+
+  // Last added product message
+  private lastAddedProductSubject = new BehaviorSubject<string>('Product added to cart.');
+  public readonly lastAddedProduct$ = this.lastAddedProductSubject.asObservable();
+
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
 
@@ -39,6 +47,7 @@ export class CartService {
 
   public openCart(): void {
     this.openStateSubject.next(true);
+    this.hideNotification(); // Hide notification when cart is opened
   }
 
   public closeCart(): void {
@@ -47,6 +56,29 @@ export class CartService {
 
   public toggleCart(): void {
     this.openStateSubject.next(!this.openStateSubject.value);
+    if (this.openStateSubject.value) {
+      this.hideNotification();
+    }
+  }
+
+  // Notification methods
+  public showNotification(message?: string): void {
+    if (message) {
+      this.lastAddedProductSubject.next(message);
+    }
+    this.notificationVisibleSubject.next(true);
+  }
+
+  public hideNotification(): void {
+    this.notificationVisibleSubject.next(false);
+  }
+
+  public get isNotificationVisible(): boolean {
+    return this.notificationVisibleSubject.value;
+  }
+
+  public get lastAddedProductMessage(): string {
+    return this.lastAddedProductSubject.value;
   }
 
   // Cart data methods
@@ -117,8 +149,9 @@ export class CartService {
     }
 
     this.saveCartToStorage();
-    // Automatically open the cart when adding items
-    this.openCart();
+
+    // Show notification instead of opening the cart
+    this.showNotification('Product added to cart.');
   }
 
   updateQuantity(productId: string, quantity: number): void {

@@ -167,6 +167,8 @@ export class ShopComponent implements OnInit {
   addSelectedProductToCart(): void {
     if (this.selectedProduct) {
       const quantity = this.quantityControl.value || 1;
+
+      // Using cartService will now show notification instead of directly opening the cart
       this.cartService.addToCart(this.selectedProduct, quantity);
 
       // Reset quantity after adding to cart
