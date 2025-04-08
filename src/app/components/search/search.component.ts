@@ -165,13 +165,13 @@ export class SearchComponent implements OnInit {
 
   private setSearchPlaceholder(): void {
     // Default to Windows/Linux shortcut
-    this.searchPlaceholder = "Search for anything... (Ctrl+K)";
+    this.searchPlaceholder = "Search";
 
     // Check for Mac OS in a way that's safe for SSR
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
       const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
       if (isMac) {
-        this.searchPlaceholder = "Search for anything... (⌘K)";
+        this.searchPlaceholder = "Search";
       }
     }
   }
