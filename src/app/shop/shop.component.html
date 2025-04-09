@@ -124,7 +124,7 @@
 
       <div class="shop__details-content">
         <div class="shop__details-image">
-          <img src="https://via.assets.so/img.jpg?w=600&h=400" alt="Product detail image">
+          <img src="https://via.assets.so/img.jpg?w=600&h=400" alt="Product detail image" loading="lazy">
         </div>
 
         <div class="shop__details-info">
@@ -222,7 +222,9 @@
 
 
         @if (loading) {
-          <div class="shop__loading">Loading products...</div>
+          <div class="shop__loading">
+            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_7WDj{transform-origin:center;animation:spinner_PBVY .75s linear infinite}@keyframes spinner_PBVY{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><circle class="spinner_7WDj" cx="12" cy="2.5" r="1.5"/></svg>
+          </div>
         }
 
         @if (error) {

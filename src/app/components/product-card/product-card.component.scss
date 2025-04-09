@@ -26,12 +26,95 @@ $spacing-xl: 24px;
   // Image Element
   &__image {
     margin-bottom: $spacing-xl;
+    position: relative;
+    overflow: hidden;
   }
 
   &__img {
     width: 100%;
     height: auto;
     border-radius: $border-radius-md;
+  }
+
+  // Carousel Styling
+  &__carousel {
+    margin-top: $spacing-lg;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: $border-radius-md;
+
+    &-inner {
+      display: flex;
+      transition: transform 0.3s ease;
+    }
+
+    &-item {
+      flex: 0 0 100%;
+      min-width: 100%;
+
+      img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    &-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: $spacing-md;
+    }
+
+    &-prev,
+    &-next {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba($color-white, 0.8);
+      border: 1px solid $color-border;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: $color-white;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &-dots {
+      display: flex;
+      gap: $spacing-xs;
+      align-items: center;
+    }
+
+    &-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $color-border;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.active {
+        background: $color-primary;
+        width: 10px;
+        height: 10px;
+      }
+
+      &:hover {
+        background: $color-text-medium;
+      }
+    }
   }
 
   // Specifications Section
@@ -231,7 +314,6 @@ $spacing-xl: 24px;
     }
 
     &__add-btn-icon {
-
       margin-left: 32px;
       display: flex;
       align-items: center;
@@ -248,6 +330,14 @@ $spacing-xl: 24px;
       gap: $spacing-lg;
     }
 
+    &__details {
+      flex-direction: column;
+
+      &__detail {
+        width: 100%;
+      }
+    }
+
     &__actions {
       flex-direction: column;
     }
@@ -255,6 +345,14 @@ $spacing-xl: 24px;
     &__quantity {
       width: 100%;
       justify-content: center;
+    }
+
+    &__carousel {
+      &-prev,
+      &-next {
+        width: 28px;
+        height: 28px;
+      }
     }
   }
 }

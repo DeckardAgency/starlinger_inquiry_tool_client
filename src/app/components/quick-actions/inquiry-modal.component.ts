@@ -9,21 +9,21 @@ import { animate, style, transition, trigger } from '@angular/animations';
   imports: [CommonModule, RouterModule],
   template: `
     <div *ngIf="isOpen" class="modal-overlay" (click)="closeOnBackdrop($event)" [@fadeAnimation]>
-      <div class="modal-container">
+      <div class="modal-container" [@slideAnimation]>
         <div class="modal-header">
           <h2 class="modal-title">
             <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M6 23h14a3 3 0 0 0 3-3V8.5L17.5 3H9a3 3 0 0 0-3 3v4m10-7v6a3 3 0 0 0 3 3h6"
-                stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             New inquiry
           </h2>
-<!--          <button class="modal-close" (click)="close()">-->
-<!--            <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">-->
-<!--              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"-->
-<!--                stroke-linecap="round" stroke-linejoin="round"/>-->
-<!--            </svg>-->
-<!--          </button>-->
+          <!--          <button class="modal-close" (click)="close()">-->
+          <!--            <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">-->
+          <!--              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"-->
+          <!--                stroke-linecap="round" stroke-linejoin="round"/>-->
+          <!--            </svg>-->
+          <!--          </button>-->
         </div>
         <div class="modal-content">
           <div class="inquiry-options">
@@ -50,7 +50,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
               </span>
             </a>
 
-            <a routerLink="/manual-inquiry" class="inquiry-option" (click)="close()">
+            <a routerLink="/manual-inquiry" class="inquiry-option inquiry-option--disabled" (click)="close()">
               <div class="inquiry-option__icon inquiry-option__icon--red">
                 <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38" fill="none">
                   <path d="M33.25 23.75V30.0833C33.25 30.9232 32.9164 31.7286 32.3225 32.3225C31.7286 32.9164 30.9232 33.25 30.0833 33.25H7.91667C7.07681 33.25 6.27136 32.9164 5.6775 32.3225C5.08363 31.7286 4.75 30.9232 4.75 30.0833V23.75M26.9167 12.6667L19 4.75M19 4.75L11.0833 12.6667M19 4.75V23.75" stroke="#DC2626" stroke-width="3.16667" stroke-linecap="round" stroke-linejoin="round"/>
@@ -96,6 +96,13 @@ import { animate, style, transition, trigger } from '@angular/animations';
               </span>
             </a>
           </div>
+
+          <!-- Mobile pagination indicators -->
+          <div class="inquiry-pagination">
+            <div class="inquiry-pagination__dot inquiry-pagination__dot--active"></div>
+            <div class="inquiry-pagination__dot"></div>
+            <div class="inquiry-pagination__dot"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -129,7 +136,6 @@ import { animate, style, transition, trigger } from '@angular/animations';
       align-items: center;
       justify-content: space-between;
       padding: 26px 26px 0 26px;
-      //border-bottom: 1px solid #E4E4E7;
     }
 
     .modal-title {
@@ -170,10 +176,13 @@ import { animate, style, transition, trigger } from '@angular/animations';
     .inquiry-option {
       background-color: #ffffff;
       padding: 24px;
-      //border: 1px solid #E4E4E7;
       border-radius: 0.375rem;
       text-decoration: none;
       transition: all 0.2s;
+      //flex: 1 0 calc(33.333% - 1rem);
+      min-width: 0;  /* Important for flex items to be able to shrink below content size */
+      display: flex;
+      flex-direction: column;
     }
 
     .inquiry-option:hover {
@@ -198,7 +207,6 @@ import { animate, style, transition, trigger } from '@angular/animations';
     }
 
     .inquiry-option__icon--red {
-      //background: transparent;
       color: #DC2626;
     }
 
@@ -237,21 +245,86 @@ import { animate, style, transition, trigger } from '@angular/animations';
       margin-left: 1rem;
     }
 
-    @media screen and (max-width: 640px) {
+    /* Hide pagination by default */
+    .inquiry-pagination {
+      display: none;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .inquiry-pagination__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #E4E4E7;
+      margin: 0 4px;
+    }
+
+    .inquiry-pagination__dot--active {
+      background-color: #DC2626;
+    }
+
+    /* Mobile styles - carousel view */
+    @media screen and (max-width: 768px) {
+      .modal-container {
+        width: 95%;
+        max-width: 95%;
+      }
+
+      .modal-content {
+        padding: 16px 16px 24px 16px;
+        position: relative;
+      }
+
+      .inquiry-options {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 12px;
+        padding: 4px 4px 8px 4px;
+        -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        scrollbar-width: none; /* Hide scrollbar in Firefox */
+        -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
+      }
+
+      .inquiry-options::-webkit-scrollbar {
+        display: none; /* Hide scrollbar in Chrome/Safari */
+      }
+
       .inquiry-option {
-        flex-direction: column;
-        align-items: flex-start;
+        flex: 0 0 90%;
+        scroll-snap-align: center;
+        min-width: 250px;
+      }
+
+      /* Show pagination on mobile */
+      .inquiry-pagination {
+        display: flex;
+      }
+    }
+
+    /* Small mobile styles */
+    @media screen and (max-width: 480px) {
+      .inquiry-option {
+        flex: 0 0 95%;
+      }
+
+      .modal-header {
+        padding: 20px 20px 0 20px;
+      }
+
+      .modal-content {
+        padding: 12px 12px 20px 12px;
       }
 
       .inquiry-option__icon {
-        margin-bottom: 1rem;
-        margin-right: 0;
+        width: 48px;
+        height: 48px;
+        margin-bottom: 24px;
       }
 
-      .inquiry-option__arrow {
-        align-self: flex-end;
-        margin-top: 1rem;
-        margin-left: 0;
+      .inquiry-option__description {
+        font-size: 0.8125rem;
       }
     }
   `],

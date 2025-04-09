@@ -29,7 +29,8 @@ export interface Product {
   technicalDescription: string;
   price: number;
   weight: string;
-  featuredImage: MediaItem | null; // Explicitly allow null
+  featuredImage: MediaItem | null;
+  imageGallery: MediaItem[];
   createdAt: string;
   updatedAt: string;
 }

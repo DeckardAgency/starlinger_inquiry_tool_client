@@ -44,7 +44,7 @@
                 (change)="onMachineSelect()"
               >
               <div class="machine-card__content">
-                <img [src]="machine.image" [alt]="machine.name" class="machine-card__image">
+                <img [src]="machine.image" [alt]="machine.name" class="machine-card__image" loading="lazy">
                 <span class="machine-card__name">{{ machine.name }}</span>
               </div>
             </label>

@@ -45,7 +45,7 @@
             <td>
               <div class="customer-cell">
                 @if (inquiry.customer.image) {
-                  <img [src]="inquiry.customer.image" [alt]="inquiry.customer.name" class="customer-cell__image">
+                  <img [src]="inquiry.customer.image" [alt]="inquiry.customer.name" class="customer-cell__image" loading="lazy">
                 } @else {
                   <div class="customer-cell__initials">{{ inquiry.customer.initials }}</div>
                 }
