@@ -225,4 +225,12 @@
     font-size: 12px;
     color: #6B7280;
   }
+
+  &__user-logout {
+    padding-top: 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    color: #6B7280;
+  }
 }

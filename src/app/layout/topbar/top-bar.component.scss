@@ -62,6 +62,12 @@
     transition: all 0.2s;
     position: relative;
 
+    @media (max-width: 576px) {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+
     &:hover {
       background: #27272A;
     }
@@ -126,7 +132,7 @@
     }
 
     &__actions {
-      display: none;
+      //display: none;
     }
   }
 }

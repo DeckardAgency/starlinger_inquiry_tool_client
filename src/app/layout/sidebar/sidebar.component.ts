@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import { SidebarService } from '../../services/sidebar.service';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,7 +14,11 @@ import { SidebarService } from '../../services/sidebar.service';
 export class SidebarComponent {
   isInquiriesExpanded = signal<boolean>(false);
 
-  constructor(private sidebarService: SidebarService) {}
+  constructor(
+    private sidebarService: SidebarService,
+    public authService: AuthService,
+    private router: Router
+  ) {}
 
   get isCollapsed() {
     return this.sidebarService.isCollapsed;
@@ -25,5 +30,10 @@ export class SidebarComponent {
 
   toggleInquiriesMenu(): void {
     this.isInquiriesExpanded.update(value => !value);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

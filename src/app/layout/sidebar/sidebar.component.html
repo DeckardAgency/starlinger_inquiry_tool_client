@@ -122,17 +122,20 @@
           </a>
         </li>
         <li class="sidebar__divider"></li>
-        <li class="sidebar__item">
-          <div class="sidebar__user">
+        @if (authService.isAuthenticated()) {
+          <li class="sidebar__item">
+            <div class="sidebar__user">
             <span class="icon-user sidebar__icon">
               <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.667 14v-1.333A2.667 2.667 0 0 0 10 10H6a2.667 2.667 0 0 0-2.667 2.667V14m7.334-9.333a2.667 2.667 0 1 1-5.334 0 2.667 2.667 0 0 1 5.334 0Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <div class="sidebar__user-info">
-              <span class="sidebar__user-name">Anes</span>
-              <span class="sidebar__user-role">Administrator</span>
+              <div class="sidebar__user-info">
+                <span class="sidebar__user-name">Starlinger Test User</span>
+                <span class="sidebar__user-role">Administrator</span>
+                <span class="sidebar__user-logout" (click)="logout()" role="button">Logout</span>
+              </div>
             </div>
-          </div>
-        </li>
+          </li>
+        }
       </ul>
     </div>
   </div>
