@@ -32,7 +32,12 @@
           <div class="cart__item">
             <div class="cart__product-info">
               <div class="cart__product-image">
-                <img src="https://via.assets.so/img.jpg?w=150&h=84" alt="{{ item.product.name }}">
+                <img
+                  [src]="environment.apiBaseUrl + item.product.featuredImage?.filePath"
+                  [alt]="item.product.name"
+                  onerror="this.src='https://via.assets.so/img.jpg?w=150&h=84'"
+                  loading="lazy"
+                >
               </div>
               <div class="cart__product-details">
                 <div class="cart__product-details-part-number">

@@ -10,6 +10,7 @@
       [src]="environment.apiBaseUrl + product.featuredImage?.filePath"
       [alt]="product.name"
       onerror="this.src='https://via.assets.so/img.jpg?w=270&h=160'"
+      loading="lazy"
     >
   </div>
   <div class="article-item__content">

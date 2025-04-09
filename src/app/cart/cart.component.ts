@@ -6,6 +6,7 @@ import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/brea
 import { CartService, CartItem } from '../services/cart.service';
 import { Subscription } from 'rxjs';
 import {QuickCartService} from '../services/quick-cart.service';
+import {environment} from "../../../environment";
 
 @Component({
   selector: 'app-cart',
@@ -141,4 +142,6 @@ export class CartComponent implements OnInit, OnDestroy {
     console.log('Proceeding to checkout with items:', this.cartItems);
     // You could add router navigation here
   }
+
+    protected readonly environment = environment;
 }

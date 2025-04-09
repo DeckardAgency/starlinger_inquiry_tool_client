@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { QuickCartService } from '../../services/quick-cart.service';
 import { Observable, Subscription } from 'rxjs';
 import { CartItem } from '../../services/cart.service';
+import {environment} from '../../../../environment';
 
 @Component({
   selector: 'app-quick-cart',
@@ -137,4 +138,6 @@ export class QuickCartComponent implements OnInit, OnDestroy {
       maximumFractionDigits: 2
     });
   }
+
+  protected readonly environment = environment;
 }

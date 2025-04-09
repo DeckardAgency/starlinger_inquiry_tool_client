@@ -27,7 +27,13 @@
       @for (item of cartItems$ | async; track item.product.id) {
         <div class="cart-item">
           <div class="cart-item__image">
-            <img src="https://via.assets.so/img.jpg?w=80&h=80" alt="{{ item.product.name }}" />
+            <img
+              class="cart-item__img"
+              [src]="environment.apiBaseUrl + item.product.featuredImage?.filePath"
+              [alt]="item.product.name"
+              onerror="this.src='https://via.assets.so/img.jpg?w=80&h=80'"
+              loading="lazy"
+            />
           </div>
           <div class="cart-item__details">
             <div class="cart-item__info">
