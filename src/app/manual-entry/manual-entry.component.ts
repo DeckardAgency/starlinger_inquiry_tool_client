@@ -8,6 +8,7 @@ import { ProductService } from '../services/product.service';
 import { Product } from '../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ArticleItemComponent } from '../components/article-item/article-item.component';
+import {AdvancedImagePreviewModalComponent} from './advanced-image-preview-modal.component';
 
 export interface MachineType {
   id: string;
@@ -22,6 +23,7 @@ export interface UploadedFile {
   file: File;
   status: 'uploading' | 'success' | 'error';
   progress: number;
+  previewUrl?: string; // New property for image preview
 }
 
 export interface Part {
@@ -45,7 +47,8 @@ export interface Part {
     ReactiveFormsModule,
     RouterModule,
     BreadcrumbsComponent,
-    ArticleItemComponent
+    ArticleItemComponent,
+    AdvancedImagePreviewModalComponent
   ],
   templateUrl: './manual-entry.component.html',
   styleUrls: ['./manual-entry.component.scss']
@@ -58,6 +61,12 @@ export class ManualEntryComponent implements OnInit {
   loading = true;
   error: string | null = null;
   totalItems = 0;
+
+  // Image preview modal properties
+  showImagePreview = false;
+  previewImageSrc = '';
+  previewImageAlt = '';
+  previewImageFileName = ''; // Add this property
 
   // File upload properties
   isDragging = false;
@@ -91,6 +100,9 @@ export class ManualEntryComponent implements OnInit {
   // Parts repeater array
   parts: Part[] = [];
 
+  // Map to store parts for each machine
+  machinePartsMap: Map<string, Part[]> = new Map();
+
   // Machine types for filtering
   machineTypes: MachineType[] = [
     { id: '1', name: 'Winding Machines', checked: false },
@@ -121,11 +133,21 @@ export class ManualEntryComponent implements OnInit {
     };
 
     this.parts.push(newPart);
+
+    // Also update the stored parts for the selected machine
+    if (this.selectedMachine) {
+      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+    }
   }
 
   removePart(index: number): void {
     if (this.parts.length > 1) {
       this.parts.splice(index, 1);
+
+      // Update the stored parts for the selected machine
+      if (this.selectedMachine) {
+        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+      }
     }
   }
 
@@ -164,6 +186,11 @@ export class ManualEntryComponent implements OnInit {
   }
 
   selectMachine(machine: Product): void {
+    // Save the current parts state if a machine is already selected
+    if (this.selectedMachine) {
+      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+    }
+
     this.selectedMachine = machine;
     if (machine) {
       this.breadcrumbs = [
@@ -172,13 +199,24 @@ export class ManualEntryComponent implements OnInit {
         { label: machine.name }
       ];
 
-      // Reset parts when selecting a new machine
-      this.parts = [];
-      this.addPart();
+      // Check if we have saved parts for this machine
+      if (this.machinePartsMap.has(machine.id)) {
+        // Restore the saved parts
+        this.parts = [...this.machinePartsMap.get(machine.id)!];
+      } else {
+        // Initialize with a single part for a new machine
+        this.parts = [];
+        this.addPart();
+      }
     }
   }
 
   closeDetails(): void {
+    // Save the current parts state before closing
+    if (this.selectedMachine) {
+      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+    }
+
     this.selectedMachine = null;
     this.breadcrumbs = [
       { label: 'Dashboard', link: '/dashboard' },
@@ -245,6 +283,11 @@ export class ManualEntryComponent implements OnInit {
     // Mark the current part as touched to show validation errors
     if (this.parts.length > 0) {
       this.parts[this.parts.length - 1].touched = true;
+
+      // Update the stored parts for the selected machine
+      if (this.selectedMachine) {
+        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+      }
     }
   }
 
@@ -332,8 +375,18 @@ export class ManualEntryComponent implements OnInit {
           progress: 0
         };
 
+        // If it's an image, create a preview URL
+        if (this.isImageFile(file.name)) {
+          uploadedFile.previewUrl = URL.createObjectURL(file);
+        }
+
         this.parts[partIndex].files.push(uploadedFile);
         this.simulateUpload(partIndex, uploadedFile);
+
+        // Update the stored parts for the selected machine
+        if (this.selectedMachine) {
+          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+        }
       });
     }
   }
@@ -350,12 +403,26 @@ export class ManualEntryComponent implements OnInit {
       if (file.progress >= 100) {
         clearInterval(interval);
         file.status = Math.random() > 0.8 ? 'error' : 'success'; // Randomly generate some errors
+
+        // Update the stored parts for the selected machine after upload is complete
+        if (this.selectedMachine) {
+          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+        }
       }
     }, 300);
   }
 
   removeFile(partIndex: number, file: UploadedFile): void {
+    // Revoke URL if exists to prevent memory leaks
+    if (file.previewUrl) {
+      URL.revokeObjectURL(file.previewUrl);
+    }
     this.parts[partIndex].files = this.parts[partIndex].files.filter(f => f !== file);
+
+    // Update the stored parts for the selected machine
+    if (this.selectedMachine) {
+      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+    }
   }
 
   cancelUpload(partIndex: number, file: UploadedFile): void {
@@ -379,6 +446,20 @@ export class ManualEntryComponent implements OnInit {
 
   getSuccessfulUploadCount(partIndex: number): number {
     return this.parts[partIndex].files.filter(file => file.status === 'success').length;
+  }
+
+  // Image preview methods
+  openImagePreview(file: UploadedFile): void {
+    if (this.isImageFile(file.name) && file.previewUrl) {
+      this.previewImageSrc = file.previewUrl;
+      this.previewImageAlt = file.name;
+      this.previewImageFileName = file.name;
+      this.showImagePreview = true;
+    }
+  }
+
+  closeImagePreview(): void {
+    this.showImagePreview = false;
   }
 
   // Utility methods for file handling
@@ -416,12 +497,51 @@ export class ManualEntryComponent implements OnInit {
       // Here you would typically save the parts to your service/backend
       console.log('Parts added:', partData);
 
+      // Log all machines with parts
+      console.log('Machines with parts:');
+      this.machinePartsMap.forEach((parts, machineId) => {
+        const machine = this.machines.find(m => m.id === machineId);
+        if (machine) {
+          console.log(`Machine: ${machine.name} (ID: ${machineId}), Parts: ${parts.length}`);
+          parts.forEach((part, index) => {
+            console.log(`  Part ${index + 1}: ${part.data.partName}`);
+          });
+        }
+      });
+
       // Show success message or notification
       alert('Parts added successfully!');
+
+      // Remove the saved parts for this machine (since they've been submitted)
+      if (this.selectedMachine) {
+        this.machinePartsMap.delete(this.selectedMachine.id);
+      }
 
       // Reset and close details
       this.closeDetails();
     }
+  }
+
+  // Add a method to get the total parts across all machines
+  getTotalPartsCount(): number {
+    let count = 0;
+    this.machinePartsMap.forEach((parts) => {
+      count += parts.length;
+    });
+    return count;
+  }
+
+  ngOnDestroy(): void {
+    // Clean up all object URLs to prevent memory leaks
+    this.machinePartsMap.forEach(parts => {
+      parts.forEach(part => {
+        part.files.forEach(file => {
+          if (file.previewUrl) {
+            URL.revokeObjectURL(file.previewUrl);
+          }
+        });
+      });
+    });
   }
 
   @HostListener('document:click', ['$event'])
@@ -430,5 +550,60 @@ export class ManualEntryComponent implements OnInit {
     if (!filterElement?.contains(event.target as Node)) {
       this.isFilterOpen = false;
     }
+  }
+
+  // Add these methods
+  saveEditedImage(dataUrl: string): void {
+    // Find the file that's currently being previewed
+    if (!this.previewImageSrc) return;
+
+    for (const part of this.parts) {
+      const fileIndex = part.files.findIndex(f => f.previewUrl === this.previewImageSrc);
+      if (fileIndex !== -1) {
+        // Convert the data URL to a Blob
+        const blob = this.dataURLToBlob(dataUrl);
+
+        // Create a new File from the Blob
+        const editedFile = new File([blob], part.files[fileIndex].name, {
+          type: part.files[fileIndex].type
+        });
+
+        // Revoke the old preview URL to prevent memory leaks
+        URL.revokeObjectURL(part.files[fileIndex].previewUrl!);
+
+        // Update the file in the array
+        part.files[fileIndex].file = editedFile;
+        part.files[fileIndex].previewUrl = URL.createObjectURL(editedFile);
+
+        // If this file was already in 'success' state, mark it as edited
+        if (part.files[fileIndex].status === 'success') {
+          console.log('File edited:', part.files[fileIndex].name);
+        }
+
+        // Update the preview src to the new URL
+        this.previewImageSrc = part.files[fileIndex].previewUrl;
+
+        // Update the stored parts for the selected machine
+        if (this.selectedMachine) {
+          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+        }
+        break;
+      }
+    }
+  }
+
+  // Helper function to convert a data URL to a Blob
+  dataURLToBlob(dataURL: string): Blob {
+    const parts = dataURL.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], { type: contentType });
   }
 }
