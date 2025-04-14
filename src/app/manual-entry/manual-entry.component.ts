@@ -61,6 +61,7 @@ export class ManualEntryComponent implements OnInit {
   loading = true;
   error: string | null = null;
   totalItems = 0;
+  dragCounter = 0;
 
   // Image preview modal properties
   showImagePreview = false;
@@ -334,16 +335,29 @@ export class ManualEntryComponent implements OnInit {
     this.isDragging = true;
   }
 
+  onDragEnter(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.dragCounter++;
+    this.isDragging = true;
+  }
+
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.isDragging = false;
+    this.dragCounter--;
+
+    // Only set isDragging to false when we've left the outermost element
+    if (this.dragCounter === 0) {
+      this.isDragging = false;
+    }
   }
 
   onDrop(event: DragEvent, partIndex: number): void {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
+    this.dragCounter = 0; // Reset counter
 
     if (event.dataTransfer?.files) {
       this.handleFiles(event.dataTransfer.files, partIndex);

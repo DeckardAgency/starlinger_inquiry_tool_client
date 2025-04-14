@@ -109,26 +109,26 @@
       <div class="product-details">
         <div class="manual-entry__details">
           <div class="manual-entry__details-header">
-            <button class="manual-entry__back-btn" (click)="closeDetails()">
-                <span class="material-icons">
-                  <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 12 6 8l4-4" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </span>
-            </button>
-            <h2 class="manual-entry__details-title">{{ selectedMachine.name }} - Add New Part</h2>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6.66659 5.33317H6.67325M7.99992 7.99984H8.00659M9.33325 5.33317H9.33992M10.6666 7.99984H10.6733M11.9999 5.33317H12.0066M3.99992 5.33317H4.00659M4.66659 10.6665H11.3333M5.33325 7.99984H5.33992M2.66659 2.6665H13.3333C14.0696 2.6665 14.6666 3.26346 14.6666 3.99984V11.9998C14.6666 12.7362 14.0696 13.3332 13.3333 13.3332H2.66659C1.93021 13.3332 1.33325 12.7362 1.33325 11.9998V3.99984C1.33325 3.26346 1.93021 2.6665 2.66659 2.6665Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+<!--            <h2 class="manual-entry__details-title">{{ selectedMachine.name }} - Add New Part</h2>-->
+            <h2 class="manual-entry__details-title">
+              Input data</h2>
           </div>
 
           <!-- Single Part Form -->
           <div class="manual-entry__form">
             <form [formGroup]="partForm">
-              <div class="part-repeater__header">
-                <h3 class="part-repeater__title">Parts ({{ parts.length }})</h3>
-              </div>
+<!--              <div class="part-repeater__header">-->
+<!--                <h3 class="part-repeater__title">Parts ({{ parts.length }})</h3>-->
+<!--              </div>-->
 
               @for (part of parts; track part.id; let i = $index) {
                 <div class="part-repeater__item">
                   <!-- Part Header -->
                   <div class="part-repeater__item-header">
-                    <h4 class="part-repeater__item-title">Part {{ i + 1 }}</h4>
+<!--                    <h4 class="part-repeater__item-title">Part {{ i + 1 }}</h4>-->
                     @if (parts.length > 1) {
                       <button type="button" class="part-repeater__remove-btn" (click)="removePart(i)">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -141,13 +141,14 @@
 
                   <!-- Part Name Field -->
                   <div class="form-group">
-                    <label [for]="'partName' + i">Part Name *</label>
+                    <label [for]="'partName' + i">Part (product) name *</label>
                     <input
                       type="text"
                       [id]="'partName' + i"
                       [(ngModel)]="part.data.partName"
                       [ngModelOptions]="{standalone: true}"
                       class="form-control"
+                      placeholder="Type exact or partial product name"
                       (input)="checkPartValidity()"
                     >
                     @if (!part.data.partName && part.touched) {
@@ -157,25 +158,27 @@
 
                   <!-- Part Number Field -->
                   <div class="form-group">
-                    <label [for]="'partNumber' + i">Part Number</label>
+                    <label [for]="'partNumber' + i">Part number (optional)</label>
                     <input
                       type="text"
                       [id]="'partNumber' + i"
                       [(ngModel)]="part.data.partNumber"
                       [ngModelOptions]="{standalone: true}"
                       class="form-control"
+                      placeholder="Type part number"
                     >
                   </div>
 
                   <!-- Short Description Field -->
                   <div class="form-group">
-                    <label [for]="'shortDescription' + i">Short Description *</label>
+                    <label [for]="'shortDescription' + i">Short description *</label>
                     <textarea
                       [id]="'shortDescription' + i"
                       [(ngModel)]="part.data.shortDescription"
                       [ngModelOptions]="{standalone: true}"
                       class="form-control"
-                      rows="3"
+                      rows="5"
+                      placeholder="Hello! I need a replacement part for my 200XE Winding Machine. Not sure about the exact part needed, please check the attached files for more info."
                       (input)="checkPartValidity()"
                     ></textarea>
                     @if (!part.data.shortDescription && part.touched) {
@@ -185,7 +188,7 @@
 
                   <!-- File Upload Field -->
                   <div class="form-group">
-                    <label>Upload Files</label>
+<!--                    <label>Upload Files</label>-->
                     <!-- Individual file input for each part -->
                     <input #fileInputElement type="file" multiple (change)="onFileSelected($event, i)" style="display: none;">
                     <div class="file-upload-container" [class.has-files]="part.files.length > 0">
@@ -194,14 +197,13 @@
                       @if (part.files.length === 0) {
                         <div class="file-upload-dropzone"
                              (dragover)="onDragOver($event)"
+                             (dragenter)="onDragEnter($event)"
                              (dragleave)="onDragLeave($event)"
                              (drop)="onDrop($event, i)"
                              [class.active]="isDragging">
-                          <div class="upload-icon">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="20" cy="20" r="19" stroke="#333333" stroke-width="2"/>
-                              <path d="M20 10V30" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
-                              <path d="M10 20H30" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                          <div class="upload-icon" (click)="triggerFileInput(i)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                              <path d="M16 24H32M24 16V32M44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24Z" stroke="#232323" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                           </div>
                           <button type="button" class="add-files-btn" (click)="triggerFileInput(i)">
@@ -318,7 +320,7 @@
 
                   <!-- Additional Notes Field -->
                   <div class="form-group">
-                    <label [for]="'additionalNotes' + i">Additional Notes *</label>
+                    <label [for]="'additionalNotes' + i">Additional notes *</label>
                     <textarea
                       [id]="'additionalNotes' + i"
                       [(ngModel)]="part.data.additionalNotes"
@@ -326,6 +328,7 @@
                       class="form-control"
                       rows="5"
                       (input)="checkPartValidity()"
+                      placeholder="If you have more infor that you want to share with us, please type here."
                     ></textarea>
                     @if (!part.data.additionalNotes && part.touched) {
                       <div class="error-message">Additional notes are required</div>
