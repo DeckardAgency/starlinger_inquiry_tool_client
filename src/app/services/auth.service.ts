@@ -31,7 +31,7 @@ export class AuthService {
   login(username: string, password: string): Observable<boolean> {
     // Fake login - in a real app, this would make an HTTP request
     // For this example, we'll accept a specific username/password
-    if (username === 'test@starlinger.com' && password === 'Secret007') {
+      if (username === 'test@starlinger.com' && password === 'Secret007') {
       const user: User = {
         username: 'user',
         email: username

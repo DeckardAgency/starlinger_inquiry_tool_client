@@ -1,4 +1,106 @@
 .manual-entry {
+  // Part repeater styles
+  .part-repeater {
+    margin-top: 30px;
+    margin-bottom: 30px;
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    &__title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    &__item {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    &__item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    &__item-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    &__remove-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background-color: white;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #fef2f2;
+      }
+
+      svg {
+        stroke: #dc2626;
+      }
+    }
+
+    &__add-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f0fdf4;
+      border: 1px dashed #86efac;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+
+    &__add-text {
+      margin: 0;
+      font-size: 16px;
+      color: #166534;
+    }
+
+    &__add-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background-color: #4ade80;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #22c55e;
+      }
+
+      svg {
+        stroke: white;
+      }
+    }
+  }
+
   // File upload styles
   .file-upload-container {
     border: 1px dashed #e2e8f0;
