@@ -243,11 +243,11 @@
                                 <div class="file-size">{{ formatFileSize(file.size) }}</div>
 
                                 <!-- Upload Progress -->
-                                @if (file.status === 'uploading') {
+<!--                                @if (file.status === 'uploading') {-->
                                   <div class="upload-progress">
                                     <div class="progress-bar" [style.width.%]="file.progress"></div>
                                   </div>
-                                }
+<!--                                }-->
 
                                 <!-- Error Message -->
                                 @if (file.status === 'error') {
@@ -255,9 +255,9 @@
                                 }
 
                                 <!-- Preview Hint for Images -->
-                                @if (isImageFile(file.name) && file.status === 'success') {
-                                  <div class="preview-hint">Click to preview</div>
-                                }
+<!--                                @if (isImageFile(file.name) && file.status === 'success') {-->
+<!--                                  <div class="preview-hint">Click to preview</div>-->
+<!--                                }-->
                               </div>
 
                               <!-- File Actions -->
@@ -278,8 +278,8 @@
                                     Retry
                                   </button>
                                   <button type="button" class="delete-btn" (click)="removeFile(i, file)">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M2 4H14M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4M12 4V13C12 13.5523 11.5523 14 11 14H5C4.44772 14 4 13.5523 4 13V4H12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                      <path d="M2 4.00016H14M12.6667 4.00016V13.3335C12.6667 14.0002 12 14.6668 11.3333 14.6668H4.66667C4 14.6668 3.33333 14.0002 3.33333 13.3335V4.00016M5.33333 4.00016V2.66683C5.33333 2.00016 6 1.3335 6.66667 1.3335H9.33333C10 1.3335 10.6667 2.00016 10.6667 2.66683V4.00016M6.66667 7.3335V11.3335M9.33333 7.3335V11.3335" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                     Delete
                                   </button>
@@ -299,16 +299,17 @@
                           @if (hasSuccessfulUploads(i) && !hasUploadsInProgress(i)) {
                             <div class="upload-summary">
                               <div class="summary-status">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <circle cx="12" cy="12" r="10" fill="#4CAF50"/>
-                                  <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
+                                <span class="summary-status__icon">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17L4 12" stroke="#237804" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                  </svg>
+                                </span>
                                 {{ getSuccessfulUploadCount(i) }} items successfully uploaded.
                               </div>
                               <button type="button" class="add-more-btn" (click)="triggerFileInput(i)">
                                 Add more
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                  <path d="M3.3335 8.00016H12.6668M8.00016 3.3335V12.6668" stroke="#237804" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                               </button>
                             </div>

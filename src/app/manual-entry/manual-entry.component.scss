@@ -194,20 +194,25 @@
     padding: 10px;
 
     .file-item {
+      position: relative;
       display: flex;
       align-items: center;
-      padding: 12px;
+      padding: 0px 16px;
       border-radius: 6px;
       border: 1px solid #E4E4E7;
       background: #FFF;
+      z-index: 4;
+      margin-bottom: 10px;
+      height: 64px;
 
       &:last-child {
-        border-bottom: none;
+
       }
 
       &.file-error {
-        background-color: #fef2f2;
-        border-radius: 4px;
+        border-radius: 6px;
+        border: 1px solid #DC2626;
+        background: #ffffff;
 
         .file-error-message {
           color: #dc2626;
@@ -217,7 +222,7 @@
       }
 
       &.file-uploading {
-        background-color: #f0fdf4;
+        //background-color: #f0fdf4;
         border-radius: 4px;
       }
     }
@@ -244,16 +249,20 @@
       }
 
       .upload-progress {
-        height: 6px;
-        background-color: #e2e8f0;
-        border-radius: 3px;
-        margin-top: 6px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 64px;
+        width: 100%;
+        border-radius: 6px;
         overflow: hidden;
+        z-index: -1;
 
         .progress-bar {
           height: 100%;
-          background-color: #22c55e;
+          background: linear-gradient(0deg, var(--alpha-default-10, rgba(255, 255, 255, 0.90)) 0%, var(--alpha-default-10, rgba(255, 255, 255, 0.90)) 100%), var(--base-success, #237804);
           transition: width 0.3s ease;
+          border-radius: 6px;
         }
       }
     }
@@ -279,9 +288,10 @@
       }
 
       .cancel-btn {
-        background-color: #f8fafc;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
+        padding: 8px 28px;
+        border-radius: 6px;
+        border: 1px solid #E4E4E7;
+        background: #ffffff;
       }
 
       .retry-btn {
@@ -291,9 +301,10 @@
       }
 
       .delete-btn {
-        background-color: #f8fafc;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
+        padding: 8px 28px;
+        border-radius: 6px;
+        border: 1px solid #E4E4E7;
+        background: #ffffff;
 
         &:hover {
           background-color: #fee2e2;
@@ -308,17 +319,30 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background-color: #4caf50;
-    background-color: rgba(76, 175, 80, 0.1);
-    border-radius: 4px;
+    border-radius: 6px;
+    background: #237804;
     margin-top: 12px;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 100%;
 
     .summary-status {
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #166534;
+      color: #F0FDF4;
       font-weight: 500;
+
+      &__icon {
+        border-radius: 6px;
+        background: #F0FDF4;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-items: center;
+      }
     }
 
     .add-more-btn {
@@ -327,19 +351,19 @@
       gap: 6px;
       padding: 8px 16px;
       background-color: white;
-      color: #4caf50;
-      border: 1px solid #4caf50;
+      color: #237804;
       border-radius: 4px;
+      border: none;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
 
       &:hover {
-        background-color: #f0fdf4;
+        //background-color: #f0fdf4;
       }
 
       svg {
-        stroke: #4caf50;
+        stroke: #237804;
       }
     }
   }
