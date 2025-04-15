@@ -1,0 +1,78 @@
+.manual-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 16px;
+  z-index: 1000;
+  width: 100%;
+  max-width: 388px;
+
+  &__content {
+    background-color: #232323;
+    color: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &--remove {
+      background-color: #DC2626; // Red background for removal notification
+    }
+  }
+
+  &__message {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+
+  &__text {
+    font-size: 0.875rem;
+    font-weight: 300;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+  }
+
+  &__view-inquiry {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .icon {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    bottom: 16px;
+    max-width: calc(100% - 32px);
+
+    &__content {
+      padding: 14px 16px;
+    }
+  }
+}

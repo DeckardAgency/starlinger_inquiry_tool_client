@@ -19,4 +19,13 @@
     (viewCart)="onViewCart()"
     (close)="hideNotification()"
   ></app-cart-notification>
+
+  <!-- Manual Notification Component -->
+  <app-manual-notification
+    [visible]="(manualQuickCartService.notificationVisible$ | async) ?? false"
+    [message]="(manualQuickCartService.notificationMessage$ | async) ?? 'Part removed from inquiry.'"
+    [type]="(manualQuickCartService.notificationType$ | async) ?? 'remove'"
+    (viewInquiry)="onViewInquiry()"
+    (close)="hideManualNotification()"
+  ></app-manual-notification>
 </div>

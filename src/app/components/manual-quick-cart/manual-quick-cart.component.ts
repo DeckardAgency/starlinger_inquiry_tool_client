@@ -58,6 +58,7 @@ export class ManualQuickCartComponent implements OnInit, OnDestroy {
   }
 
   removeItem(index: number): void {
+    // The service will now handle showing the notification
     this.manualQuickCartService.removeFromCart(index);
   }
 

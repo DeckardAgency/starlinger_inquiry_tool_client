@@ -11,11 +11,24 @@ export class ManualQuickCartService {
   private openStateSubject = new BehaviorSubject<boolean>(false);
   public readonly isOpen$ = this.openStateSubject.asObservable();
 
+  // Notification state
+  private notificationVisibleSubject = new BehaviorSubject<boolean>(false);
+  public readonly notificationVisible$ = this.notificationVisibleSubject.asObservable();
+
+  // Notification message
+  private notificationMessageSubject = new BehaviorSubject<string>('Part removed from inquiry.');
+  public readonly notificationMessage$ = this.notificationMessageSubject.asObservable();
+
+  // Notification type
+  private notificationTypeSubject = new BehaviorSubject<'success' | 'remove'>('remove');
+  public readonly notificationType$ = this.notificationTypeSubject.asObservable();
+
   constructor(private manualCartService: ManualCartService) {}
 
   // Open the cart
   public open(): void {
     this.openStateSubject.next(true);
+    this.hideNotification(); // Hide notification when cart is opened
   }
 
   // Close the cart
@@ -26,6 +39,21 @@ export class ManualQuickCartService {
   // Toggle cart visibility
   public toggle(): void {
     this.openStateSubject.next(!this.openStateSubject.value);
+    if (this.openStateSubject.value) {
+      this.hideNotification();
+    }
+  }
+
+  // Show notification
+  public showNotification(message: string, type: 'success' | 'remove' = 'remove'): void {
+    this.notificationMessageSubject.next(message);
+    this.notificationTypeSubject.next(type);
+    this.notificationVisibleSubject.next(true);
+  }
+
+  // Hide notification
+  public hideNotification(): void {
+    this.notificationVisibleSubject.next(false);
   }
 
   // Add inquiry parts to the cart
@@ -34,9 +62,21 @@ export class ManualQuickCartService {
     this.open(); // Open the cart after adding items
   }
 
-  // Remove a part from the cart
+  // Remove a part from the cart with notification
   public removeFromCart(index: number): void {
+    // Get items to find the part name before removing
+    let partName = "Part";
+    this.manualCartService.getCartItems().subscribe(items => {
+      if (items.length > index) {
+        partName = items[index].partName || `Part ${index + 1}`;
+      }
+    }).unsubscribe();
+
+    // Remove the item
     this.manualCartService.removeFromCart(index);
+
+    // Show notification
+    this.showNotification(`${partName} removed from inquiry.`, 'remove');
   }
 
   // Get cart items

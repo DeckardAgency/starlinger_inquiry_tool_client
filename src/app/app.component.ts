@@ -8,6 +8,7 @@ import { AsyncPipe } from '@angular/common';
 import { QuickCartComponent } from './components/quick-cart/quick-cart.component';
 import { ManualQuickCartComponent } from './components/manual-quick-cart/manual-quick-cart.component';
 import { CartNotificationComponent } from './components/cart-notification/cart-notification.component';
+import { ManualNotificationComponent } from './components/manual-notification/manual-notification.component';
 import { ManualQuickCartService } from './services/manual-quick-cart.service';
 
 @Component({
@@ -20,6 +21,7 @@ import { ManualQuickCartService } from './services/manual-quick-cart.service';
     QuickCartComponent,
     ManualQuickCartComponent,
     CartNotificationComponent,
+    ManualNotificationComponent,
     AsyncPipe
   ],
   templateUrl: './app.component.html',
@@ -41,5 +43,14 @@ export class AppComponent {
 
   hideNotification(): void {
     this.quickCartService.hideNotification();
+  }
+
+  onViewInquiry(): void {
+    this.manualQuickCartService.hideNotification();
+    this.manualQuickCartService.open();
+  }
+
+  hideManualNotification(): void {
+    this.manualQuickCartService.hideNotification();
   }
 }
