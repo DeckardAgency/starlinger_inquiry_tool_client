@@ -4,8 +4,9 @@ import { ShopComponent } from './shop/shop.component';
 import { ManualEntryComponent } from './manual-entry/manual-entry.component';
 import { InquiryToolComponent } from './inquiry-tool/inquiry-tool.component';
 import { CartComponent } from './cart/cart.component';
-import {LoginComponent} from './login/login.component';
-import {AuthGuard} from './auth.guard';
+import { LoginComponent } from './login/login.component';
+import { AuthGuard } from './auth.guard';
+import { ManualEntryCartComponent } from './manual-entry-cart/manual-entry-cart.component';
 
 export const routes: Routes = [
   {
@@ -35,6 +36,12 @@ export const routes: Routes = [
     component: ManualEntryComponent,
     canActivate: [AuthGuard],
     title: 'Inquiry Tool | Manual entry'
+  },
+  {
+    path: 'manual-entry-cart',
+    component: ManualEntryCartComponent,
+    canActivate: [AuthGuard],
+    title: 'Inquiry Tool | Inquiry Overview'
   },
   {
     path: 'inquiry-tool',

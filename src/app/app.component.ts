@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { TopBarComponent } from './layout/topbar/top-bar.component';
 import { SidebarService } from './services/sidebar.service';
@@ -10,6 +10,7 @@ import { ManualQuickCartComponent } from './components/manual-quick-cart/manual-
 import { CartNotificationComponent } from './components/cart-notification/cart-notification.component';
 import { ManualNotificationComponent } from './components/manual-notification/manual-notification.component';
 import { ManualQuickCartService } from './services/manual-quick-cart.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -29,12 +30,24 @@ import { ManualQuickCartService } from './services/manual-quick-cart.service';
 })
 export class AppComponent {
   title = 'starlinger_inquiry_tool_client';
+  currentRoute: string = '';
 
   constructor(
     public sidebarService: SidebarService,
     public quickCartService: QuickCartService,
-    public manualQuickCartService: ManualQuickCartService
-  ) {}
+    public manualQuickCartService: ManualQuickCartService,
+    private router: Router
+  ) {
+    // Subscribe to router events to keep track of current route
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.currentRoute = event.url;
+    });
+
+    // Initialize current route
+    this.currentRoute = this.router.url;
+  }
 
   onViewCart(): void {
     this.quickCartService.hideNotification();
@@ -52,5 +65,19 @@ export class AppComponent {
 
   hideManualNotification(): void {
     this.manualQuickCartService.hideNotification();
+  }
+
+  // Check if current route is in the manual entry section
+  isManualEntryRoute(): boolean {
+    return this.currentRoute.includes('/manual-entry');
+  }
+
+  // Navigate to the appropriate cart based on current route
+  navigateToCart(): void {
+    if (this.isManualEntryRoute()) {
+      this.router.navigate(['/manual-entry-cart']);
+    } else {
+      this.router.navigate(['/cart']);
+    }
   }
 }
