@@ -65,9 +65,6 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background-color: #f0fdf4;
-      border: 1px dashed #86efac;
-      border-radius: 8px;
       padding: 16px;
       margin-top: 20px;
     }
@@ -75,19 +72,19 @@
     &__add-text {
       margin: 0;
       font-size: 16px;
-      color: #166534;
+      font-weight: 400;
     }
 
     &__add-btn {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 16px;
-      background-color: #4ade80;
-      color: white;
+      padding: 12px 18px;
+      background-color: #232323;
+      color: #FAFAFA;
       border: none;
       border-radius: 4px;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
 
@@ -191,7 +188,6 @@
   }
 
   .uploaded-files {
-    padding: 10px;
 
     .file-item {
       position: relative;
@@ -295,9 +291,10 @@
       }
 
       .retry-btn {
-        background-color: #f8fafc;
-        color: #64748b;
-        border: 1px solid #e2e8f0;
+        padding: 8px 28px;
+        border-radius: 6px;
+        border: 1px solid #E4E4E7;
+        background: #ffffff;
       }
 
       .delete-btn {
@@ -341,7 +338,7 @@
         height: 36px;
         display: flex;
         align-items: center;
-        justify-items: center;
+        justify-content: center;
       }
     }
 
@@ -599,6 +596,7 @@
   // Details styles
   &__details {
     flex: 1;
+    padding-bottom: 16px;
   }
 
   &__details-header {
@@ -665,7 +663,7 @@
     }
 
     .form-control {
-      width: 100%;
+      width: calc(100% - 36px);
       padding: 10px 12px;
       border: 1px solid #e2e8f0;
       border-radius: 6px;
@@ -687,7 +685,7 @@
 
   .form-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 12px;
     margin-top: 24px;
 
