@@ -8,6 +8,9 @@
   <!-- Quick Cart Component -->
   <app-quick-cart [isOpen]="(quickCartService.isOpen$ | async) ?? false"></app-quick-cart>
 
+  <!-- Manual Quick Cart Component -->
+  <app-manual-quick-cart [isOpen]="(manualQuickCartService.isOpen$ | async) ?? false"></app-manual-quick-cart>
+
   <!-- Cart Notification Component -->
   <app-cart-notification
     [visible]="(quickCartService.notificationVisible$ | async) ?? false"

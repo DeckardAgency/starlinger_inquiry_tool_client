@@ -9,6 +9,8 @@ import { Product } from '../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ArticleItemComponent } from '../components/article-item/article-item.component';
 import {AdvancedImagePreviewModalComponent} from './advanced-image-preview-modal.component';
+import {ManualQuickCartService} from '../services/manual-quick-cart.service';
+import {ManualCartItem} from '../services/manual-cart.service';
 
 export interface MachineType {
   id: string;
@@ -156,7 +158,10 @@ export class ManualEntryComponent implements OnInit {
     return 'part_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
   }
 
-  constructor(private productService: ProductService) {
+  constructor(
+    private productService: ProductService,
+    private manualQuickCartService: ManualQuickCartService
+  ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -499,40 +504,31 @@ export class ManualEntryComponent implements OnInit {
     });
 
     if (this.isFormValid() && this.selectedMachine) {
-      const partData = this.parts.map(part => {
+      // Map parts to ManualCartItems for the cart service
+      const manualCartItems: ManualCartItem[] = this.parts.map(part => {
         return {
-          machineName: this.selectedMachine!.name,
           machineId: this.selectedMachine!.id,
-          ...part.data,
+          machineName: this.selectedMachine!.name,
+          partName: part.data.partName,
+          partNumber: part.data.partNumber,
+          shortDescription: part.data.shortDescription,
+          additionalNotes: part.data.additionalNotes,
+          // Only include successfully uploaded files
           files: part.files.filter(file => file.status === 'success')
         };
       });
 
-      // Here you would typically save the parts to your service/backend
-      console.log('Parts added:', partData);
-
-      // Log all machines with parts
-      console.log('Machines with parts:');
-      this.machinePartsMap.forEach((parts, machineId) => {
-        const machine = this.machines.find(m => m.id === machineId);
-        if (machine) {
-          console.log(`Machine: ${machine.name} (ID: ${machineId}), Parts: ${parts.length}`);
-          parts.forEach((part, index) => {
-            console.log(`  Part ${index + 1}: ${part.data.partName}`);
-          });
-        }
-      });
-
-      // Show success message or notification
-      alert('Parts added successfully!');
+      // Add parts to manual cart and open the inquiry overview
+      this.manualQuickCartService.addToCart(manualCartItems);
 
       // Remove the saved parts for this machine (since they've been submitted)
       if (this.selectedMachine) {
         this.machinePartsMap.delete(this.selectedMachine.id);
       }
 
-      // Reset and close details
-      this.closeDetails();
+      // Reset the form state but don't close details yet
+      this.parts = [];
+      this.addPart();
     }
   }
 
