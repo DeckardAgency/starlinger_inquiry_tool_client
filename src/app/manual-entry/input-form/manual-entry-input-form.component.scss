@@ -624,6 +624,17 @@
       border-color: rgba(9, 9, 11, 0.10);
       color: #232323;
     }
+
+    a {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      color: inherit;
+    }
+
+    &--active {
+      background-color: red;
+    }
   }
 
   &__view-btn--disabled {
@@ -714,7 +725,7 @@
     }
 
     .form-control {
-      width: calc(100% - 36px);
+      width: calc(100% - 28px);
       padding: 10px 12px;
       border: 1px solid #e2e8f0;
       border-radius: 6px;
