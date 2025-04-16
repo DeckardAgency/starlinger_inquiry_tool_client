@@ -3,14 +3,14 @@ import { Component, OnInit, HostListener, ViewChild, ElementRef, ViewChildren, Q
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/breadcrumbs.component';
-import { ProductService } from '../services/product.service';
-import { Product } from '../interfaces/product.interface';
+import { BreadcrumbsComponent, Breadcrumb } from '../../components/breadcrumbs/breadcrumbs.component';
+import { ProductService } from '../../services/product.service';
+import { Product } from '../../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { ArticleItemComponent } from '../components/article-item/article-item.component';
+import { ArticleItemComponent } from '../../components/article-item/article-item.component';
 import {AdvancedImagePreviewModalComponent} from './advanced-image-preview-modal.component';
-import {ManualQuickCartService} from '../services/manual-quick-cart.service';
-import {ManualCartItem} from '../services/manual-cart.service';
+import {ManualQuickCartService} from '../../services/manual-quick-cart.service';
+import {ManualCartItem} from '../../services/manual-cart.service';
 
 export interface MachineType {
   id: string;
@@ -41,7 +41,7 @@ export interface Part {
 }
 
 @Component({
-  selector: 'app-manual-entry',
+  selector: 'app-manual-entry-input-form',
   standalone: true,
   imports: [
     CommonModule,
@@ -52,10 +52,10 @@ export interface Part {
     ArticleItemComponent,
     AdvancedImagePreviewModalComponent
   ],
-  templateUrl: './manual-entry.component.html',
-  styleUrls: ['./manual-entry.component.scss']
+  templateUrl: './manual-entry-input-form.component.html',
+  styleUrls: ['./manual-entry-input-form.component.scss']
 })
-export class ManualEntryComponent implements OnInit {
+export class ManualEntryInputFormComponent implements OnInit {
   // Machine data properties
   machines: Product[] = [];
   filteredMachines: Product[] = [];

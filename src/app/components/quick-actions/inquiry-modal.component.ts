@@ -50,7 +50,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
               </span>
             </a>
 
-            <a routerLink="/manual-inquiry" class="inquiry-option inquiry-option--disabled" (click)="close()">
+            <a routerLink="/manual-entry/input-form" class="inquiry-option" (click)="close()">
               <div class="inquiry-option__icon inquiry-option__icon--red">
                 <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38" fill="none">
                   <path d="M33.25 23.75V30.0833C33.25 30.9232 32.9164 31.7286 32.3225 32.3225C31.7286 32.9164 30.9232 33.25 30.0833 33.25H7.91667C7.07681 33.25 6.27136 32.9164 5.6775 32.3225C5.08363 31.7286 4.75 30.9232 4.75 30.0833V23.75M26.9167 12.6667L19 4.75M19 4.75L11.0833 12.6667M19 4.75V23.75" stroke="#DC2626" stroke-width="3.16667" stroke-linecap="round" stroke-linejoin="round"/>

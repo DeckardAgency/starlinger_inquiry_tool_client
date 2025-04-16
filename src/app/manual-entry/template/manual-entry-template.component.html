@@ -1,0 +1,144 @@
+<!-- src/app/manual-entry/manual-entry.component.html -->
+<div class="manual-entry">
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+  <div class="manual-entry__header">
+    <div class="manual-entry__header-left">
+      <h1 class="manual-entry__title">Available machines <span class="manual-entry__title--total-items">{{ totalItems }}</span></h1>
+    </div>
+
+    <div class="manual-entry__header-right">
+      <div class="manual-entry__controls">
+        <div class="manual-entry__view-controls">
+          <button class="manual-entry__view-btn">
+            <a routerLink="/manual-entry/input-form" routerLinkActive="">
+              <span class="material-icons">
+                <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 2H2.667A.667.667 0 0 0 2 2.667V6c0 .368.298.667.667.667H6A.667.667 0 0 0 6.667 6V2.667A.667.667 0 0 0 6 2ZM13.333 2H10a.667.667 0 0 0-.667.667V6c0 .368.299.667.667.667h3.333A.667.667 0 0 0 14 6V2.667A.667.667 0 0 0 13.333 2ZM13.333 9.333H10a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h3.333a.667.667 0 0 0 .667-.667V10a.667.667 0 0 0-.667-.667ZM6 9.333H2.667A.667.667 0 0 0 2 10v3.333c0 .368.298.667.667.667H6a.667.667 0 0 0 .667-.667V10A.667.667 0 0 0 6 9.333Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Use input form
+            </a>
+          </button>
+          <button class="manual-entry__view-btn">
+            <a routerLink="/manual-entry/template" routerLinkActive="">
+              <span class="material-icons">
+                <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 2.667H14M9.333 6H14m-4.667 4H14m-4.667 3.333H14M2.667 2H6c.368 0 .667.298.667.667V6A.667.667 0 0 1 6 6.667H2.667A.667.667 0 0 1 2 6V2.667C2 2.298 2.298 2 2.667 2Zm0 7.333H6c.368 0 .667.299.667.667v3.333A.667.667 0 0 1 6 14H2.667A.667.667 0 0 1 2 13.333V10c0-.368.298-.667.667-.667Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Use template
+            </a>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-entry__filters">
+    <div class="manual-entry__search">
+        <span class="material-icons">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m14 14-2.867-2.867m1.534-3.8A5.333 5.333 0 1 1 2 7.333a5.333 5.333 0 0 1 10.667 0Z" stroke="#71717A" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      <input
+        type="text"
+        [formControl]="searchControl"
+        placeholder="Filter by machine name"
+        class="manual-entry__search-input"
+      >
+    </div>
+
+    <div class="manual-entry__machine-filter">
+      <button class="manual-entry__filter-btn" (click)="toggleFilter()">
+        <span class="material-icons">
+          <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 4h12M5.167 8h6.666m-4.666 4h2.666"
+                  stroke="#232323"
+                  stroke-width="1.33"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Filter by type
+        <span class="material-icons filter-arrow" [class.open]="isFilterOpen">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="m4 6 4 4 4-4" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+
+      @if (isFilterOpen) {
+        <div class="manual-entry__filter-dropdown">
+          @for (machine of machineTypes; track machine.id) {
+            <label class="manual-entry__filter-option">
+              <input
+                type="checkbox"
+                [checked]="machine.checked"
+                (change)="toggleMachineType(machine)"
+              >
+              <span class="manual-entry__filter-checkbox"></span>
+              <span class="manual-entry__filter-label">{{ machine.name }}</span>
+            </label>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (activeFilters.length > 0) {
+    <div class="manual-entry__active-filters">
+      <span>Active filters:</span>
+      @for (filter of activeFilters; track filter) {
+        <div class="manual-entry__filter-tag">
+          {{ filter }}
+          <button class="manual-entry__filter-remove" (click)="removeFilter(filter)">
+            <span class="material-icons">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#71717A" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- List View with Form Details -->
+  <div class="manual-entry__container">
+    <div class="manual-entry__machines-section"
+         [class.manual-entry__machines-section--details]="selectedMachine">
+
+      @if (loading) {
+        <div class="manual-entry__loading">
+          <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_7WDj{transform-origin:center;animation:spinner_PBVY .75s linear infinite}@keyframes spinner_PBVY{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><circle class="spinner_7WDj" cx="12" cy="2.5" r="1.5"/></svg>
+        </div>
+      }
+
+      @if (error) {
+        <div class="manual-entry__error">{{ error }}</div>
+      }
+
+      @if (!loading && !error) {
+        <div class="manual-entry__machines manual-entry__machines--list">
+          @for (machine of filteredMachines; track machine.id) {
+            <app-article-item
+              [product]="machine"
+              viewMode="list"
+              [isSelected]="selectedMachine?.id === machine.id"
+              (productSelected)="selectMachine($event)"
+            ></app-article-item>
+          }
+        </div>
+      }
+    </div>
+
+    <h2>template</h2>
+  </div>
+</div>
+
+<!-- Advanced Image Preview Modal -->
+@if (showImagePreview && previewImageSrc) {
+  <app-advanced-image-preview-modal
+    [imageSrc]="previewImageSrc"
+    [imageAlt]="previewImageAlt"
+    [imageFileName]="previewImageFileName"
+    (closeModal)="closeImagePreview()"
+    (saveImage)="saveEditedImage($event)"
+  ></app-advanced-image-preview-modal>
+}

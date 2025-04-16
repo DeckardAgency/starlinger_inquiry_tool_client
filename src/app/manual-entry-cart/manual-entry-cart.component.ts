@@ -6,7 +6,7 @@ import { BreadcrumbsComponent, Breadcrumb } from '../components/breadcrumbs/brea
 import { ManualCartService, ManualCartItem } from '../services/manual-cart.service';
 import { ManualQuickCartService } from '../services/manual-quick-cart.service';
 import { Subscription } from 'rxjs';
-import { UploadedFile } from '../manual-entry/manual-entry.component';
+import { UploadedFile } from '../manual-entry/input-form/manual-entry-input-form.component';
 
 interface SectionState {
   details: boolean;

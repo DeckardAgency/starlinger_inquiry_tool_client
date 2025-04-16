@@ -6,6 +6,29 @@
     <div class="manual-entry__header-left">
       <h1 class="manual-entry__title">Available machines <span class="manual-entry__title--total-items">{{ totalItems }}</span></h1>
     </div>
+
+    <div class="manual-entry__header-right">
+      <div class="manual-entry__controls">
+        <div class="manual-entry__view-controls">
+          <button class="manual-entry__view-btn">
+            <a routerLink="/manual-entry/input-form" routerLinkActive="">
+              <span class="material-icons">
+                <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 2H2.667A.667.667 0 0 0 2 2.667V6c0 .368.298.667.667.667H6A.667.667 0 0 0 6.667 6V2.667A.667.667 0 0 0 6 2ZM13.333 2H10a.667.667 0 0 0-.667.667V6c0 .368.299.667.667.667h3.333A.667.667 0 0 0 14 6V2.667A.667.667 0 0 0 13.333 2ZM13.333 9.333H10a.667.667 0 0 0-.667.667v3.333c0 .368.299.667.667.667h3.333a.667.667 0 0 0 .667-.667V10a.667.667 0 0 0-.667-.667ZM6 9.333H2.667A.667.667 0 0 0 2 10v3.333c0 .368.298.667.667.667H6a.667.667 0 0 0 .667-.667V10A.667.667 0 0 0 6 9.333Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+                Use input form
+            </a>
+          </button>
+          <button class="manual-entry__view-btn">
+            <a routerLink="/manual-entry/template" routerLinkActive="">
+              <span class="material-icons">
+                <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 2.667H14M9.333 6H14m-4.667 4H14m-4.667 3.333H14M2.667 2H6c.368 0 .667.298.667.667V6A.667.667 0 0 1 6 6.667H2.667A.667.667 0 0 1 2 6V2.667C2 2.298 2.298 2 2.667 2Zm0 7.333H6c.368 0 .667.299.667.667v3.333A.667.667 0 0 1 6 14H2.667A.667.667 0 0 1 2 13.333V10c0-.368.298-.667.667-.667Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Use template
+            </a>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="manual-entry__filters">
