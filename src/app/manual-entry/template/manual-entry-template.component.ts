@@ -1,5 +1,5 @@
 // src/app/manual-entry/manual-entry.component.ts
-import { Component, OnInit, HostListener, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -8,9 +8,14 @@ import { ProductService } from '../../services/product.service';
 import { Product } from '../../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ArticleItemComponent } from '../../components/article-item/article-item.component';
-import {AdvancedImagePreviewModalComponent} from './advanced-image-preview-modal.component';
-import {ManualQuickCartService} from '../../services/manual-quick-cart.service';
-import {ManualCartItem} from '../../services/manual-cart.service';
+import { AdvancedImagePreviewModalComponent } from './advanced-image-preview-modal.component';
+import { ManualQuickCartService } from '../../services/manual-quick-cart.service';
+import { ManualCartItem } from '../../services/manual-cart.service';
+
+// Import ag-Grid modules
+import { AgGridModule } from 'ag-grid-angular';
+import { ColDef, GridReadyEvent, CellValueChangedEvent } from 'ag-grid-community';
+import {SpreadsheetComponent} from './spreadsheet.component';
 
 export interface MachineType {
   id: string;
@@ -25,19 +30,18 @@ export interface UploadedFile {
   file: File;
   status: 'uploading' | 'success' | 'error';
   progress: number;
-  previewUrl?: string; // New property for image preview
+  previewUrl?: string;
 }
 
 export interface Part {
   id: string;
-  data: {
-    partName: string;
-    partNumber: string;
-    shortDescription: string;
-    additionalNotes: string;
-  };
   files: UploadedFile[];
-  touched: boolean;
+  spreadsheetData?: any[];
+}
+
+export interface SpreadsheetTemplateData {
+  columns: ColDef[];
+  data: any[];
 }
 
 @Component({
@@ -50,26 +54,43 @@ export interface Part {
     RouterModule,
     BreadcrumbsComponent,
     ArticleItemComponent,
-    AdvancedImagePreviewModalComponent
+    AdvancedImagePreviewModalComponent,
+    AgGridModule,
+    SpreadsheetComponent
   ],
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']
 })
-export class ManualEntryTemplateComponent implements OnInit {
+export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   // Machine data properties
   machines: Product[] = [];
   filteredMachines: Product[] = [];
   selectedMachine: Product | null = null;
+  rowData = [
+    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
+    { make: "Ford", model: "F-Series", price: 33850, electric: false },
+    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+  ];
+  colDefs: ColDef[] = [
+    { field: "make" },
+    { field: "model" },
+    { field: "price" },
+    { field: "electric" }
+  ];
   loading = true;
   error: string | null = null;
   totalItems = 0;
   dragCounter = 0;
 
+  // Spreadsheet properties
+  showSpreadsheet = true;
+  isFullScreenMode = false;
+
   // Image preview modal properties
   showImagePreview = false;
   previewImageSrc = '';
   previewImageAlt = '';
-  previewImageFileName = ''; // Add this property
+  previewImageFileName = '';
 
   // File upload properties
   isDragging = false;
@@ -89,18 +110,16 @@ export class ManualEntryTemplateComponent implements OnInit {
   // Using ViewChildren to get all file inputs
   @ViewChildren('fileInputElement') fileInputElements!: QueryList<ElementRef<HTMLInputElement>>;
 
+  // ViewChild for spreadsheet component
+  @ViewChild('spreadsheet') spreadsheetComponent!: SpreadsheetComponent;
+
   // Search and form controls
   searchControl = new FormControl('');
 
-  // Form for adding a new part
-  partForm = new FormGroup({
-    partName: new FormControl('', Validators.required),
-    partNumber: new FormControl(''),
-    shortDescription: new FormControl('', Validators.required),
-    additionalNotes: new FormControl('', Validators.required)
-  });
+  // Simple form for files only
+  partForm = new FormGroup({});
 
-  // Parts repeater array
+  // Parts array (simplified)
   parts: Part[] = [];
 
   // Map to store parts for each machine
@@ -121,18 +140,12 @@ export class ManualEntryTemplateComponent implements OnInit {
     { label: 'Manual Entry', link: '/manual-entry' }
   ];
 
-  // Part repeater methods
+  // Simplified part methods - no longer need additional fields
   addPart(): void {
     const newPart: Part = {
       id: this.generateUniqueId(),
-      data: {
-        partName: '',
-        partNumber: '',
-        shortDescription: '',
-        additionalNotes: ''
-      },
       files: [],
-      touched: false
+      spreadsheetData: []
     };
 
     this.parts.push(newPart);
@@ -158,6 +171,34 @@ export class ManualEntryTemplateComponent implements OnInit {
     return 'part_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
   }
 
+  toggleFullScreenMode(value?: boolean): void {
+    if (value !== undefined) {
+      // If value is provided from the event, use it
+      this.isFullScreenMode = value;
+    } else {
+      // Otherwise toggle the current value
+      this.isFullScreenMode = !this.isFullScreenMode;
+    }
+
+    // Allow time for the DOM to update before refreshing the grid
+    setTimeout(() => {
+      if (this.spreadsheetComponent) {
+        this.spreadsheetComponent.resizeGrid();
+      }
+    }, 100);
+  }
+
+  onSpreadsheetDataChanged(data: any[]): void {
+    if (this.parts.length > 0) {
+      this.parts[0].spreadsheetData = data;
+
+      // Update the stored parts for the selected machine
+      if (this.selectedMachine) {
+        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+      }
+    }
+  }
+
   constructor(
     private productService: ProductService,
     private manualQuickCartService: ManualQuickCartService
@@ -171,6 +212,15 @@ export class ManualEntryTemplateComponent implements OnInit {
   ngOnInit(): void {
     this.loadMachines();
     this.addPart(); // Add first part by default
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize grid if needed
+    setTimeout(() => {
+      if (this.spreadsheetComponent) {
+        this.spreadsheetComponent.resizeGrid();
+      }
+    }, 100);
   }
 
   private loadMachines(): void {
@@ -284,36 +334,36 @@ export class ManualEntryTemplateComponent implements OnInit {
     this.filteredMachines = filtered;
   }
 
-  // Methods to check part form validity
-  checkPartValidity(): void {
-    // Mark the current part as touched to show validation errors
-    if (this.parts.length > 0) {
-      this.parts[this.parts.length - 1].touched = true;
-
-      // Update the stored parts for the selected machine
-      if (this.selectedMachine) {
-        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-      }
-    }
-  }
-
+  // Updated validation methods - check for files or spreadsheet data
   isCurrentPartValid(): boolean {
     if (this.parts.length === 0) return false;
 
     const currentPart = this.parts[this.parts.length - 1];
 
-    // Check if required fields are filled
-    return !!currentPart.data.partName &&
-      !!currentPart.data.shortDescription &&
-      !!currentPart.data.additionalNotes;
+    // Either valid spreadsheet data or at least one successful file upload is required
+    const hasValidFiles = currentPart.files.some(file => file.status === 'success');
+
+    // Check if spreadsheetData exists before trying to use it
+    const hasValidSpreadsheetData = currentPart.spreadsheetData ?
+      currentPart.spreadsheetData.some(row =>
+        Boolean(row.name) || Boolean(row.description) || Boolean(row.notes)
+      ) : false;
+
+    return hasValidFiles || hasValidSpreadsheetData;
   }
 
   isFormValid(): boolean {
-    return this.parts.every(part =>
-      !!part.data.partName &&
-      !!part.data.shortDescription &&
-      !!part.data.additionalNotes
-    );
+    // For each part, check if there's valid data
+    return this.parts.every(part => {
+      const hasValidFiles = part.files.some(file => file.status === 'success');
+
+      const hasValidSpreadsheetData = part.spreadsheetData ?
+        part.spreadsheetData.some(row =>
+          Boolean(row.name) || Boolean(row.description) || Boolean(row.notes)
+        ) : false;
+
+      return hasValidFiles || hasValidSpreadsheetData;
+    });
   }
 
   // File upload methods
@@ -326,6 +376,9 @@ export class ManualEntryTemplateComponent implements OnInit {
       }
     }
   }
+
+  // Rest of the component's methods (file handling, etc.) remain the same
+  // ...
 
   onFileSelected(event: Event, partIndex: number): void {
     const input = event.target as HTMLInputElement;
@@ -498,24 +551,17 @@ export class ManualEntryTemplateComponent implements OnInit {
   }
 
   onSubmit(): void {
-    // Mark all parts as touched to show validation errors
-    this.parts.forEach(part => {
-      part.touched = true;
-    });
-
     if (this.isFormValid() && this.selectedMachine) {
       // Map parts to ManualCartItems for the cart service
       const manualCartItems: ManualCartItem[] = this.parts.map(part => {
         return {
           machineId: this.selectedMachine!.id,
           machineName: this.selectedMachine!.name,
-          partName: part.data.partName,
-          partNumber: part.data.partNumber,
-          shortDescription: part.data.shortDescription,
-          additionalNotes: part.data.additionalNotes,
           // Only include successfully uploaded files
-          files: part.files.filter(file => file.status === 'success')
-        };
+          files: part.files.filter(file => file.status === 'success'),
+          // Include spreadsheet data
+          spreadsheetData: part.spreadsheetData
+        } as unknown as ManualCartItem;
       });
 
       // Add parts to manual cart and open the inquiry overview
@@ -532,7 +578,7 @@ export class ManualEntryTemplateComponent implements OnInit {
     }
   }
 
-  // Add a method to get the total parts across all machines
+  // Get the total parts across all machines
   getTotalPartsCount(): number {
     let count = 0;
     this.machinePartsMap.forEach((parts) => {
@@ -562,7 +608,7 @@ export class ManualEntryTemplateComponent implements OnInit {
     }
   }
 
-  // Add these methods
+  // Image editing methods
   saveEditedImage(dataUrl: string): void {
     // Find the file that's currently being previewed
     if (!this.previewImageSrc) return;
