@@ -67,15 +67,13 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   filteredMachines: Product[] = [];
   selectedMachine: Product | null = null;
   rowData = [
-    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-    { make: "Ford", model: "F-Series", price: 33850, electric: false },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+    { A: "Product (part) name", B: "..."},
+    { A: "Short description", B: "..."},
+    { A: "Additional notes", B: "..."},
   ];
   colDefs: ColDef[] = [
-    { field: "make" },
-    { field: "model" },
-    { field: "price" },
-    { field: "electric" }
+    { field: "A", minWidth: 200 },
+    { field: "B", minWidth: 400},
   ];
   loading = true;
   error: string | null = null;
