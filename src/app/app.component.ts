@@ -2,15 +2,19 @@ import { Component } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { TopBarComponent } from './layout/topbar/top-bar.component';
-import { SidebarService } from './core/services/sidebar.service';
-import { QuickCartService } from './core/services/cart/quick-cart.service';
 import { AsyncPipe } from '@angular/common';
-import { QuickCartComponent } from './shared/components/cart/quick-cart/quick-cart.component';
-import { ManualQuickCartComponent } from './shared/components/cart/manual-quick-cart/manual-quick-cart.component';
-import { CartNotificationComponent } from './shared/components/notifications/cart-notification/cart-notification.component';
-import { ManualNotificationComponent } from './shared/components/notifications/manual-notification/manual-notification.component';
-import { ManualQuickCartService } from './core/services/cart/manual-quick-cart.service';
 import { filter } from 'rxjs/operators';
+import {QuickCartComponent} from '@shared/components/cart/quick-cart/quick-cart.component';
+import {ManualQuickCartComponent} from '@shared/components/cart/manual-quick-cart/manual-quick-cart.component';
+import {
+  CartNotificationComponent
+} from '@shared/components/notifications/cart-notification/cart-notification.component';
+import {
+  ManualNotificationComponent
+} from '@shared/components/notifications/manual-notification/manual-notification.component';
+import {SidebarService} from '@services/sidebar.service';
+import {QuickCartService} from '@services/cart/quick-cart.service';
+import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
 
 @Component({
   selector: 'app-root',

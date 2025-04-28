@@ -1,13 +1,5 @@
-export interface MediaItem {
-  '@id': string;
-  '@type': string;
-  id: string;
-  filename: string;
-  mimeType: string;
-  filePath: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// src/app/core/models/product.model.ts
+import { MediaItem } from './media.model';
 
 export interface ProductResponse {
   '@context': string;

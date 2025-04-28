@@ -2,9 +2,9 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import {CartItem} from '@models/cart-item.model';
 import {QuickCartService} from '@services/cart/quick-cart.service';
 import { environment } from '@env/environment';
+import {CartItem} from '@core/models';
 
 @Component({
   selector: 'app-quick-cart',

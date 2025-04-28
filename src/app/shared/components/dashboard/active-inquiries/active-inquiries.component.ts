@@ -1,14 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-interface Inquiry {
-  id: string;
-  machine: string;
-  dateCreated: string;
-  partsOrdered: number;
-  status: 'Submitted' | 'Processing' | 'Confirmed';
-}
+import {Inquiry} from '@core/models';
 
 @Component({
   selector: 'app-active-inquiries',

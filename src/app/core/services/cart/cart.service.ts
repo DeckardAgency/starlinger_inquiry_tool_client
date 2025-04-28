@@ -1,8 +1,7 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, map } from 'rxjs';
-import { Product } from '../../../interfaces/product.interface';
-import {CartItem} from '@models/cart-item.model';
+import {CartItem, Product} from '@core/models';
 
 @Injectable({
   providedIn: 'root'

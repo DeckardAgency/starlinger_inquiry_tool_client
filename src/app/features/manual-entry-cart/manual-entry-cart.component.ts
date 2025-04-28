@@ -5,9 +5,9 @@ import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import {ManualCartItem} from '@models/manual-cart-item.model';
-import {Breadcrumb} from '@shared/interfaces/breadcrumb.interface';
 import {ManualCartService} from '@services/cart/manual-cart.service';
 import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
+import {Breadcrumb} from '@core/models';
 
 interface SectionState {
   details: boolean;

@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import {environment} from "../../../environments/environment";
-import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import {CartItem} from '@models/cart-item.model';
-import {Breadcrumb} from '@shared/interfaces/breadcrumb.interface';
-import {CartService} from '@services/cart/cart.service';
-import {QuickCartService} from '@services/cart/quick-cart.service';
+import { environment } from '@env/environment';
+import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
+import { CartService } from '@services/cart/cart.service';
+import { QuickCartService } from '@services/cart/quick-cart.service';
+import { Breadcrumb, CartItem } from '@core/models';
 
 @Component({
   selector: 'app-cart',

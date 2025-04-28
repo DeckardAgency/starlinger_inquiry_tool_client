@@ -2,7 +2,6 @@ import { Component, OnInit, HostListener, ViewChild, ElementRef, ViewChildren, Q
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { Product } from '../../../interfaces/product.interface';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // Import ag-Grid modules
@@ -15,10 +14,10 @@ import {
   AdvancedImagePreviewModalComponent
 } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
 import {MachineType} from '@models/machine-type.model';
-import {Breadcrumb} from '@shared/interfaces/breadcrumb.interface';
 import {ProductService} from '@services/http/product.service';
 import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
 import {ManualCartItem} from '@models/manual-cart-item.model';
+import {Breadcrumb, Product} from '@core/models';
 
 export interface UploadedFile {
   name: string;
