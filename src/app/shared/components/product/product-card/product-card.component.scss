@@ -374,4 +374,9 @@ $spacing-xl: 24px;
   &__next {
     right: 1rem;
   }
+
+  &__disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
