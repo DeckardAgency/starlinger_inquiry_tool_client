@@ -5,11 +5,12 @@ import { QuickCartService } from '@services/cart/quick-cart.service';
 import { Product } from '@core/models';
 import { environment } from '@env/environment';
 import { SlickCarouselModule, SlickCarouselComponent } from 'ngx-slick-carousel';
+import {IconComponent} from '@shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, FormsModule, SlickCarouselModule],
+  imports: [CommonModule, FormsModule, SlickCarouselModule, IconComponent],
   styleUrls: ['./product-card.component.scss'],
   templateUrl: './product-card.component.html',
 })
