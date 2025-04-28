@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { CartService } from '../../services/cart.service';
-import { QuickCartService } from '../../services/quick-cart.service';
-import { ManualCartService } from '../../services/manual-cart.service';
-import { ManualQuickCartService } from '../../services/manual-quick-cart.service';
-import { SearchComponent } from '../../components/search/search.component';
 import { filter } from 'rxjs/operators';
+import {SearchComponent} from '@shared/components/ui/search/search.component';
+import {CartService} from '@services/cart/cart.service';
+import {QuickCartService} from '@services/cart/quick-cart.service';
+import {ManualCartService} from '@services/cart/manual-cart.service';
+import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -26,7 +26,7 @@ export class TopBarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to router events to keep track of current route
+    // Subscribe to router events to keep track of the current route
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
@@ -38,7 +38,7 @@ export class TopBarComponent implements OnInit {
   }
 
   toggleCart() {
-    // Determine which cart to toggle based on current route
+    // Determine which cart to toggle based on the current route
     if (this.isManualEntryRoute()) {
       this.manualQuickCartService.toggle();
     } else {
@@ -47,7 +47,7 @@ export class TopBarComponent implements OnInit {
   }
 
   navigateToCart() {
-    // Navigate to the appropriate cart based on current route
+    // Navigate to the appropriate cart based on the current route
     if (this.isManualEntryRoute()) {
       this.router.navigate(['/manual-entry-cart']);
     } else {

@@ -1,0 +1,404 @@
+<!-- src/app/manual-entry/manual-entry.component.html -->
+<div class="manual-entry">
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+  <div class="manual-entry__header">
+    <div class="manual-entry__header-left">
+      <h1 class="manual-entry__title">Available machines <span class="manual-entry__title--total-items">{{ totalItems }}</span></h1>
+    </div>
+
+    <div class="manual-entry__header-right">
+      <div class="manual-entry__controls">
+        <div class="manual-entry__view-controls">
+          <button class="manual-entry__view-btn">
+            <a routerLink="/manual-entry/input-form" routerLinkActive="manual-entry__view-btn--active">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                <path d="M3.83325 2.66699H4.49992C5.03035 2.66699 5.53906 2.87771 5.91413 3.25278C6.28921 3.62785 6.49992 4.13656 6.49992 4.66699M6.49992 4.66699C6.49992 4.13656 6.71063 3.62785 7.0857 3.25278C7.46078 2.87771 7.96949 2.66699 8.49992 2.66699H9.16659M6.49992 4.66699V11.3337M9.16659 13.3337H8.49992C7.96949 13.3337 7.46078 13.1229 7.0857 12.7479C6.71063 12.3728 6.49992 11.8641 6.49992 11.3337M6.49992 11.3337C6.49992 11.8641 6.28921 12.3728 5.91413 12.7479C5.53906 13.1229 5.03035 13.3337 4.49992 13.3337H3.83325M3.83325 10.667H3.16659C2.81296 10.667 2.47382 10.5265 2.22378 10.2765C1.97373 10.0264 1.83325 9.68728 1.83325 9.33366V6.66699C1.83325 6.31337 1.97373 5.97423 2.22378 5.72418C2.47382 5.47413 2.81296 5.33366 3.16659 5.33366H3.83325M9.16659 5.33366H13.8333C14.1869 5.33366 14.526 5.47413 14.7761 5.72418C15.0261 5.97423 15.1666 6.31337 15.1666 6.66699V9.33366C15.1666 9.68728 15.0261 10.0264 14.7761 10.2765C14.526 10.5265 14.1869 10.667 13.8333 10.667H9.16659" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Use input form
+            </a>
+          </button>
+          <button class="manual-entry__view-btn">
+            <a routerLink="/manual-entry/template" routerLinkActive="manual-entry__view-btn--active">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                <path d="M2.5 6H14.5M2.5 10H14.5M6.5 6V14M10.5 6V14M3.83333 2H13.1667C13.903 2 14.5 2.59695 14.5 3.33333V12.6667C14.5 13.403 13.903 14 13.1667 14H3.83333C3.09695 14 2.5 13.403 2.5 12.6667V3.33333C2.5 2.59695 3.09695 2 3.83333 2Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Use template
+            </a>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-entry__filters">
+    <div class="manual-entry__search">
+        <span class="material-icons">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m14 14-2.867-2.867m1.534-3.8A5.333 5.333 0 1 1 2 7.333a5.333 5.333 0 0 1 10.667 0Z" stroke="#71717A" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      <input
+        type="text"
+        [formControl]="searchControl"
+        placeholder="Filter by machine name"
+        class="manual-entry__search-input"
+      >
+    </div>
+
+    <div class="manual-entry__machine-filter">
+      <button class="manual-entry__filter-btn" (click)="toggleFilter()">
+        <span class="material-icons">
+          <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.5 4h12M5.167 8h6.666m-4.666 4h2.666"
+                  stroke="#232323"
+                  stroke-width="1.33"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Filter by type
+        <span class="material-icons filter-arrow" [class.open]="isFilterOpen">
+          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="m4 6 4 4 4-4" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+
+      @if (isFilterOpen) {
+        <div class="manual-entry__filter-dropdown">
+          @for (machine of machineTypes; track machine.id) {
+            <label class="manual-entry__filter-option">
+              <input
+                type="checkbox"
+                [checked]="machine.checked"
+                (change)="toggleMachineType(machine)"
+              >
+              <span class="manual-entry__filter-checkbox"></span>
+              <span class="manual-entry__filter-label">{{ machine.name }}</span>
+            </label>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (activeFilters.length > 0) {
+    <div class="manual-entry__active-filters">
+      <span>Active filters:</span>
+      @for (filter of activeFilters; track filter) {
+        <div class="manual-entry__filter-tag">
+          {{ filter }}
+          <button class="manual-entry__filter-remove" (click)="removeFilter(filter)">
+            <span class="material-icons">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3L3 9M3 3L9 9" stroke="#71717A" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- List View with Form Details -->
+  <div class="manual-entry__container">
+    <div class="manual-entry__machines-section"
+         [class.manual-entry__machines-section--details]="selectedMachine">
+
+      @if (loading) {
+        <div class="manual-entry__loading">
+          <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><style>.spinner_7WDj{transform-origin:center;animation:spinner_PBVY .75s linear infinite}@keyframes spinner_PBVY{100%{transform:rotate(360deg)}}</style><path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/><circle class="spinner_7WDj" cx="12" cy="2.5" r="1.5"/></svg>
+        </div>
+      }
+
+      @if (error) {
+        <div class="manual-entry__error">{{ error }}</div>
+      }
+
+      @if (!loading && !error) {
+        <div class="manual-entry__machines manual-entry__machines--list">
+          @for (machine of filteredMachines; track machine.id) {
+            <app-article-item
+              [product]="machine"
+              viewMode="list"
+              [isSelected]="selectedMachine?.id === machine.id"
+              (productSelected)="selectMachine($event)"
+            ></app-article-item>
+          }
+        </div>
+      }
+    </div>
+
+    @if (selectedMachine) {
+      <div class="product-details">
+        <div class="manual-entry__details">
+          <div class="manual-entry__details-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6.66659 5.33317H6.67325M7.99992 7.99984H8.00659M9.33325 5.33317H9.33992M10.6666 7.99984H10.6733M11.9999 5.33317H12.0066M3.99992 5.33317H4.00659M4.66659 10.6665H11.3333M5.33325 7.99984H5.33992M2.66659 2.6665H13.3333C14.0696 2.6665 14.6666 3.26346 14.6666 3.99984V11.9998C14.6666 12.7362 14.0696 13.3332 13.3333 13.3332H2.66659C1.93021 13.3332 1.33325 12.7362 1.33325 11.9998V3.99984C1.33325 3.26346 1.93021 2.6665 2.66659 2.6665Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2 class="manual-entry__details-title">Input data</h2>
+          </div>
+
+          <!-- Single Part Form -->
+          <div class="manual-entry__form">
+            <form [formGroup]="partForm">
+              <!--              <div class="part-repeater__header">-->
+              <!--                <h3 class="part-repeater__title">Parts ({{ parts.length }})</h3>-->
+              <!--              </div>-->
+
+              @for (part of parts; track part.id; let i = $index) {
+                <div class="part-repeater__item">
+                  <!-- Part Header -->
+                  <div class="part-repeater__item-header">
+                    <!--                    <h4 class="part-repeater__item-title">Part {{ i + 1 }}</h4>-->
+                    @if (parts.length > 1) {
+                      <button type="button" class="part-repeater__remove-btn" (click)="removePart(i)">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M2 4H14M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4M12 4V13C12 13.5523 11.5523 14 11 14H5C4.44772 14 4 13.5523 4 13V4H12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Remove
+                      </button>
+                    }
+                  </div>
+
+                  <!-- Part Name Field -->
+                  <div class="form-group">
+                    <label [for]="'partName' + i">Part (product) name *</label>
+                    <input
+                      type="text"
+                      [id]="'partName' + i"
+                      [(ngModel)]="part.data.partName"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control"
+                      placeholder="Type exact or partial product name"
+                      (input)="checkPartValidity()"
+                    >
+                    @if (!part.data.partName && part.touched) {
+                      <div class="error-message">Part name is required</div>
+                    }
+                  </div>
+
+                  <!-- Part Number Field -->
+                  <div class="form-group">
+                    <label [for]="'partNumber' + i">Part number (optional)</label>
+                    <input
+                      type="text"
+                      [id]="'partNumber' + i"
+                      [(ngModel)]="part.data.partNumber"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control"
+                      placeholder="Type part number"
+                    >
+                  </div>
+
+                  <!-- Short Description Field -->
+                  <div class="form-group">
+                    <label [for]="'shortDescription' + i">Short description *</label>
+                    <textarea
+                      [id]="'shortDescription' + i"
+                      [(ngModel)]="part.data.shortDescription"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control"
+                      rows="5"
+                      placeholder="Hello! I need a replacement part for my 200XE Winding Machine. Not sure about the exact part needed, please check the attached files for more info."
+                      (input)="checkPartValidity()"
+                    ></textarea>
+                    @if (!part.data.shortDescription && part.touched) {
+                      <div class="error-message">Short description is required</div>
+                    }
+                  </div>
+
+                  <!-- File Upload Field -->
+                  <div class="form-group">
+                    <!-- Individual file input for each part -->
+                    <input #fileInputElement type="file" multiple (change)="onFileSelected($event, i)" style="display: none;">
+                    <div class="file-upload-container" [class.has-files]="part.files.length > 0">
+
+                      <!-- Empty Upload State -->
+                      @if (part.files.length === 0) {
+                        <div class="file-upload-dropzone"
+                             (dragover)="onDragOver($event)"
+                             (dragenter)="onDragEnter($event)"
+                             (dragleave)="onDragLeave($event)"
+                             (drop)="onDrop($event, i)"
+                             [class.active]="isDragging">
+                          <div class="upload-icon" (click)="triggerFileInput(i)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                              <path d="M16 24H32M24 16V32M44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24Z" stroke="#232323" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </div>
+                          <button type="button" class="add-files-btn" (click)="triggerFileInput(i)">
+                            Add file(s)
+                          </button>
+                          <p class="drag-text">or Drag & Drop them here!</p>
+                          <p class="file-types">We accept: JPG, PNG, WEBP, PDF, XLS, DOC & MP4. Max file size: 5 MB.</p>
+                        </div>
+                      }
+
+                      <!-- Files List -->
+                      @if (part.files.length > 0) {
+                        <div class="uploaded-files">
+                          @for (file of part.files; track file.name) {
+                            <div class="file-item"
+                                 [class.file-error]="file.status === 'error'"
+                                 [class.file-uploading]="file.status === 'uploading'">
+
+                              <!-- File Icon -->
+                              <div class="file-icon" [class.clickable]="isImageFile(file.name) && file.previewUrl && file.status === 'success'"
+                                   (click)="isImageFile(file.name) && file.previewUrl && file.status === 'success' ? openImagePreview(file) : null">
+                                @if (isImageFile(file.name)) {
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM5 19V5H19V19H5ZM8.5 13.5L11 16.51L14.5 12L19 18H5L8.5 13.5Z" fill="#666666"/>
+                                  </svg>
+                                } @else {
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20Z" fill="#666666"/>
+                                  </svg>
+                                }
+                              </div>
+
+                              <!-- File Info -->
+                              <div class="file-info" [class.clickable]="isImageFile(file.name) && file.previewUrl && file.status === 'success'"
+                                   (click)="isImageFile(file.name) && file.previewUrl && file.status === 'success' ? openImagePreview(file) : null">
+                                <div class="file-name">{{ file.name }}</div>
+                                <div class="file-size">{{ formatFileSize(file.size) }}</div>
+
+                                <!-- Upload Progress -->
+                                @if (file.status === 'uploading') {
+                                  <div class="upload-progress">
+                                    <div class="progress-bar" [style.width.%]="file.progress"></div>
+                                  </div>
+                                }
+
+                                <!-- Error Message -->
+                                @if (file.status === 'error') {
+                                  <div class="file-error-message">Failed to upload!</div>
+                                }
+
+                                <!-- Preview Hint for Images -->
+                                <!--                                @if (isImageFile(file.name) && file.status === 'success') {-->
+                                <!--                                  <div class="preview-hint">Click to preview</div>-->
+                                <!--                                }-->
+                              </div>
+
+                              <!-- File Actions -->
+                              <div class="file-actions">
+                                @if (file.status === 'uploading') {
+                                  <button type="button" class="cancel-btn" (click)="cancelUpload(i, file)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Cancel
+                                  </button>
+                                } @else if (file.status === 'error') {
+                                  <button type="button" class="retry-btn" (click)="retryUpload(i, file)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                      <path d="M14 8C14 9.18669 13.6481 10.3467 12.9888 11.3334C12.3295 12.3201 11.3925 13.0892 10.2961 13.5433C9.19975 13.9974 7.99335 14.1162 6.82946 13.8847C5.66558 13.6532 4.59648 13.0818 3.75736 12.2426C2.91825 11.4035 2.3468 10.3344 2.11529 9.17054C1.88378 8.00666 2.0026 6.80026 2.45673 5.7039C2.91085 4.60754 3.67989 3.67047 4.66658 3.01118C5.65328 2.35189 6.81331 2 8 2C9.68 2 11.2867 2.66667 12.4933 3.82667L14 5.33333M14 5.33333L14 2M14 5.33333H10.6667" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Retry
+                                  </button>
+                                  <button type="button" class="delete-btn" (click)="removeFile(i, file)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                      <path d="M2 4.00016H14M12.6667 4.00016V13.3335C12.6667 14.0002 12 14.6668 11.3333 14.6668H4.66667C4 14.6668 3.33333 14.0002 3.33333 13.3335V4.00016M5.33333 4.00016V2.66683C5.33333 2.00016 6 1.3335 6.66667 1.3335H9.33333C10 1.3335 10.6667 2.00016 10.6667 2.66683V4.00016M6.66667 7.3335V11.3335M9.33333 7.3335V11.3335" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Delete
+                                  </button>
+                                } @else {
+                                  <button type="button" class="delete-btn" (click)="removeFile(i, file)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M2 4H14M5 4V3C5 2.44772 5.44772 2 6 2H10C10.5523 2 11 2.44772 11 3V4M12 4V13C12 13.5523 11.5523 14 11 14H5C4.44772 14 4 13.5523 4 13V4H12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Delete
+                                  </button>
+                                }
+                              </div>
+                            </div>
+                          }
+
+                          <!-- Upload Success Summary -->
+                          @if (hasSuccessfulUploads(i) && !hasUploadsInProgress(i)) {
+                            <div class="upload-summary">
+                              <div class="summary-status">
+                                <span class="summary-status__icon">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M20 6L9 17L4 12" stroke="#237804" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                  </svg>
+                                </span>
+                                <span>
+                                  {{ getSuccessfulUploadCount(i) }} items successfully uploaded.
+                                </span>
+                              </div>
+                              <button type="button" class="add-more-btn" (click)="triggerFileInput(i)">
+                                Add more
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                  <path d="M3.3335 8.00016H12.6668M8.00016 3.3335V12.6668" stroke="#237804" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Additional Notes Field -->
+                  <div class="form-group">
+                    <label [for]="'additionalNotes' + i">Additional notes *</label>
+                    <textarea
+                      [id]="'additionalNotes' + i"
+                      [(ngModel)]="part.data.additionalNotes"
+                      [ngModelOptions]="{standalone: true}"
+                      class="form-control"
+                      rows="5"
+                      (input)="checkPartValidity()"
+                      placeholder="If you have more infor that you want to share with us, please type here."
+                    ></textarea>
+                    @if (!part.data.additionalNotes && part.touched) {
+                      <div class="error-message">Additional notes are required</div>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Add Part Button (Only visible when current part is complete) -->
+              @if (isCurrentPartValid()) {
+                <div class="part-repeater__add-section">
+                  <p class="part-repeater__add-text">Do you want to add more parts to the inquiry?</p>
+                  <button type="button" class="part-repeater__add-btn" (click)="addPart()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Add Part
+                  </button>
+                </div>
+              }
+
+              <!-- Form Actions -->
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="closeDetails()">Cancel</button>
+                <button type="button" class="btn btn-primary" [disabled]="!isFormValid()" (click)="onSubmit()">
+                  Continue
+                  <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                      <path d="M6.5 12L10.5 8L6.5 4" stroke="white" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Advanced Image Preview Modal -->
+@if (showImagePreview && previewImageSrc) {
+  <app-advanced-image-preview-modal
+    [imageSrc]="previewImageSrc"
+    [imageAlt]="previewImageAlt"
+    [imageFileName]="previewImageFileName"
+    (closeModal)="closeImagePreview()"
+    (saveImage)="saveEditedImage($event)"
+  ></app-advanced-image-preview-modal>
+}
