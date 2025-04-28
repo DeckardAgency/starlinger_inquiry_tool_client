@@ -1,7 +1,7 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, map } from 'rxjs';
-import {CartItem, Product} from '@core/models';
+import { CartItem, Product } from '@core/models';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,7 @@ import {CartItem, Product} from '@core/models';
 export class CartService {
   private cartItems = new BehaviorSubject<CartItem[]>([]);
   private shippingCost = 49.00; // Default shipping cost
-  private isBrowser: boolean;
+  private readonly isBrowser: boolean;
 
   // Quick cart panel state
   private readonly openStateSubject = new BehaviorSubject<boolean>(false);
@@ -30,7 +30,7 @@ export class CartService {
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
 
-    // Load cart from localStorage only in browser environment
+    // Load cart from localStorage only in the browser environment
     if (this.isBrowser) {
       const savedCart = localStorage.getItem('cart');
       if (savedCart) {
@@ -40,9 +40,6 @@ export class CartService {
   }
 
   // Cart panel UI methods
-  public get isOpen(): boolean {
-    return this.openStateSubject.value;
-  }
 
   public openCart(): void {
     this.openStateSubject.next(true);
@@ -77,14 +74,6 @@ export class CartService {
     this.notificationVisibleSubject.next(false);
   }
 
-  public get isNotificationVisible(): boolean {
-    return this.notificationVisibleSubject.value;
-  }
-
-  public get lastAddedProductMessage(): string {
-    return this.lastAddedProductSubject.value;
-  }
-
   // Cart data methods
   getCartItems(): Observable<CartItem[]> {
     return this.cartItems.asObservable();
@@ -111,33 +100,6 @@ export class CartService {
     return this.getCartTotal().pipe(
       map(total => total + this.shippingCost)
     );
-  }
-
-  // Calculate discounted price (20% discount)
-  getDiscountedPrice(originalPrice: number): number {
-    // Ensure price is a valid number
-    const price = Number(originalPrice) || 0;
-    return price * 0.8;
-  }
-
-  // Format price to two decimal places
-  formatPrice(price: number): string {
-    // Ensure price is a valid number
-    const validPrice = Number(price) || 0;
-    return validPrice.toFixed(2);
-  }
-
-  // Calculate and format the discounted total for an item
-  getFormattedItemTotal(item: CartItem): string {
-    if (!item || !item.product || typeof item.product.price !== 'number') {
-      console.warn('Invalid cart item or missing price:', item);
-      return '0.00';
-    }
-
-    const quantity = Number(item.quantity) || 0;
-    const discountedPrice = this.getDiscountedPrice(item.product.price);
-    const total = discountedPrice * quantity;
-    return this.formatPrice(total);
   }
 
   // Cart manipulation methods
@@ -175,7 +137,7 @@ export class CartService {
 
   removeFromCart(productId: string): void {
     const currentItems = this.cartItems.value;
-    // Find product name before removal
+    // Find the product name before removal
     const product = currentItems.find(item => item.product.id === productId);
     const productName = product?.product.name || 'Product';
 

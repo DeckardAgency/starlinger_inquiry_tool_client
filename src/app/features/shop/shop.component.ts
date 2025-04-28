@@ -4,18 +4,13 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import {ProductCardComponent} from '@shared/components/product/product-card/product-card.component';
-import {ArticleItemComponent} from '@shared/components/product/article-item/article-item.component';
-import {ProductService} from '@services/http/product.service';
-import {CartService} from '@services/cart/cart.service';
-import {Breadcrumb, Product} from '@core/models';
-
-export interface Machine {
-  id: string;
-  name: string;
-  checked: boolean;
-}
+import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
+import { ProductCardComponent } from '@shared/components/product/product-card/product-card.component';
+import { ArticleItemComponent } from '@shared/components/product/article-item/article-item.component';
+import { ProductService } from '@services/http/product.service';
+import { CartService } from '@services/cart/cart.service';
+import { Breadcrumb, Product } from '@core/models';
+import { Machine } from '@models/machine-type.model';
 
 @Component({
   selector: 'app-shop',

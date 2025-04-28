@@ -3,17 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import {ManualCartItem} from '@models/manual-cart-item.model';
-import {ManualCartService} from '@services/cart/manual-cart.service';
-import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
-import {Breadcrumb} from '@core/models';
-
-interface SectionState {
-  details: boolean;
-  files: boolean;
-  notes: boolean;
-}
+import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
+import { ManualCartItem } from '@models/manual-cart-item.model';
+import { ManualCartService } from '@services/cart/manual-cart.service';
+import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
+import { Breadcrumb, SectionState } from '@core/models';
 
 @Component({
   selector: 'app-manual-entry-cart',

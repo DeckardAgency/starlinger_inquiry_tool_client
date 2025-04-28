@@ -4,5 +4,11 @@ export interface Inquiry {
   machine: string;
   dateCreated: string;
   partsOrdered: number;
-  status: 'Submitted' | 'Processing' | 'Confirmed';
+  status: InquiryStatus;
+}
+
+export enum InquiryStatus {
+  Submitted = 'Submitted',
+  Processing = 'Processing',
+  Confirmed = 'Confirmed'
 }

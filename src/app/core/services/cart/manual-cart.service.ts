@@ -1,7 +1,7 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, map } from 'rxjs';
-import {ManualCartItem} from '@models/manual-cart-item.model';
+import { ManualCartItem } from '@models/manual-cart-item.model';
 
 
 @Injectable({
@@ -9,12 +9,12 @@ import {ManualCartItem} from '@models/manual-cart-item.model';
 })
 export class ManualCartService {
   private cartItems = new BehaviorSubject<ManualCartItem[]>([]);
-  private isBrowser: boolean;
+  private readonly isBrowser: boolean;
 
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
 
-    // Load cart from localStorage only in browser environment
+    // Load cart from localStorage only in the browser environment
     if (this.isBrowser) {
       const savedCart = localStorage.getItem('manualCart');
       if (savedCart) {

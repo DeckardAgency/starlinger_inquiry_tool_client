@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import {Inquiry} from '@core/models';
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {Inquiry, InquiryStatus} from '@core/models';
 
 @Component({
   selector: 'app-active-inquiries',
@@ -17,21 +17,21 @@ export class ActiveInquiriesComponent {
       machine: 'ad*starKON SX+ 120',
       dateCreated: '14-03-2024',
       partsOrdered: 12,
-      status: 'Submitted'
+      status: InquiryStatus.Submitted
     },
     {
       id: '0002',
       machine: 'ad*starKON SX+ 120',
       dateCreated: '14-03-2024',
       partsOrdered: 12,
-      status: 'Processing'
+      status: InquiryStatus.Processing
     },
     {
       id: '0003',
       machine: 'ad*starKON SX+ 120',
       dateCreated: '14-03-2024',
       partsOrdered: 12,
-      status: 'Confirmed'
+      status: InquiryStatus.Confirmed
     }
   ];
 }

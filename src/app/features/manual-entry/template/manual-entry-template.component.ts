@@ -6,18 +6,18 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // Import ag-Grid modules
 import { AgGridModule } from 'ag-grid-angular';
-import { ColDef, GridReadyEvent, CellValueChangedEvent } from 'ag-grid-community';
-import {SpreadsheetComponent} from '../components/spreadsheet/spreadsheet.component';
-import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import {ArticleItemComponent} from '@shared/components/product/article-item/article-item.component';
+import { ColDef } from 'ag-grid-community';
+import { SpreadsheetComponent } from '../components/spreadsheet/spreadsheet.component';
+import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
+import { ArticleItemComponent } from '@shared/components/product/article-item/article-item.component';
 import {
   AdvancedImagePreviewModalComponent
 } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
-import {MachineType} from '@models/machine-type.model';
-import {ProductService} from '@services/http/product.service';
-import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
-import {ManualCartItem} from '@models/manual-cart-item.model';
-import {Breadcrumb, Product} from '@core/models';
+import { MachineType } from '@models/machine-type.model';
+import { ProductService } from '@services/http/product.service';
+import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
+import { ManualCartItem } from '@models/manual-cart-item.model';
+import { Breadcrumb, Product } from '@core/models';
 
 export interface UploadedFile {
   name: string;
@@ -104,7 +104,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   // Using ViewChildren to get all file inputs
   @ViewChildren('fileInputElement') fileInputElements!: QueryList<ElementRef<HTMLInputElement>>;
 
-  // ViewChild for spreadsheet component
+  // ViewChild for a spreadsheet component
   @ViewChild('spreadsheet') spreadsheetComponent!: SpreadsheetComponent;
 
   // Search and form controls

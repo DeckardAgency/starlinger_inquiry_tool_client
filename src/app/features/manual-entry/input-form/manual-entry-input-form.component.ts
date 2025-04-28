@@ -4,15 +4,15 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import {ArticleItemComponent} from '@shared/components/product/article-item/article-item.component';
+import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
+import { ArticleItemComponent } from '@shared/components/product/article-item/article-item.component';
 import {
   AdvancedImagePreviewModalComponent
 } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
-import {ProductService} from '@services/http/product.service';
-import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
-import {ManualCartItem} from '@models/manual-cart-item.model';
-import {Breadcrumb, Product} from '@core/models';
+import { ProductService } from '@services/http/product.service';
+import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
+import { ManualCartItem } from '@models/manual-cart-item.model';
+import { Breadcrumb, Product } from '@core/models';
 
 export interface MachineType {
   id: string;

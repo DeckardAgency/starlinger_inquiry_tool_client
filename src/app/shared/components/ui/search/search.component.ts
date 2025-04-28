@@ -2,14 +2,7 @@ import { Component, OnInit, HostListener, ElementRef, Pipe, PipeTransform, ViewC
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
-interface SearchResult {
-  id: string;
-  title: string;
-  type: string;
-  badge?: string;
-  active?: boolean;
-}
+import { SearchResult } from '@core/models';
 
 @Pipe({
   name: 'filterResults',
@@ -167,7 +160,7 @@ export class SearchComponent implements OnInit {
     // Default to Windows/Linux shortcut
     this.searchPlaceholder = "Search";
 
-    // Check for Mac OS in a way that's safe for SSR
+    // Check for macOS in a way that's safe for SSR
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
       const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
       if (isMac) {

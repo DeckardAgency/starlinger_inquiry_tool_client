@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import {ManualCartItem} from '@models/manual-cart-item.model';
-import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
+import { ManualCartItem } from '@models/manual-cart-item.model';
+import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 
 @Component({
   selector: 'app-manual-quick-cart',

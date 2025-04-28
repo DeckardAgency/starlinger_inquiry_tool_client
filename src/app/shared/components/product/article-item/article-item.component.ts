@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment } from '@env/environment';
-import {Product} from '@core/models';
+import { Product } from '@core/models';
 
 @Component({
   selector: 'app-article-item',

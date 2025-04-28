@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
-import {ProductResponse} from '@core/models';
+import { ProductResponse } from '@core/models';
 
 @Injectable({
   providedIn: 'root'

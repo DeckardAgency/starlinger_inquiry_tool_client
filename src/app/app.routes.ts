@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { ShopComponent } from './features/shop/shop.component';
-import { ManualEntryInputFormComponent } from './features/manual-entry/input-form/manual-entry-input-form.component';
-import { ManualEntryTemplateComponent } from './features/manual-entry/template/manual-entry-template.component';
-import { InquiryToolComponent } from './features/inquiry-tool/inquiry-tool.component';
-import { CartComponent } from './features/cart/cart.component';
-import { LoginComponent } from './features/login/login.component';
-import { AuthGuard } from './core/auth/auth.guard';
-import { ManualEntryCartComponent } from './features/manual-entry-cart/manual-entry-cart.component';
+import { LoginComponent } from '@features/login/login.component';
+import { DashboardComponent } from '@features/dashboard/dashboard.component';
+import { AuthGuard } from '@core/auth/auth.guard';
+import { ShopComponent } from '@features/shop/shop.component';
+import { ManualEntryInputFormComponent } from '@features/manual-entry/input-form/manual-entry-input-form.component';
+import { ManualEntryTemplateComponent } from '@features/manual-entry/template/manual-entry-template.component';
+import { ManualEntryCartComponent } from '@features/manual-entry-cart/manual-entry-cart.component';
+import { InquiryToolComponent } from '@features/inquiry-tool/inquiry-tool.component';
+import { CartComponent } from '@features/cart/cart.component';
 
 export const routes: Routes = [
   {

@@ -44,24 +44,9 @@ export class QuickCartService {
     this.cartService.toggleCart();
   }
 
-  // Show notification
-  public showNotification(message?: string, type: 'success' | 'remove' = 'success'): void {
-    this.cartService.showNotification(message, type);
-  }
-
-  // Show remove notification
-  public showRemoveNotification(message?: string): void {
-    this.cartService.showRemoveNotification(message);
-  }
-
   // Hide notification
   public hideNotification(): void {
     this.cartService.hideNotification();
-  }
-
-  // Alias for toggle() to maintain compatibility with existing code
-  public toggleCart(): void {
-    this.toggle();
   }
 
   // Add a product to the cart - delegates to CartService

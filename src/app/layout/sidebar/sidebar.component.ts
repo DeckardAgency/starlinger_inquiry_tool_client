@@ -1,8 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {Router, RouterModule} from '@angular/router';
-import {SidebarService} from '@services/sidebar.service';
-import {AuthService} from '@core/auth/auth.service';
+import { Router, RouterModule } from '@angular/router';
+import { SidebarService } from '@services/sidebar.service';
+import { AuthService } from '@core/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',

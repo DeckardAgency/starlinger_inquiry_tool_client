@@ -84,18 +84,8 @@ export class ManualQuickCartService {
     return this.manualCartService.getCartItems();
   }
 
-  // Get cart item count
-  public getCartCount(): Observable<number> {
-    return this.manualCartService.getCartCount();
-  }
-
   // Clear the cart
   public clearCart(): void {
     this.manualCartService.clearCart();
-  }
-
-  // Get open state value directly
-  public get isOpen(): boolean {
-    return this.openStateSubject.value;
   }
 }

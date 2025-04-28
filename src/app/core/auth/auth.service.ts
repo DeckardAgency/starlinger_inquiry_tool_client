@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { delay, tap } from 'rxjs/operators';
-
-export interface User {
-  username: string;
-  email: string;
-}
+import { User } from '@core/models';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +13,7 @@ export class AuthService {
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor() {
-    // Check if user is already logged in from localStorage
+    // Check if a user is already logged in from localStorage
     try {
       const storedUser = this.getItemFromStorage('currentUser');
       if (storedUser) {
