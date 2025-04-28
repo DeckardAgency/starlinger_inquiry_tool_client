@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {QuickCartService} from '@services/cart/quick-cart.service';
-import { environment } from '@env/environment';
+import { QuickCartService } from '@services/cart/quick-cart.service';
 import { Product } from '@core/models';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-product-card',
