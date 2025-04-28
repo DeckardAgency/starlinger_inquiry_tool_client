@@ -1,12 +1,36 @@
 <div class="product-card">
   <div class="product-card__image">
-    <img
-      class="product-card__img"
-      [src]="environment.apiBaseUrl + product.featuredImage?.filePath"
-      [alt]="product.name"
-      onerror="this.src='https://via.assets.so/img.jpg?w=600&h=400'"
-      loading="lazy"
-    >
+    <ngx-slick-carousel
+      *ngIf="hasImages()"
+      style="width: 600px;"
+      #slickModal="slick-carousel"
+      [config]="slideConfig"
+      (init)="slickInit()"
+      (breakpoint)="breakpoint()"
+      (afterChange)="afterChange()"
+      (beforeChange)="beforeChange()">
+
+      <!-- Featured Image First (if exists) -->
+      <div ngxSlickItem *ngIf="product.featuredImage" class="slide">
+        <img src="{{ environment.apiBaseUrl + product.featuredImage.filePath }}"
+             [alt]="product.name + ' featured'"
+             width="100%">
+      </div>
+
+      <!-- Then Loop through product.imageGallery -->
+      <div ngxSlickItem *ngFor="let image of product.imageGallery" class="slide">
+        <img src="{{ environment.apiBaseUrl + image.filePath }}"
+             [alt]="product.name + ' image'"
+             width="100%">
+      </div>
+    </ngx-slick-carousel>
+
+    <!-- Fallback if no images at all -->
+    <img *ngIf="!hasImages()"
+         class="product-card__img"
+         src="https://via.assets.so/img.jpg?w=600&h=400"
+         [alt]="product.name"
+         loading="lazy">
   </div>
 
   <div class="product-card__specs">

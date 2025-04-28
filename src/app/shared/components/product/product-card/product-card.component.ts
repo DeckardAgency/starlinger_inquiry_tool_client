@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { QuickCartService } from '@services/cart/quick-cart.service';
 import { Product } from '@core/models';
 import { environment } from '@env/environment';
+import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SlickCarouselModule],
   styleUrls: ['./product-card.component.scss'],
   templateUrl: './product-card.component.html',
 })
@@ -17,10 +18,15 @@ export class ProductCardComponent implements OnInit {
   @Input() product!: Product;
   quantity: number = 1;
 
-  // Carousel properties
-  currentSlide: number = 0;
-  carouselPosition: number = 0;
-  slideWidth: number = 0;
+  // Slick Carousel Configuration
+  slideConfig = {
+    "slidesToShow": 1,
+    "slidesToScroll": 1,
+    "arrows": true,
+    "dots": true,
+    "infinite": true,
+    "autoplay": false
+  };
 
   constructor(private quickCartService: QuickCartService) {}
 
@@ -34,52 +40,19 @@ export class ProductCardComponent implements OnInit {
     if (!this.product.imageGallery) {
       this.product.imageGallery = [];
     }
+
+    console.log(this.product.imageGallery);
   }
 
-  // Carousel Methods
-  hasGalleryImages(): boolean {
-    return this.product.featuredImage !== null ||
-      (this.product.imageGallery && this.product.imageGallery.length > 0);
-  }
-
-  getTotalSlides(): number {
-    // Count featuredImage (if exists) plus all gallery images
-    let count = 0;
-    if (this.product.featuredImage) {
-      count++;
-    }
-    if (this.product.imageGallery) {
-      count += this.product.imageGallery.length;
-    }
-    return count;
-  }
-
-  getTotalSlidesArray(): number[] {
-    return Array(this.getTotalSlides()).fill(0);
-  }
-
-  goToSlide(slideIndex: number): void {
-    this.currentSlide = slideIndex;
-    this.updateCarouselPosition();
-  }
-
-  nextSlide(): void {
-    if (this.currentSlide < this.getTotalSlides() - 1) {
-      this.currentSlide++;
-      this.updateCarouselPosition();
-    }
-  }
-
-  prevSlide(): void {
-    if (this.currentSlide > 0) {
-      this.currentSlide--;
-      this.updateCarouselPosition();
-    }
-  }
-
-  updateCarouselPosition(): void {
-    // Calculate position based on current slide
-    this.carouselPosition = -100 * this.currentSlide;
+  /**
+   * Check if product has any images (featured or gallery)
+   * @returns boolean indicating if there are any images to display
+   */
+  hasImages(): boolean {
+    return (
+      (this.product.featuredImage !== null && this.product.featuredImage !== undefined) ||
+      (this.product.imageGallery && this.product.imageGallery.length > 0)
+    );
   }
 
   // Quantity Methods
@@ -112,5 +85,22 @@ export class ProductCardComponent implements OnInit {
       // Reset quantity after adding to cart
       this.quantity = 1;
     }
+  }
+
+  // Slick Carousel Events
+  slickInit() {
+    console.log('slick initialized');
+  }
+
+  breakpoint() {
+    console.log('breakpoint');
+  }
+
+  afterChange() {
+    console.log('afterChange');
+  }
+
+  beforeChange() {
+    console.log('beforeChange');
   }
 }
