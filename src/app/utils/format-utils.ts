@@ -1,3 +1,5 @@
+import {environment} from '@env/environment';
+
 /**
  * Format price with a currency symbol
  */
@@ -57,4 +59,13 @@ export function getInitials(name: string): string {
     return names[0].substring(0, 2).toUpperCase();
   }
   return '';
+}
+
+
+export function getImageVariationUrl(filePath: string | undefined, variation: string): string {
+  if (!filePath) {
+    return 'https://via.assets.so/img.jpg?w=270&h=160'; // Default fallback
+  }
+
+  return `${environment.apiBaseUrl}/media/cache/resolve/${variation}${filePath}`;
 }

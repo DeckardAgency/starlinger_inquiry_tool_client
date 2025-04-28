@@ -11,6 +11,7 @@ import { ProductService } from '@services/http/product.service';
 import { CartService } from '@services/cart/cart.service';
 import { Breadcrumb, Product } from '@core/models';
 import { Machine } from '@models/machine-type.model';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-shop',
@@ -21,7 +22,8 @@ import { Machine } from '@models/machine-type.model';
     RouterModule,
     BreadcrumbsComponent,
     ProductCardComponent,
-    ArticleItemComponent
+    ArticleItemComponent,
+    IconComponent
   ],
   templateUrl: 'shop.component.html',
   styleUrls: ['shop.component.scss']

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment } from '@env/environment';
 import { Product } from '@core/models';
+import {getImageVariationUrl} from '@utils/format-utils';
 
 @Component({
   selector: 'app-article-item',
@@ -21,4 +22,6 @@ export class ArticleItemComponent {
   onProductClick(): void {
     this.productSelected.emit(this.product);
   }
+
+  protected readonly getImageVariationUrl = getImageVariationUrl;
 }
