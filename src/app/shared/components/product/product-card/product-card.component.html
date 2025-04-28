@@ -4,11 +4,7 @@
       *ngIf="hasImages()"
       style="width: 600px;"
       #slickModal="slick-carousel"
-      [config]="slideConfig"
-      (init)="slickInit()"
-      (breakpoint)="breakpoint()"
-      (afterChange)="afterChange()"
-      (beforeChange)="beforeChange()">
+      [config]="slideConfig">
 
       <!-- Featured Image First (if exists) -->
       <div ngxSlickItem *ngIf="product.featuredImage" class="slide">
@@ -24,6 +20,9 @@
              width="100%">
       </div>
     </ngx-slick-carousel>
+
+    <button class="btn-prev" (click)="prev()">prev</button>
+    <button class="btn-next" (click)="next()">next</button>
 
     <!-- Fallback if no images at all -->
     <img *ngIf="!hasImages()"

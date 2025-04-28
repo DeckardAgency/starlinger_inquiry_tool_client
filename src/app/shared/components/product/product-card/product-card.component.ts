@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuickCartService } from '@services/cart/quick-cart.service';
@@ -13,21 +13,22 @@ import { SlickCarouselModule, SlickCarouselComponent } from 'ngx-slick-carousel'
   styleUrls: ['./product-card.component.scss'],
   templateUrl: './product-card.component.html',
 })
-export class ProductCardComponent implements OnInit, OnChanges {
+export class ProductCardComponent implements OnInit, OnChanges, AfterViewInit {
   environment = environment;
   @Input() product!: Product;
   quantity: number = 1;
 
   // Reference to the carousel component
   @ViewChild('slickModal') slickModal!: SlickCarouselComponent;
+  private productChanged = false;
 
   // Slick Carousel Configuration
   slideConfig = {
     "slidesToShow": 1,
     "slidesToScroll": 1,
-    "arrows": true,
-    "dots": true,
-    "infinite": true,
+    "arrows": false,
+    "dots": false,
+    "infinite": false,
     "autoplay": false
   };
 
@@ -45,16 +46,23 @@ export class ProductCardComponent implements OnInit, OnChanges {
     }
   }
 
+  ngAfterViewInit() {
+    // If product changed and view is initialized, reset the carousel
+    if (this.productChanged && this.slickModal) {
+      this.slickModal.slickGoTo(0);
+      this.productChanged = false;
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
-    // Check if the product input has changed
     if (changes['product'] && !changes['product'].firstChange) {
-      // Reset the carousel to the first slide after a short delay to ensure DOM is updated
-      setTimeout(() => {
-        if (this.slickModal) {
-          this.slickModal.slickGoTo(0);
-          console.log('Carousel reset to first slide');
-        }
-      }, 0);
+      this.productChanged = true;
+
+      // If view is already initialized, reset the carousel immediately
+      if (this.slickModal) {
+        this.slickModal.slickGoTo(0);
+        this.productChanged = false;
+      }
     }
   }
 
@@ -67,6 +75,14 @@ export class ProductCardComponent implements OnInit, OnChanges {
       (this.product.featuredImage !== null && this.product.featuredImage !== undefined) ||
       (this.product.imageGallery && this.product.imageGallery.length > 0)
     );
+  }
+
+  next() {
+    this.slickModal.slickNext();
+  }
+
+  prev() {
+    this.slickModal.slickPrev();
   }
 
   // Quantity Methods
@@ -91,37 +107,12 @@ export class ProductCardComponent implements OnInit, OnChanges {
     });
   }
 
-  // Method to add the product to cart
+  // Method to add the product to the cart
   addToCart(): void {
-    console.log('addToCart');
     if (this.product) {
       this.quickCartService.addToCart(this.product, this.quantity);
-      // Reset quantity after adding to cart
+      // Reset quantity after adding to the cart
       this.quantity = 1;
     }
-  }
-
-  // Manual method to reset the carousel to first slide
-  resetCarousel(): void {
-    if (this.slickModal) {
-      this.slickModal.slickGoTo(0);
-    }
-  }
-
-  // Slick Carousel Events
-  slickInit() {
-    console.log('slick initialized');
-  }
-
-  breakpoint() {
-    console.log('breakpoint');
-  }
-
-  afterChange() {
-    console.log('afterChange');
-  }
-
-  beforeChange() {
-    console.log('beforeChange');
   }
 }
