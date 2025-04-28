@@ -43,8 +43,6 @@ export class ProductCardComponent implements OnInit, OnChanges {
     if (!this.product.imageGallery) {
       this.product.imageGallery = [];
     }
-
-    console.log(this.product.imageGallery);
   }
 
   ngOnChanges(changes: SimpleChanges) {
