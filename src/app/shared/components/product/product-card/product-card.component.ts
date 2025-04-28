@@ -1,10 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuickCartService } from '@services/cart/quick-cart.service';
 import { Product } from '@core/models';
 import { environment } from '@env/environment';
-import { SlickCarouselModule } from 'ngx-slick-carousel';
+import { SlickCarouselModule, SlickCarouselComponent } from 'ngx-slick-carousel';
 
 @Component({
   selector: 'app-product-card',
@@ -13,10 +13,13 @@ import { SlickCarouselModule } from 'ngx-slick-carousel';
   styleUrls: ['./product-card.component.scss'],
   templateUrl: './product-card.component.html',
 })
-export class ProductCardComponent implements OnInit {
+export class ProductCardComponent implements OnInit, OnChanges {
   environment = environment;
   @Input() product!: Product;
   quantity: number = 1;
+
+  // Reference to the carousel component
+  @ViewChild('slickModal') slickModal!: SlickCarouselComponent;
 
   // Slick Carousel Configuration
   slideConfig = {
@@ -42,6 +45,19 @@ export class ProductCardComponent implements OnInit {
     }
 
     console.log(this.product.imageGallery);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Check if the product input has changed
+    if (changes['product'] && !changes['product'].firstChange) {
+      // Reset the carousel to the first slide after a short delay to ensure DOM is updated
+      setTimeout(() => {
+        if (this.slickModal) {
+          this.slickModal.slickGoTo(0);
+          console.log('Carousel reset to first slide');
+        }
+      }, 0);
+    }
   }
 
   /**
@@ -84,6 +100,13 @@ export class ProductCardComponent implements OnInit {
       this.quickCartService.addToCart(this.product, this.quantity);
       // Reset quantity after adding to cart
       this.quantity = 1;
+    }
+  }
+
+  // Manual method to reset the carousel to first slide
+  resetCarousel(): void {
+    if (this.slickModal) {
+      this.slickModal.slickGoTo(0);
     }
   }
 
