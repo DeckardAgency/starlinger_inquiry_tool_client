@@ -8,6 +8,7 @@ import { ManualEntryTemplateComponent } from '@features/manual-entry/template/ma
 import { ManualEntryCartComponent } from '@features/manual-entry-cart/manual-entry-cart.component';
 import { InquiryToolComponent } from '@features/inquiry-tool/inquiry-tool.component';
 import { CartComponent } from '@features/cart/cart.component';
+import {OrderConfirmationComponent} from '@features/order-confirmation/order-confirmation.component';
 
 export const routes: Routes = [
   {
@@ -61,5 +62,10 @@ export const routes: Routes = [
     component: CartComponent,
     canActivate: [AuthGuard],
     title: 'Inquiry Tool | Cart'
+  },
+  {
+    path: 'order-confirmation',
+    component: OrderConfirmationComponent,
+    title: 'Inquiry Tool | Order Confirmation'
   }
 ];

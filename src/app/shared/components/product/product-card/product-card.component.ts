@@ -29,8 +29,9 @@ export class ProductCardComponent implements OnInit, OnChanges, AfterViewInit {
     "slidesToScroll": 1,
     "arrows": false,
     "dots": false,
-    "infinite": false,
-    "autoplay": false
+    "infinite": true,
+    "autoplay": false,
+    "variableWidth": false,
   };
 
   constructor(private quickCartService: QuickCartService) {}

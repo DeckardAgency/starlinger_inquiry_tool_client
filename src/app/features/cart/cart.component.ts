@@ -1,18 +1,21 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from '@env/environment';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { CartService } from '@services/cart/cart.service';
 import { QuickCartService } from '@services/cart/quick-cart.service';
 import { Breadcrumb, CartItem } from '@core/models';
+import { OrderResponse, OrderService } from '@services/http/order.service';
+import { IconComponent } from '@shared/components/icon/icon.component';
+import { AuthService } from '@core/auth/auth.service';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, BreadcrumbsComponent, IconComponent],
   templateUrl: 'cart.component.html',
   styleUrls: ['cart.component.scss']
 })
@@ -22,8 +25,14 @@ export class CartComponent implements OnInit, OnDestroy {
   discountAmount: number = 0;
   shippingCost: number = 0;
   totalAmount: number = 0;
+  isSubmitting: boolean = false;
+  orderSuccess: boolean = false;
+  orderError: string | null = null;
+  orderResponse: OrderResponse | null = null;
+  referenceNumber: string = '';
 
   private cartSubscription: Subscription | null = null;
+  private currentUser: any = null;
 
   breadcrumbs: Breadcrumb[] = [
     { label: 'Cart' }
@@ -32,6 +41,9 @@ export class CartComponent implements OnInit, OnDestroy {
   constructor(
     private cartService: CartService,
     public quickCartService: QuickCartService,
+    private orderService: OrderService,
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -43,10 +55,20 @@ export class CartComponent implements OnInit, OnDestroy {
 
     // Get shipping cost
     this.shippingCost = this.cartService.getShippingCost();
+
+    // Get current user
+    this.currentUser = this.authService.getCurrentUser();
+
+    // If the user is not authenticated, redirect to login
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/cart' }
+      });
+    }
   }
 
   ngOnDestroy(): void {
-    // Clean up subscription
+    // Cleanup subscription
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
@@ -136,13 +158,62 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Proceed to checkout
+   * Proceed to check out by sending order to API
    */
   checkout(): void {
-    // This would typically navigate to a checkout page or process
+    if (this.isSubmitting || this.cartItems.length === 0) {
+      return;
+    }
+
+    // Check if user is authenticated
+    if (!this.currentUser || !this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/cart' }
+      });
+      return;
+    }
+
     console.log('Proceeding to checkout with items:', this.cartItems);
-    // You could add router navigation here
+    console.log(this.currentUser);
+
+    this.isSubmitting = true;
+    this.orderError = null;
+
+    // For this example, using static addresses
+    // In a real application, you would get these from a form or user profile
+    const shippingAddress = "444 Main Street, Anytown, ST 12345";
+    const billingAddress = "444 Main Street, Anytown, ST 12345";
+
+    // Use the OrderService to create the order with user ID
+    this.orderService.createOrder(
+      this.cartItems,
+      shippingAddress,
+      billingAddress,
+      this.referenceNumber || 'Order from cart',  // Use the reference number as notes
+      this.currentUser.id  // Pass the user ID
+    )
+      .subscribe({
+        next: (response) => {
+          console.log('Order created successfully:', response);
+          this.orderResponse = response;
+          this.orderSuccess = true;
+          this.isSubmitting = false;
+
+          // Clear the cart after a successful order
+          this.cartService.clearCart();
+
+          // Redirect to order confirmation page
+          this.router.navigate(['/order-confirmation'], {
+            queryParams: { orderId: response.id, orderNumber: response.orderNumber }
+          });
+        },
+        error: (error) => {
+          console.error('Error creating order:', error);
+          this.orderError = error.message || 'Failed to create order. Please try again.';
+          this.isSubmitting = false;
+        }
+      });
   }
 
-    protected readonly environment = environment;
+  protected readonly environment = environment;
 }

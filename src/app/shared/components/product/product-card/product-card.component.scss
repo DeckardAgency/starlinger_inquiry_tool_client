@@ -380,3 +380,9 @@ $spacing-xl: 24px;
     pointer-events: none;
   }
 }
+
+
+.slick-slide {
+  box-sizing: border-box;
+  //width: fit-content;
+}

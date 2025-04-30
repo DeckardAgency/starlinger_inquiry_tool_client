@@ -43,8 +43,8 @@ export class LoginComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.username, this.password).subscribe(
-      success => {
+    this.authService.login(this.username, this.password).subscribe({
+      next: (success) => {
         this.isLoading = false;
         if (success) {
           this.router.navigate([this.returnUrl]);
@@ -52,11 +52,11 @@ export class LoginComponent {
           this.errorMessage = 'Invalid email or password';
         }
       },
-      error => {
+      error: (error) => {
         this.isLoading = false;
         this.errorMessage = 'An error occurred. Please try again.';
         console.error('Login error:', error);
       }
-    );
+    });
   }
 }

@@ -134,7 +134,7 @@
     font-size: 14px;
 
     &:hover {
-
+      background-color: #F9FAFB;
     }
 
     &--active {
@@ -232,5 +232,22 @@
     cursor: pointer;
     transition: color 0.2s ease;
     color: #6B7280;
+
+    &:hover {
+      color: #DC2626;
+    }
+  }
+
+  &__user-initials {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #DC2626;
+    color: white;
+    font-size: 10px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
