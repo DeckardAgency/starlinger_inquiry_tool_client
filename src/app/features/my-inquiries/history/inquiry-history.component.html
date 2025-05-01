@@ -1,71 +1,23 @@
-<div class="inquiry-history-container">
-  <h2>Inquiry History</h2>
+<div class="inquiries-history">
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-  <div class="history-filters">
-    <div class="filter-group">
-      <label>Status:</label>
-      <div class="filter-buttons">
-        <button [class.active]="statusFilter === 'all'" (click)="setStatusFilter('all')">All</button>
-        <button [class.active]="statusFilter === 'Resolved'" (click)="setStatusFilter('Resolved')">Resolved</button>
-        <button [class.active]="statusFilter === 'Closed'" (click)="setStatusFilter('Closed')">Closed</button>
-        <button [class.active]="statusFilter === 'Escalated'" (click)="setStatusFilter('Escalated')">Escalated</button>
-      </div>
-    </div>
-
-    <div class="filter-group">
-      <label>Date Range:</label>
-      <div class="filter-buttons">
-        <button [class.active]="dateFilter === 'all'" (click)="setDateFilter('all')">All Time</button>
-        <button [class.active]="dateFilter === 'week'" (click)="setDateFilter('week')">Last Week</button>
-        <button [class.active]="dateFilter === 'month'" (click)="setDateFilter('month')">Last Month</button>
-      </div>
-    </div>
-
-    <div class="search-filter">
-      <input type="text" placeholder="Search by keyword or ID..." class="search-input">
-    </div>
+  <div class="inquiries-history__header">
+    <h2 class="inquiries-history__title">
+      <app-icon name="fileWarning" size="20px" color="#232323"></app-icon>
+      Activity / History
+    </h2>
   </div>
-
-  <div class="history-table-container">
-    <table class="history-table">
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Category</th>
-        <th>Date Created</th>
-        <th>Date Closed</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let inquiry of filteredHistory">
-        <td>{{ inquiry.id }}</td>
-        <td>{{ inquiry.title }}</td>
-        <td>{{ inquiry.category }}</td>
-        <td>{{ inquiry.dateCreated | date:'mediumDate' }}</td>
-        <td>{{ inquiry.dateClosed | date:'mediumDate' }}</td>
-        <td>
-            <span class="status-badge" [ngClass]="inquiry.status.toLowerCase()">
-              {{ inquiry.status }}
-            </span>
-        </td>
-        <td>
-          <button class="view-btn" (click)="viewInquiryDetails(inquiry.id)">View</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="empty-history" *ngIf="filteredHistory.length === 0">
-    <p>No inquiry history matching the selected filters.</p>
-  </div>
-
-  <div class="pagination">
-    <button class="pagination-btn" disabled>&laquo; Previous</button>
-    <span class="page-info">Page 1 of 1</span>
-    <button class="pagination-btn" disabled>Next &raquo;</button>
+  <div class="inquiries-history__body">
+    <div class="inquiries-history__tabs">
+      <button
+        *ngFor="let tab of tabs"
+        class="inquiries-history__tab"
+        [class.inquiries-history__tab--active]="activeTab === tab"
+        (click)="activeTab = tab"
+      >
+        {{ tab }}
+      </button>
+    </div>
+    <app-inquiry-table [inquiries]="inquiryHistory"></app-inquiry-table>
   </div>
 </div>

@@ -1,0 +1,47 @@
+<div class="inquiry-table-wrapper">
+  <table class="inquiry-table">
+    <thead>
+    <tr>
+      <th>Inquiry ID</th>
+      <th>Machine model</th>
+      <th>Date Created</th>
+      <th>Customer</th>
+      <th>Parts ordered</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+      @for (inquiry of inquiries; track inquiry.id) {
+        <tr>
+          <td>{{ inquiry.id }}</td>
+          <td>{{ inquiry.machine }}</td>
+          <td>{{ inquiry.dateCreated }}</td>
+          <td>
+            <div class="customer-cell">
+              @if (inquiry.customer.image) {
+                <img [src]="inquiry.customer.image" [alt]="inquiry.customer.name" class="customer-cell__image" loading="lazy">
+              } @else {
+                <div class="customer-cell__initials">{{ inquiry.customer.initials }}</div>
+              }
+              {{ inquiry.customer.name }}
+            </div>
+          </td>
+          <td>{{ inquiry.partsOrdered }}</td>
+          <td>
+            <span class="status-badge" [class]="'status-badge--' + inquiry.status.toLowerCase()">
+              {{ inquiry.status }}
+            </span>
+          </td>
+          <td>
+            <button class="action-menu">
+              <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM10 5a.833.833 0 1 0 0-1.667A.833.833 0 0 0 10 5Zm0 11.667a.833.833 0 1 0 0-1.667.833.833 0 0 0 0 1.667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

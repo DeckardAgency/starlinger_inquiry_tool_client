@@ -12,3 +12,17 @@ export enum InquiryStatus {
   Processing = 'Processing',
   Confirmed = 'Confirmed'
 }
+
+
+export interface InquiryHistory {
+  id: string;
+  machine: string;
+  dateCreated: string;
+  customer: {
+    initials: string;
+    name: string;
+    image?: string;
+  };
+  partsOrdered: number;
+  status: 'Completed' | 'Confirmed' | 'Processing' | 'Cancelled';
+}

@@ -1,24 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-interface InquiryHistory {
-  id: string;
-  machine: string;
-  dateCreated: string;
-  customer: {
-    initials: string;
-    name: string;
-    image?: string;
-  };
-  partsOrdered: number;
-  status: 'Completed' | 'Confirmed' | 'Processing' | 'Cancelled';
-}
+import {InquiryTableComponent} from '@shared/components/inquiry-table/inquiry-table.component';
+import {InquiryHistory} from '@core/models';
 
 @Component({
   selector: 'app-activity-history',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, InquiryTableComponent],
   templateUrl: "activity-history.component.html",
   styleUrls: ['./activity-history.component.scss']
 })

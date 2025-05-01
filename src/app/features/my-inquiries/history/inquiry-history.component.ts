@@ -1,97 +1,210 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
+import {IconComponent} from '@shared/components/icon/icon.component';
+import {InquiryCardComponent} from '@shared/components/inquiry-card/inquiry-card.component';
+import {RouterLink} from '@angular/router';
+import {InquiryTableComponent} from '@shared/components/inquiry-table/inquiry-table.component';
+import {InquiryHistory} from '@core/models';
 
 @Component({
   selector: 'app-inquiry-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryCardComponent, RouterLink, InquiryTableComponent],
   templateUrl: './inquiry-history.component.html',
   styleUrls: ['./inquiry-history.component.scss']
 })
 export class InquiryHistoryComponent implements OnInit {
-  inquiryHistory: any[] = [];
-  filteredHistory: any[] = [];
-  statusFilter: string = 'all';
-  dateFilter: string = 'all';
-
-  constructor() { }
-
   ngOnInit(): void {
-    // Initialize inquiry history or fetch from a service
-    this.loadInquiryHistory();
-    this.applyFilters();
+      // throw new Error('Method not implemented.');
   }
+  breadcrumbs = [
+    { label: 'My inquiries', link: '/my-inquiries' },
+    { label: 'History' }
+  ];
 
-  loadInquiryHistory(): void {
-    // This would typically come from a service
-    this.inquiryHistory = [
-      {
-        id: 201,
-        title: 'Product Return Request',
-        status: 'Resolved',
-        dateCreated: new Date(Date.now() - 7 * 86400000),
-        dateClosed: new Date(Date.now() - 2 * 86400000),
-        category: 'Returns'
+  tabs = ['All Inquiries', 'Completed', 'Confirmed', 'Processing', 'Cancelled'];
+  activeTab = 'All Inquiries';
+
+  // Completed inquiries
+  completedInquiries: InquiryHistory[] = [
+    {
+      id: '0001',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'AK',
+        name: 'Anes Kapetanovic'
       },
-      {
-        id: 202,
-        title: 'Shipping Delay Inquiry',
-        status: 'Closed',
-        dateCreated: new Date(Date.now() - 14 * 86400000),
-        dateClosed: new Date(Date.now() - 10 * 86400000),
-        category: 'Shipping'
+      partsOrdered: 12,
+      status: 'Completed'
+    },
+    {
+      id: '0002',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'AK',
+        name: 'Anes Kapetanovic'
       },
-      {
-        id: 203,
-        title: 'Account Verification Issue',
-        status: 'Resolved',
-        dateCreated: new Date(Date.now() - 30 * 86400000),
-        dateClosed: new Date(Date.now() - 28 * 86400000),
-        category: 'Account'
+      partsOrdered: 192,
+      status: 'Completed'
+    },
+    {
+      id: '0006',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'AK',
+        name: 'Anes Kapetanovic'
       },
-      {
-        id: 204,
-        title: 'Payment Processing Error',
-        status: 'Escalated',
-        dateCreated: new Date(Date.now() - 5 * 86400000),
-        dateClosed: new Date(Date.now() - 1 * 86400000),
-        category: 'Billing'
-      }
-    ];
-  }
+      partsOrdered: 60,
+      status: 'Completed'
+    },
+    {
+      id: '0007',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'IJ',
+        name: 'Ivan Jozic'
+      },
+      partsOrdered: 72,
+      status: 'Completed'
+    }
+  ];
 
-  applyFilters(): void {
-    this.filteredHistory = this.inquiryHistory.filter(inquiry => {
-      // Status filter
-      if (this.statusFilter !== 'all' && inquiry.status !== this.statusFilter) {
-        return false;
-      }
+  // Confirmed inquiries
+  confirmedInquiries: InquiryHistory[] = [
+    {
+      id: '0003',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'ME',
+        name: 'Martin Ertl'
+      },
+      partsOrdered: 48,
+      status: 'Confirmed'
+    },
+    {
+      id: '0008',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'JK',
+        name: 'John Kowalski'
+      },
+      partsOrdered: 35,
+      status: 'Confirmed'
+    },
+    {
+      id: '0009',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '13-03-2024',
+      customer: {
+        initials: 'RM',
+        name: 'Robert Miller'
+      },
+      partsOrdered: 89,
+      status: 'Confirmed'
+    }
+  ];
 
-      // Date filter
-      if (this.dateFilter === 'week') {
-        const oneWeekAgo = new Date(Date.now() - 7 * 86400000);
-        return new Date(inquiry.dateClosed) >= oneWeekAgo;
-      } else if (this.dateFilter === 'month') {
-        const oneMonthAgo = new Date(Date.now() - 30 * 86400000);
-        return new Date(inquiry.dateClosed) >= oneMonthAgo;
-      }
+  // Processing inquiries
+  processingInquiries: InquiryHistory[] = [
+    {
+      id: '0004',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'ME',
+        name: 'Martin Ertl'
+      },
+      partsOrdered: 36,
+      status: 'Processing'
+    },
+    {
+      id: '0010',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '13-03-2024',
+      customer: {
+        initials: 'LB',
+        name: 'Lucy Brown'
+      },
+      partsOrdered: 156,
+      status: 'Processing'
+    },
+    {
+      id: '0011',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '13-03-2024',
+      customer: {
+        initials: 'TS',
+        name: 'Tom Smith'
+      },
+      partsOrdered: 42,
+      status: 'Processing'
+    }
+  ];
 
-      return true;
-    });
-  }
+  // Cancelled inquiries
+  cancelledInquiries: InquiryHistory[] = [
+    {
+      id: '0005',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '14-03-2024',
+      customer: {
+        initials: 'AK',
+        name: 'Anes Kapetanovic'
+      },
+      partsOrdered: 24,
+      status: 'Cancelled'
+    },
+    {
+      id: '0012',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '12-03-2024',
+      customer: {
+        initials: 'PW',
+        name: 'Peter Wilson'
+      },
+      partsOrdered: 18,
+      status: 'Cancelled'
+    },
+    {
+      id: '0013',
+      machine: 'ad*starKON SX+ 120',
+      dateCreated: '12-03-2024',
+      customer: {
+        initials: 'SD',
+        name: 'Sarah Davis'
+      },
+      partsOrdered: 67,
+      status: 'Cancelled'
+    }
+  ];
 
-  setStatusFilter(status: string): void {
-    this.statusFilter = status;
-    this.applyFilters();
-  }
+  // Combine all inquiries for the "All Inquiries" tab
+  allInquiries: InquiryHistory[] = [
+    ...this.completedInquiries,
+    ...this.confirmedInquiries,
+    ...this.processingInquiries,
+    ...this.cancelledInquiries
+  ].sort((a, b) => b.id.localeCompare(a.id)); // Sort by ID in descending order
 
-  setDateFilter(date: string): void {
-    this.dateFilter = date;
-    this.applyFilters();
-  }
-
-  viewInquiryDetails(id: number): void {
-    // Logic to view inquiry details
-    console.log(`View details for inquiry with ID: ${id}`);
+  get inquiryHistory(): InquiryHistory[] {
+    switch (this.activeTab) {
+      case 'Completed':
+        return this.completedInquiries;
+      case 'Confirmed':
+        return this.confirmedInquiries;
+      case 'Processing':
+        return this.processingInquiries;
+      case 'Cancelled':
+        return this.cancelledInquiries;
+      default:
+        return this.allInquiries;
+    }
   }
 }

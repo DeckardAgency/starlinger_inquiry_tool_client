@@ -1,45 +1,43 @@
 <div class="active-inquiries">
   <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-  <section class="active-inquiries">
-    <div class="active-inquiries__header">
-      <h2 class="active-inquiries__title">
-        <app-icon name="fileWarning" size="20px" color="#232323"></app-icon>
-        Active Inquiries
-      </h2>
-    </div>
+  <div class="active-inquiries__header">
+    <h2 class="active-inquiries__title">
+      <app-icon name="fileWarning" size="20px" color="#232323"></app-icon>
+      Active Inquiries
+    </h2>
+  </div>
 
-    <div class="active-inquiries__body">
-      @if (isLoading) {
-        <div class="active-inquiries__loading">
-          <p>Loading your orders...</p>
-          <div class="active-inquiries__spinner"></div>
-        </div>
-      } @else if (error) {
-        <div class="active-inquiries__error">
-          <app-icon name="alertTriangle" size="24px" color="#DC2626"></app-icon>
-          <p>{{ error }}</p>
-          <button (click)="loadUserOrders()" class="active-inquiries__retry-btn">
-            <app-icon name="refresh" size="16px" color="#ffffff"></app-icon>
-            Try Again
-          </button>
-        </div>
-      } @else if (activeInquiries.length === 0) {
-        <div class="active-inquiries__empty">
-          <app-icon name="inbox" size="32px" color="#71717A"></app-icon>
-          <p>You don't have any active inquiries at the moment.</p>
-          <a routerLink="/products" class="active-inquiries__shop-link">
-            <app-icon name="shoppingCart" size="16px" color="#ffffff"></app-icon>
-            Browse Products
-          </a>
-        </div>
-      } @else {
-        <div class="active-inquiries__grid">
-          @for (inquiry of activeInquiries; track inquiry.id) {
-            <app-inquiry-card [inquiry]="inquiry"></app-inquiry-card>
-          }
-        </div>
-      }
-    </div>
-  </section>
+  <div class="active-inquiries__body">
+    @if (isLoading) {
+      <div class="active-inquiries__loading">
+        <p>Loading your orders...</p>
+        <div class="active-inquiries__spinner"></div>
+      </div>
+    } @else if (error) {
+      <div class="active-inquiries__error">
+        <app-icon name="alertTriangle" size="24px" color="#DC2626"></app-icon>
+        <p>{{ error }}</p>
+        <button (click)="loadUserOrders()" class="active-inquiries__retry-btn">
+          <app-icon name="refresh" size="16px" color="#ffffff"></app-icon>
+          Try Again
+        </button>
+      </div>
+    } @else if (activeInquiries.length === 0) {
+      <div class="active-inquiries__empty">
+        <app-icon name="inbox" size="32px" color="#71717A"></app-icon>
+        <p>You don't have any active inquiries at the moment.</p>
+        <a routerLink="/products" class="active-inquiries__shop-link">
+          <app-icon name="shoppingCart" size="16px" color="#ffffff"></app-icon>
+          Browse Products
+        </a>
+      </div>
+    } @else {
+      <div class="active-inquiries__grid">
+        @for (inquiry of activeInquiries; track inquiry.id) {
+          <app-inquiry-card [inquiry]="inquiry"></app-inquiry-card>
+        }
+      </div>
+    }
+  </div>
 </div>
