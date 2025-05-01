@@ -9,16 +9,13 @@
   }
 
   &__title {
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 1.25rem;
     font-weight: 500;
     color: #18181B;
-
-    svg {
-      color: #71717A;
-    }
   }
 
   &__view-all {
@@ -31,6 +28,8 @@
     font-size: 0.875rem;
   }
 
+  &__body {}
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -38,6 +37,79 @@
 
     @media screen and (max-width: 834px) {
       grid-template-columns: repeat(1, 1fr);
+    }
+  }
+
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #E4E4E7;
+    text-align: center;
+
+    p {
+      color: #71717A;
+      margin: 0;
+    }
+  }
+
+  &__retry-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #DC2626;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #B91C1C;
+    }
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #E4E4E7;
+    text-align: center;
+
+    p {
+      color: #71717A;
+      margin: 0;
+    }
+  }
+
+  &__shop-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #DC2626;
+    color: white;
+    text-decoration: none;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #B91C1C;
     }
   }
 }
@@ -152,14 +224,39 @@
       color: #D97706;
     }
 
+    &--draft {
+      background: #F3F4F6;
+      color: #4B5563;
+    }
+
+    &--pending {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    &--paid {
+      background: #E0F2FE;
+      color: #0EA5E9;
+    }
+
     &--processing {
       background: #EDE9FE;
       color: #7C3AED;
     }
 
-    &--confirmed {
+    &--shipped {
+      background: #F0FDF4;
+      color: #22C55E;
+    }
+
+    &--delivered {
       background: #DCFCE7;
       color: #16A34A;
+    }
+
+    &--canceled {
+      background: #FEE2E2;
+      color: #EF4444;
     }
   }
 
