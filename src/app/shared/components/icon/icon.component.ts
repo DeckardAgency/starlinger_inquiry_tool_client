@@ -203,4 +203,7 @@ const ICONS: {[key: string]: string} = {
   continueArrow: `<svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
     <path d="M6.5 12L10.5 8L6.5 4" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`,
+
+  fileWarning: `<svg fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 7.5v3.333m0 3.334h.008m2.492-12.5H5a1.667 1.667 0 0 0-1.667 1.666v13.334A1.666 1.666 0 0 0 5 18.333h10a1.666 1.666 0 0 0 1.667-1.666V5.833L12.5 1.667Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
 };

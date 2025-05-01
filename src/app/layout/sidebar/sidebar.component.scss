@@ -97,6 +97,8 @@
   &__nested-list {
     position: relative;
     margin-top: 4px;
+    overflow: hidden; // Added to ensure smooth animation
+
     &::before {
       content: "";
       width: 1px;
@@ -114,6 +116,7 @@
 
     &--indented {
       padding-left: 32px;
+      width: calc(100% - 100px);
     }
   }
 
@@ -135,6 +138,7 @@
 
     &:hover {
       background-color: #F9FAFB;
+      border-radius: 6px;
     }
 
     &--active {
@@ -151,8 +155,22 @@
     }
   }
 
+  &__link--submenu {
+    padding: 8px 16px;
+  }
+
   &__submenu-toggle {
     position: relative;
+    width: 100%;
+
+    &--expanded {
+      background-color: #F9FAFB;
+      border-radius: 6px;
+
+      .sidebar__icon svg path {
+        stroke: #DC2626;
+      }
+    }
   }
 
   &__submenu-icon {
@@ -321,5 +339,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  &__submenu-link--active {
+    background-color: #F9FAFB;
+    font-weight: normal;
+    border-radius: 6px;
+
+    svg {
+      stroke: #DC2626 !important;
+    }
   }
 }

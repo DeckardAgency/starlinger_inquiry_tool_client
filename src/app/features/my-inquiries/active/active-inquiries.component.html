@@ -1,34 +1,22 @@
-<div class="active-inquiries-container">
-  <h2>Active Inquiries</h2>
+<div class="active-inquiries">
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
-  <div class="inquiries-filter">
-    <input type="text" placeholder="Search active inquiries..." class="search-input">
-    <select class="filter-dropdown">
-      <option value="all">All Statuses</option>
-      <option value="inProgress">In Progress</option>
-      <option value="awaitingResponse">Awaiting Response</option>
-      <option value="open">Open</option>
-    </select>
-  </div>
+  <section class="active-inquiries">
 
-  <div class="inquiries-list" *ngIf="activeInquiries.length > 0">
-    <div class="inquiry-card" *ngFor="let inquiry of activeInquiries">
-      <div class="inquiry-header">
-        <h3>{{ inquiry.title }}</h3>
-        <span class="status-badge">{{ inquiry.status }}</span>
-      </div>
-      <div class="inquiry-details">
-        <p>ID: {{ inquiry.id }}</p>
-        <p>Last Updated: {{ inquiry.updatedDate | date:'medium' }}</p>
-      </div>
-      <div class="inquiry-actions">
-        <button class="view-btn">View Details</button>
-        <button class="respond-btn">Respond</button>
+    <div class="active-inquiries__header">
+      <h2 class="active-inquiries__title">
+        <app-icon name="fileWarning" size="20px" color="#232323"></app-icon>
+        Active Inquiries
+      </h2>
+    </div>
+
+    <div class="active-inquiries__body">
+      <div class="active-inquiries__grid">
+        @for (inquiry of activeInquiries; track inquiry.id) {
+          <app-inquiry-card [inquiry]="inquiry"></app-inquiry-card>
+        }
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="no-inquiries" *ngIf="activeInquiries.length === 0">
-    <p>No active inquiries found.</p>
-  </div>
 </div>

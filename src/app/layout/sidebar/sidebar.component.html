@@ -55,34 +55,34 @@
                 <i class="icon-chevron sidebar__icon sidebar__submenu-icon"
                    [class.sidebar__submenu-icon--rotated]="isInquiriesExpanded()"></i>
               </button>
-              @if (isInquiriesExpanded()) {
-                <ul class="sidebar__nested-list">
-                  <li class="sidebar__item sidebar__item--indented">
-                    <a routerLink="/my-inquiries/active" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                      <span class="icon-active sidebar__icon">
-                        <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 6v2.667m0 2.666h.007m1.993-10H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                      <span class="sidebar__link-text">Active</span>
-                    </a>
-                  </li>
-                  <li class="sidebar__item sidebar__item--indented">
-                    <a routerLink="/my-inquiries/drafts" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                      <span class="icon-history sidebar__icon">
-                        <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 1.333V4a1.333 1.333 0 0 0 1.334 1.333h2.666M6 10l1.333 1.333L10 8.667m0-7.334H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                      <span class="sidebar__link-text">History</span>
-                    </a>
-                  </li>
-                  <li class="sidebar__item sidebar__item--indented">
-                    <a routerLink="/my-inquiries/history" routerLinkActive="sidebar__link--active" class="sidebar__link">
-                      <span class="icon-history sidebar__icon">
-                        <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 1.333V4a1.333 1.333 0 0 0 1.334 1.333h2.666M6 10l1.333 1.333L10 8.667m0-7.334H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                      </span>
-                      <span class="sidebar__link-text">Drafts</span>
-                    </a>
-                  </li>
-                </ul>
-              }
+              <ul class="sidebar__nested-list" [@expandCollapse] *ngIf="isInquiriesExpanded()">
+                <li class="sidebar__item sidebar__item--indented">
+                  <a routerLink="/my-inquiries/active" routerLinkActive="sidebar__submenu-link--active" class="sidebar__link sidebar__link--submenu">
+                    <span class="icon-active sidebar__icon">
+                      <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 6v2.667m0 2.666h.007m1.993-10H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="sidebar__link-text">Active</span>
+                  </a>
+                </li>
+                <li class="sidebar__item sidebar__item--indented">
+                  <a routerLink="/my-inquiries/history" routerLinkActive="sidebar__submenu-link--active" class="sidebar__link sidebar__link--submenu">
+                    <span class="icon-history sidebar__icon">
+                      <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 1.333V4a1.333 1.333 0 0 0 1.334 1.333h2.666M6 10l1.333 1.333L10 8.667m0-7.334H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span class="sidebar__link-text">History</span>
+                  </a>
+                </li>
+                <li class="sidebar__item sidebar__item--indented">
+                  <a routerLink="/my-inquiries/drafts" routerLinkActive="sidebar__submenu-link--active" class="sidebar__link sidebar__link--submenu">
+                    <span class="icon-history sidebar__icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8.33329 14.6667H12C12.3536 14.6667 12.6927 14.5262 12.9428 14.2762C13.1928 14.0261 13.3333 13.687 13.3333 13.3333V4.66668L9.99996 1.33334H3.99996C3.64634 1.33334 3.3072 1.47382 3.05715 1.72387C2.8071 1.97392 2.66663 2.31305 2.66663 2.66668V9.00001M9.33329 1.33334V4.00001C9.33329 4.35363 9.47377 4.69277 9.72382 4.94282C9.97387 5.19287 10.313 5.33334 10.6666 5.33334H13.3333M8.91861 10.4173C9.05011 10.2858 9.15442 10.1297 9.22558 9.95786C9.29675 9.78606 9.33338 9.60191 9.33338 9.41595C9.33338 9.22998 9.29675 9.04584 9.22558 8.87403C9.15442 8.70222 9.05011 8.54611 8.91861 8.41461C8.78711 8.28312 8.631 8.17881 8.45919 8.10764C8.28739 8.03648 8.10324 7.99985 7.91728 7.99985C7.73131 7.99985 7.54717 8.03648 7.37536 8.10764C7.20355 8.17881 7.04744 8.28312 6.91594 8.41461L3.57594 11.7559C3.41744 11.9144 3.30142 12.1102 3.23861 12.3253L2.68061 14.2386C2.66388 14.296 2.66288 14.3568 2.67771 14.4147C2.69254 14.4726 2.72265 14.5254 2.76491 14.5676C2.80716 14.6099 2.86 14.64 2.91788 14.6549C2.97577 14.6697 3.03658 14.6687 3.09394 14.6519L5.00728 14.0939C5.22239 14.0311 5.4182 13.9151 5.57661 13.7566L8.91861 10.4173Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                    <span class="sidebar__link-text">Drafts</span>
+                  </a>
+                </li>
+              </ul>
             </li>
           </ul>
         </li>

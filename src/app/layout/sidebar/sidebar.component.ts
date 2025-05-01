@@ -1,14 +1,15 @@
 import { Component, signal, OnInit, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { SidebarService } from '@services/sidebar.service';
 import { AuthService } from '@core/auth/auth.service';
 import { User } from '@core/models';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { trigger, transition, style, animate, state } from '@angular/animations';
 import { LoginModalComponent } from '@shared/components/modals/login-modal/login-modal.component';
 import { LoginModalService } from '@services/login-modal.service';
 import { SupportModalComponent } from '@shared/components/modals/support-modal/support-modal.component';
 import { SupportModalService } from '@services/support-modal.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar',
@@ -24,6 +25,21 @@ import { SupportModalService } from '@services/support-modal.service';
       ]),
       transition(':leave', [
         animate('200ms ease-out', style({ opacity: 0 }))
+      ])
+    ]),
+    trigger('expandCollapse', [
+      state('void', style({
+        height: '0',
+        overflow: 'hidden',
+        opacity: 0,
+        margin: '0'
+      })),
+      state('*', style({
+        height: '*',
+        opacity: 1
+      })),
+      transition('void <=> *', [
+        animate('300ms ease-in-out')
       ])
     ])
   ]
@@ -67,6 +83,19 @@ export class SidebarComponent implements OnInit {
     this.supportModalService.isOpen$.subscribe(isOpen => {
       this.isSupportModalOpen.set(isOpen);
     });
+
+    // Subscribe to router events to expand inquiries menu when on related routes
+    // and collapse it when navigating to other routes
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        const currentUrl = event.url;
+        // Set expanded state based on current URL
+        this.isInquiriesExpanded.set(currentUrl.includes('/my-inquiries/'));
+      });
+
+    // Set initial state of inquiries menu based on current URL
+    this.isInquiriesExpanded.set(this.router.url.includes('/my-inquiries/'));
   }
 
   @HostListener('document:click', ['$event'])
@@ -149,6 +178,13 @@ export class SidebarComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  /**
+   * Check if the current route is a my-inquiries route
+   */
+  isMyInquiriesRoute(): boolean {
+    return this.router.url.includes('/my-inquiries/');
   }
 
   /**
