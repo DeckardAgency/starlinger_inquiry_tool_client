@@ -33,7 +33,7 @@
                 <img
                   [src]="environment.apiBaseUrl + item.product.featuredImage?.filePath"
                   [alt]="item.product.name"
-                  onerror="this.src='https://via.assets.so/img.jpg?w=150&h=84'"
+                  onerror="this.src='https://via.assets.so/img.jpg?w=90&h=90'"
                   loading="lazy"
                 >
               </div>
@@ -50,11 +50,11 @@
             </div>
 
             <div class="cart__price">
-              <div class="cart__original-price">€ {{ item.product.price.toFixed(2) }}</div>
+              <div class="cart__original-price">€ {{ item.product.clientPrice.toFixed(2) }}</div>
             </div>
 
             <div class="cart__discount">
-              <div class="cart__discounted-price">-20%</div>
+              <div class="cart__discounted-price">{{ item.product.discountPercentage }}</div>
             </div>
 
             <div class="cart__quantity-controls">

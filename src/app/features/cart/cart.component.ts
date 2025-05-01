@@ -80,13 +80,13 @@ export class CartComponent implements OnInit, OnDestroy {
   calculateTotals(): void {
     // Calculate original subtotal
     this.cartSubtotal = this.cartItems.reduce(
-      (total, item) => total + (item.product.price * item.quantity),
+      (total, item) => total + (item.product.clientPrice * item.quantity),
       0
     );
 
     // Calculate total with discount applied
     const discountedTotal = this.cartItems.reduce(
-      (total, item) => total + (this.getDiscountedPrice(item.product.price) * item.quantity),
+      (total, item) => total + (this.getDiscountedPrice(item.product.clientPrice) * item.quantity),
       0
     );
 
@@ -101,14 +101,14 @@ export class CartComponent implements OnInit, OnDestroy {
    * Get the discounted price (20% off)
    */
   getDiscountedPrice(price: number): number {
-    return price * 0.8;
+    return price;
   }
 
   /**
    * Calculate the total for a specific item
    */
   getItemTotal(item: CartItem): number {
-    return this.getDiscountedPrice(item.product.price) * item.quantity;
+    return this.getDiscountedPrice(item.product.clientPrice) * item.quantity;
   }
 
   /**

@@ -155,6 +155,11 @@
     font-size: 12px;
     font-weight: 600;
 
+    &--pending {
+      background-color: #079ca1;
+      color: #ffffff;
+    }
+
     &--submitted {
       background-color: #a16207;
       color: #ffffff;

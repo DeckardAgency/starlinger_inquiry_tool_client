@@ -9,6 +9,13 @@ export interface User {
   updatedAt?: string;
   orders?: any[];
   username?: string; // For compatibility with existing code
+  client?: {
+    '@id': string;
+    '@type': string;
+    id: string;
+    name: string;
+    code: string;
+  };
 }
 
 // API response format (JSON-LD)
@@ -47,4 +54,20 @@ export interface UserMember {
   createdAt: string;
   updatedAt: string;
   orders: any[];
+  client?: {
+    '@id': string;
+    '@type': string;
+    id: string;
+    name: string;
+    code: string;
+  };
+}
+
+// Client interface
+export interface Client {
+  '@id': string;
+  '@type': string;
+  id: string;
+  name: string;
+  code: string;
 }

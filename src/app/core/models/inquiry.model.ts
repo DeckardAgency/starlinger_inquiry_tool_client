@@ -4,7 +4,7 @@ export interface Inquiry {
   machine: string;
   dateCreated: string;
   partsOrdered: number;
-  status: InquiryStatus;
+  status: string;
 }
 
 export enum InquiryStatus {

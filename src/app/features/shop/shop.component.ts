@@ -9,6 +9,7 @@ import { ProductCardComponent } from '@shared/components/product/product-card/pr
 import { ArticleItemComponent } from '@shared/components/product/article-item/article-item.component';
 import { ProductService } from '@services/http/product.service';
 import { CartService } from '@services/cart/cart.service';
+import { AuthService } from '@core/auth/auth.service';
 import { Breadcrumb, Product } from '@core/models';
 import { Machine } from '@models/machine-type.model';
 import { IconComponent } from '@shared/components/icon/icon.component';
@@ -38,6 +39,7 @@ export class ShopComponent implements OnInit {
   error: string | null = null;
   viewMode: 'grid' | 'list' = 'list';
   totalItems = 0;
+  clientName: string = '';
 
   searchControl = new FormControl('');
   discountedControl = new FormControl(false);
@@ -59,7 +61,8 @@ export class ShopComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private authService: AuthService
   ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
@@ -67,6 +70,18 @@ export class ShopComponent implements OnInit {
     ).subscribe(value => this.filterProducts());
 
     this.discountedControl.valueChanges.subscribe(() => this.filterProducts());
+
+    // Get client name if available
+    const clientInfo = this.authService.getClientInfo();
+    if (clientInfo) {
+      this.clientName = clientInfo.name;
+
+      // Update breadcrumbs with client name
+      this.breadcrumbs = [
+        { label: 'Shop', link: '/shop' },
+        { label: `${this.clientName} Products`, link: '/shop/machines' }
+      ];
+    }
   }
 
   ngOnInit(): void {
@@ -75,29 +90,132 @@ export class ShopComponent implements OnInit {
 
   private loadProducts(): void {
     this.loading = true;
-    this.productService.getProducts().subscribe({
-      next: (response) => {
-        this.products = response.member;
-        this.totalItems = response.totalItems;
-        this.filteredProducts = this.products;
+
+    // Check if user has a client
+    if (this.authService.hasClient()) {
+      const clientId = this.authService.getCurrentUser()?.client?.id;
+      if (clientId) {
+        console.log('Client found. Loading client products for client ID:', clientId);
+
+        // Load client-specific products
+        this.productService.getProductsByClientId(clientId).subscribe({
+          next: (response) => {
+            console.log('Product response received:', response);
+            this.products = response.member;
+            this.totalItems = response.totalItems;
+            this.filteredProducts = this.products;
+            this.loading = false;
+          },
+          error: (err) => {
+            this.error = 'Failed to load products. Please try again later.';
+            this.loading = false;
+            console.error('Error loading client products:', err);
+          }
+        });
+      } else {
+        this.error = 'Client ID is missing. Please contact support.';
         this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load products. Please try again later.';
-        this.loading = false;
-        console.error('Error loading products:', err);
       }
-    });
+    } else {
+      // Load all products (no client filter)
+      console.log('No client found. Loading all products.');
+      this.productService.getProducts().subscribe({
+        next: (response) => {
+          console.log('Product response received:', response);
+          this.products = response.member;
+          this.totalItems = response.totalItems;
+          this.filteredProducts = this.products;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = 'Failed to load products. Please try again later.';
+          this.loading = false;
+          console.error('Error loading products:', err);
+        }
+      });
+    }
+  }
+
+  /**
+   * Get the effective price to display for a product
+   * @param product The product
+   * @returns The price to display
+   */
+  getProductPrice(product: Product): number {
+    // First check if effectivePrice is available (new model)
+    if (product.effectivePrice !== undefined) {
+      return product.effectivePrice;
+    }
+
+    // Fallback to clientPrice if available
+    if (product.clientPrice !== undefined) {
+      return product.clientPrice;
+    }
+
+    // Fallback to regularPrice if available
+    if (product.regularPrice !== undefined) {
+      return product.regularPrice;
+    }
+
+    // Last resort: use legacy price field or return 0
+    return product.price || 0;
+  }
+
+  /**
+   * Check if a product has a discount
+   * @param product The product
+   * @returns True if the product has a discount
+   */
+  hasDiscount(product: Product): boolean {
+    // If discountPercentage is explicitly set and not null
+    if (product.discountPercentage !== undefined && product.discountPercentage !== null) {
+      return true;
+    }
+
+    // If both regularPrice and clientPrice are available and different
+    if (product.regularPrice !== undefined && product.clientPrice !== undefined) {
+      return product.regularPrice > product.clientPrice && product.regularPrice > 0;
+    }
+
+    return false;
+  }
+
+  /**
+   * Get the discount percentage for a product
+   * @param product The product
+   * @returns The discount percentage or 0 if no discount
+   */
+  getDiscountPercentage(product: Product): number {
+    // If discountPercentage is explicitly set
+    if (product.discountPercentage !== undefined && product.discountPercentage !== null) {
+      return product.discountPercentage;
+    }
+
+    // Calculate discount if regularPrice and clientPrice are available
+    if (product.regularPrice !== undefined && product.clientPrice !== undefined && product.regularPrice > 0) {
+      return Math.round((1 - product.clientPrice / product.regularPrice) * 100);
+    }
+
+    return 0;
   }
 
   selectProduct(product: Product): void {
     this.selectedProduct = product;
     if (product) {
-      this.breadcrumbs = [
-        { label: 'Shop', link: '/shop' },
-        { label: 'All machines', link: '/shop/machines' },
-        { label: product.name }
-      ];
+      // Update breadcrumbs with client name if available
+      if (this.clientName) {
+        this.breadcrumbs = [
+          { label: 'Shop', link: '/shop' },
+          { label: `${this.clientName} Products`, link: '/shop/machines' },
+          { label: product.name }
+        ];
+      } else {
+        this.breadcrumbs = [
+          { label: 'Shop', link: '/shop' },
+          { label: 'All machines', link: '/shop/machines' },
+          { label: product.name }
+        ];
+      }
 
       this.relatedProducts = this.products
         .filter(p => p.id !== product.id)
@@ -110,10 +228,19 @@ export class ShopComponent implements OnInit {
 
   closeDetails(): void {
     this.selectedProduct = null;
-    this.breadcrumbs = [
-      { label: 'Shop', link: '/shop' },
-      { label: 'All machines', link: '/shop/machines' }
-    ];
+
+    // Reset breadcrumbs with client name if available
+    if (this.clientName) {
+      this.breadcrumbs = [
+        { label: 'Shop', link: '/shop' },
+        { label: `${this.clientName} Products`, link: '/shop/machines' }
+      ];
+    } else {
+      this.breadcrumbs = [
+        { label: 'Shop', link: '/shop' },
+        { label: 'All machines', link: '/shop/machines' }
+      ];
+    }
   }
 
   removeFilter(filter: string): void {
@@ -193,7 +320,8 @@ export class ShopComponent implements OnInit {
             id: '1',
             name: 'Power Control 200XE',
             partNo: 'PC-200XE-001',
-            price: 599.99,
+            clientPrice: 599.99,
+            effectivePrice: 599.99,
             shortDescription: 'Power control unit for 200XE Winding Machine',
             technicalDescription: '24V DC, 500W, IP65'
           },
@@ -201,7 +329,8 @@ export class ShopComponent implements OnInit {
             id: '2',
             name: 'Sensor Module 200XE',
             partNo: 'SM-200XE-002',
-            price: 299.99,
+            clientPrice: 299.99,
+            effectivePrice: 299.99,
             shortDescription: 'High-precision sensor module for 200XE',
             technicalDescription: 'Accuracy ±0.01mm, Response time 1ms'
           },
@@ -209,7 +338,8 @@ export class ShopComponent implements OnInit {
             id: '3',
             name: 'Control Panel 200XE',
             partNo: 'CP-200XE-003',
-            price: 449.99,
+            clientPrice: 449.99,
+            effectivePrice: 449.99,
             shortDescription: 'Touch control panel for 200XE series',
             technicalDescription: '7" TFT, IP54, Multi-touch'
           }
@@ -224,7 +354,8 @@ export class ShopComponent implements OnInit {
     }
 
     if (this.discountedControl.value) {
-      filtered = filtered.filter(product => product.price > 0);
+      // Filter products with discounts
+      filtered = filtered.filter(product => this.hasDiscount(product));
     }
 
     this.filteredProducts = filtered;

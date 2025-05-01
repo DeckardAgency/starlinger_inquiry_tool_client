@@ -88,7 +88,7 @@ export class CartService {
   getCartTotal(): Observable<number> {
     return this.cartItems.pipe(
       map(items => items.reduce((total, item) =>
-        total + (item.product.price * item.quantity), 0))
+        total + (item.product.clientPrice * item.quantity), 0))
     );
   }
 

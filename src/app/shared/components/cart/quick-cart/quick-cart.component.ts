@@ -92,7 +92,7 @@ export class QuickCartComponent implements OnInit, OnDestroy {
     // Calculate manually if we have access to the items
     if (this.cartItems && this.cartItems.length > 0) {
       for (const item of this.cartItems) {
-        const discountedPrice = item.product.price * 0.8;
+        const discountedPrice = item.product.clientPrice * 0.8;
         itemTotal += (discountedPrice * item.quantity);
       }
     } else {
@@ -120,7 +120,7 @@ export class QuickCartComponent implements OnInit, OnDestroy {
     // Manual calculation from cart items
     if (this.cartItems && this.cartItems.length > 0) {
       for (const item of this.cartItems) {
-        const discountedPrice = item.product.price * 0.8;
+        const discountedPrice = item.product.clientPrice * 0.8;
         itemTotal += (discountedPrice * item.quantity);
       }
     }

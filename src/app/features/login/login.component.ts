@@ -1,15 +1,24 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/auth/auth.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('200ms ease-out', style({ opacity: 1 }))
+      ])
+    ])
+  ]
 })
 export class LoginComponent {
   username: string = '';
@@ -17,6 +26,8 @@ export class LoginComponent {
   errorMessage: string = '';
   isLoading: boolean = false;
   returnUrl: string = '/dashboard';
+  rememberMe: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -58,5 +69,15 @@ export class LoginComponent {
         console.error('Login error:', error);
       }
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  resetPassword(): void {
+    // Implement password reset functionality or navigate to reset page
+    console.log('Password reset requested');
+    // For example: this.router.navigate(['/reset-password']);
   }
 }

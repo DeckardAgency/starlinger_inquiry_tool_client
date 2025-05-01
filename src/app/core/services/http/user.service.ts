@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { User, UserCollectionResponse } from '@core/models';
-import {environment} from '@env/environment';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,8 @@ export class UserService {
               createdAt: userMember.createdAt,
               updatedAt: userMember.updatedAt,
               orders: userMember.orders,
-              username: userMember.email // Ensure the username is set for compatibility
+              username: userMember.email, // Ensure the username is set for compatibility
+              client: userMember.client  // Include the client information if available
             };
 
             return user;

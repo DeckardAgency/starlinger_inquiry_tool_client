@@ -7,7 +7,7 @@ export interface Inquiry {
   machine?: string;
   dateCreated: string;
   partsOrdered: number;
-  status: 'Submitted' | 'Processing' | 'Shipped' | 'Completed' | 'Cancelled';
+  status: string;
   internalReference?: string;
 }
 

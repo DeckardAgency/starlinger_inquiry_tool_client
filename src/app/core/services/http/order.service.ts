@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { CartItem } from '@models/cart.model';
@@ -15,10 +15,25 @@ export interface OrderRequest {
   user: string;
 }
 
+export interface OrderItemResponse {
+  '@id': string;
+  '@type': string;
+  product: {
+    '@id': string;
+    '@type': string;
+    id: string;
+    name: string;
+    price: number;
+  };
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
 export interface OrderResponse {
-  "@context": string;
-  "@id": string;
-  "@type": string;
+  '@context': string;
+  '@id': string;
+  '@type': string;
   id: string;
   orderNumber: string;
   status: string;
@@ -27,8 +42,32 @@ export interface OrderResponse {
   billingAddress: string;
   createdAt: string;
   updatedAt: string;
-  items: string[]; // Contains order item URLs
+  lastSavedAt: string;
+  items: OrderItemResponse[];
   user: string;
+}
+
+export interface OrdersCollection {
+  '@context': string;
+  '@id': string;
+  '@type': string;
+  'totalItems': number;
+  'member': OrderResponse[];
+  'view': {
+    '@id': string;
+    '@type': string;
+  };
+  'search': {
+    '@type': string;
+    'template': string;
+    'variableRepresentation': string;
+    'mapping': Array<{
+      '@type': string;
+      'variable': string;
+      'property': string;
+      'required': boolean;
+    }>;
+  };
 }
 
 @Injectable({
@@ -78,5 +117,21 @@ export class OrderService {
 
     // Use the headers for GET requests
     return this.http.get<OrderResponse>(`${this.apiUrl}/${orderId}`, { headers });
+  }
+
+  /**
+   * Get all orders by user email
+   */
+  getOrdersByUserEmail(email: string): Observable<OrdersCollection> {
+    // Define headers explicitly for this request
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/ld+json')
+      .set('Accept', 'application/ld+json');
+
+    // Create the query parameters with user.email filter
+    const params = new HttpParams().set('user.email', email);
+
+    // Use the headers and params for GET requests
+    return this.http.get<OrdersCollection>(this.apiUrl, { headers, params });
   }
 }

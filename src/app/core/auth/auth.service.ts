@@ -159,7 +159,9 @@ export class AuthService {
         id: '',
         roles: [],
         firstName: '',
-        lastName: ''
+        lastName: '',
+        // Client information will be empty until fetched from the API
+        client: undefined
       };
 
       // Store user info
@@ -256,5 +258,38 @@ export class AuthService {
     if (this.isLocalStorageAvailable()) {
       localStorage.removeItem(key);
     }
+  }
+
+  /**
+   * Get client information if available
+   * @returns Client information or null
+   */
+  getClientInfo(): { name: string, code: string } | null {
+    const user = this.getCurrentUser();
+    if (user?.client) {
+      return {
+        name: user.client.name,
+        code: user.client.code
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Check if user is associated with a client
+   * @returns True if user has client information
+   */
+  hasClient(): boolean {
+    const user = this.getCurrentUser();
+    return !!user?.client;
+  }
+
+  /**
+   * Get client name if available
+   * @returns Client name or empty string
+   */
+  getClientName(): string {
+    const client = this.getClientInfo();
+    return client ? client.name : '';
   }
 }

@@ -144,11 +144,11 @@
 
           <p class="shop__details-description">{{ selectedProduct.shortDescription }}</p>
 
-          @if (selectedProduct.price > 0) {
+          @if (selectedProduct.clientPrice > 0) {
             <div class="shop__details-price">
-              <span class="shop__original-price">€ {{ selectedProduct.price }}</span>
+              <span class="shop__original-price">€ {{ selectedProduct.clientPrice }}</span>
               <span class="shop__discount">-20%</span>
-              <span class="shop__final-price">€ {{ selectedProduct.price * 0.8 }}</span>
+              <span class="shop__final-price">€ {{ selectedProduct.clientPrice * 0.8 }}</span>
             </div>
           }
 

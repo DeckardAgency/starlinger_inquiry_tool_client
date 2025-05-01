@@ -69,11 +69,11 @@
   <p class="product-card__description">Short description text goes here, it can be short, it can be long, it can be whatewer we want it to be, but it has to be here.</p>
   <!--  <p class="product-card__description">{{ product.shortDescription }}</p>-->
 
-  @if (product.price > 0) {
+  @if (product.clientPrice > 0) {
     <div class="product-card__price">
-      <span class="product-card__price-original">€ {{ formatPrice(product.price) }}</span>
+      <span class="product-card__price-original">€ {{ formatPrice(product.clientPrice) }}</span>
       <span class="product-card__price-discount">-20%</span>
-      <span class="product-card__price-final">€ {{ formatPrice(product.price * 0.8) }}</span>
+      <span class="product-card__price-final">€ {{ formatPrice(product.clientPrice * 0.8) }}</span>
     </div>
   }
 
