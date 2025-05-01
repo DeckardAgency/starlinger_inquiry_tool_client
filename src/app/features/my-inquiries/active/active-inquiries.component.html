@@ -10,9 +10,8 @@
 
   <div class="active-inquiries__body">
     @if (isLoading) {
-      <div class="active-inquiries__loading">
-        <p>Loading your orders...</p>
-        <div class="active-inquiries__spinner"></div>
+      <div class="active-inquiries__grid">
+        <app-inquiry-card-shimmer *ngFor="let i of [1,2,3]"></app-inquiry-card-shimmer>
       </div>
     } @else if (error) {
       <div class="active-inquiries__error">
@@ -34,8 +33,10 @@
       </div>
     } @else {
       <div class="active-inquiries__grid">
-        @for (inquiry of activeInquiries; track inquiry.id) {
-          <app-inquiry-card [inquiry]="inquiry"></app-inquiry-card>
+        @for (inquiry of activeInquiries; track inquiry.id; let i = $index) {
+          <app-inquiry-card
+            [inquiry]="inquiry">
+          </app-inquiry-card>
         }
       </div>
     }

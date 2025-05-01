@@ -14,6 +14,7 @@ import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service
 import { ManualCartItem } from '@models/manual-cart-item.model';
 import { Breadcrumb, Product } from '@core/models';
 import {IconComponent} from '@shared/components/icon/icon.component';
+import {ArticleItemShimmerComponent} from '@shared/components/product/article-item/article-item-shimmer.component';
 
 export interface MachineType {
   id: string;
@@ -54,7 +55,8 @@ export interface Part {
     BreadcrumbsComponent,
     ArticleItemComponent,
     AdvancedImagePreviewModalComponent,
-    IconComponent
+    IconComponent,
+    ArticleItemShimmerComponent
   ],
   templateUrl: './manual-entry-input-form.component.html',
   styleUrls: ['./manual-entry-input-form.component.scss']

@@ -9,11 +9,12 @@ import { OrderResponse, OrderService } from '@services/http/order.service';
 import { AuthService } from '@core/auth/auth.service';
 import { RouterLink } from '@angular/router';
 import { Inquiry } from '@core/models/inquiry.model';
+import {InquiryCardShimmerComponent} from '@shared/components/inquiry-card/inquiry-card-shimmer.component';
 
 @Component({
   selector: 'app-active-inquiries',
   standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, InquiryCardComponent, IconComponent, RouterLink],
+  imports: [CommonModule, BreadcrumbsComponent, InquiryCardComponent, IconComponent, RouterLink, InquiryCardShimmerComponent],
   templateUrl: './active-inquiries.component.html',
   styleUrls: ['./active-inquiries.component.scss']
 })
@@ -76,7 +77,9 @@ export class ActiveInquiriesComponent implements OnInit {
           });
         }),
         finalize(() => {
-          this.isLoading = false;
+          setTimeout(() => {
+            this.isLoading = false;
+          }, 300);
         })
       )
       .subscribe(ordersCollection => {

@@ -107,6 +107,33 @@ export class OrderService {
   }
 
   /**
+   * Save order as draft
+   */
+  saveDraft(cartItems: CartItem[], shippingAddress: string, billingAddress: string, referenceNumber: string, userId: string): Observable<OrderResponse> {
+    // Transform cart items to the format expected by the API
+    const items = cartItems.map(item => ({
+      product: `/api/v1/products/${item.product.id}`,
+      quantity: item.quantity
+    }));
+
+    const orderData: OrderRequest = {
+      status: 'draft', // Set status as draft
+      shippingAddress,
+      billingAddress,
+      items,
+      user: '/api/v1/users/' + userId
+    };
+
+    // Define headers explicitly for this request
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/ld+json')
+      .set('Accept', 'application/ld+json');
+
+    // Pass the headers with the correct content type
+    return this.http.post<OrderResponse>(this.apiUrl, orderData, { headers });
+  }
+
+  /**
    * Get order details by ID
    */
   getOrderById(orderId: string): Observable<OrderResponse> {
@@ -130,6 +157,24 @@ export class OrderService {
 
     // Create the query parameters with user.email filter
     const params = new HttpParams().set('user.email', email);
+
+    // Use the headers and params for GET requests
+    return this.http.get<OrdersCollection>(this.apiUrl, { headers, params });
+  }
+
+  /**
+   * Get draft orders by user email
+   */
+  getDraftOrdersByUserEmail(email: string): Observable<OrdersCollection> {
+    // Define headers explicitly for this request
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/ld+json')
+      .set('Accept', 'application/ld+json');
+
+    // Create the query parameters with user.email and status=draft filters
+    const params = new HttpParams()
+      .set('user.email', email)
+      .set('status', 'draft');
 
     // Use the headers and params for GET requests
     return this.http.get<OrdersCollection>(this.apiUrl, { headers, params });

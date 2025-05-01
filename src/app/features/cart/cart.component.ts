@@ -216,4 +216,56 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   protected readonly environment = environment;
+
+  /**
+   * Save the current cart as a draft order
+   */
+  saveDraft(): void {
+    if (this.isSubmitting || this.cartItems.length === 0) {
+      return;
+    }
+
+    // Check if the user is authenticated
+    if (!this.currentUser || !this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/cart' }
+      });
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.orderError = null;
+
+    // For this example, using static addresses
+    const shippingAddress = "444 Main Street, Anytown, ST 12345";
+    const billingAddress = "444 Main Street, Anytown, ST 12345";
+
+    // Use the OrderService to create the draft order
+    this.orderService.saveDraft(
+      this.cartItems,
+      shippingAddress,
+      billingAddress,
+      this.referenceNumber || 'Draft order',
+      this.currentUser.id
+    )
+      .subscribe({
+        next: (response) => {
+          console.log('Draft saved successfully:', response);
+          this.orderResponse = response;
+          this.isSubmitting = false;
+
+          // Show notification
+          this.cartService.showNotification('Order saved as draft successfully!', 'success');
+        },
+        error: (error) => {
+          console.error('Error saving draft:', error);
+          this.orderError = error.message || 'Failed to save draft. Please try again.';
+          this.isSubmitting = false;
+
+          // Show error notification
+          this.cartService.showNotification('Error saving draft. Please try again.', 'remove');
+        }
+      });
+  }
+
 }

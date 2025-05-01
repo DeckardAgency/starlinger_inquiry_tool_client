@@ -12,10 +12,10 @@
       </div>
 
       <!-- Then Loop through product.imageGallery -->
-      <div ngxSlickItem *ngFor="let image of product.imageGallery" class="slide">
-        <img class="product-card__img" src="{{ environment.apiBaseUrl + image.filePath }}"
-             [alt]="product.name + ' image'">
-      </div>
+<!--      <div ngxSlickItem *ngFor="let image of product.imageGallery" class="slide">-->
+<!--        <img class="product-card__img" src="{{ environment.apiBaseUrl + image.filePath }}"-->
+<!--             [alt]="product.name + ' image'">-->
+<!--      </div>-->
     </ngx-slick-carousel>
 
     <button class="carousel-arrow carousel-arrow__prev" (click)="prev()">

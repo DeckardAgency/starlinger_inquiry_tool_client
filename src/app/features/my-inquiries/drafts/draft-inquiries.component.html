@@ -8,5 +8,35 @@
     </h2>
   </div>
   <div class="draft-inquiries__body">
+    @if (isLoading) {
+      <div class="draft-inquiries__loading">
+        <p>Loading your draft orders...</p>
+        <div class="draft-inquiries__spinner"></div>
+      </div>
+    } @else if (error) {
+      <div class="draft-inquiries__error">
+        <app-icon name="alertTriangle" size="24px" color="#DC2626"></app-icon>
+        <p>{{ error }}</p>
+        <button (click)="loadDraftOrders()" class="draft-inquiries__retry-btn">
+          <app-icon name="refresh" size="16px" color="#ffffff"></app-icon>
+          Try Again
+        </button>
+      </div>
+    } @else if (draftInquiries.length === 0) {
+      <div class="draft-inquiries__empty">
+        <app-icon name="inbox" size="32px" color="#71717A"></app-icon>
+        <p>You don't have any draft inquiries at the moment.</p>
+        <a routerLink="/products" class="draft-inquiries__shop-link">
+          <app-icon name="shoppingCart" size="16px" color="#ffffff"></app-icon>
+          Browse Products
+        </a>
+      </div>
+    } @else {
+      <div class="draft-inquiries__grid">
+        @for (inquiry of draftInquiries; track inquiry.id) {
+          <app-inquiry-card [inquiry]="inquiry"></app-inquiry-card>
+        }
+      </div>
+    }
   </div>
 </div>

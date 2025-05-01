@@ -5,6 +5,9 @@ import { Observable, Subscription } from 'rxjs';
 import { QuickCartService } from '@services/cart/quick-cart.service';
 import { environment } from '@env/environment';
 import { CartItem } from '@core/models';
+import {AuthService} from '@core/auth/auth.service';
+import {Router} from '@angular/router';
+import {OrderService} from '@services/http/order.service';
 
 @Component({
   selector: 'app-quick-cart',
@@ -23,7 +26,10 @@ export class QuickCartComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
-    public quickCartService: QuickCartService
+    public quickCartService: QuickCartService,
+    private orderService: OrderService,  // Add this
+    private router: Router,              // Add this
+    private authService: AuthService     // Add this
   ) {}
 
   ngOnInit(): void {
@@ -140,4 +146,56 @@ export class QuickCartComponent implements OnInit, OnDestroy {
   }
 
   protected readonly environment = environment;
+
+  saveDraft(): void {
+    // Check if cart is empty
+    let cartItems: CartItem[] = [];
+    const subscription = this.cartItems$.subscribe(items => {
+      cartItems = items;
+    });
+    subscription.unsubscribe();
+
+    if (cartItems.length === 0) {
+      return; // No items to save
+    }
+
+    // Check if user is authenticated
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser || !this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/cart' }
+      });
+      return;
+    }
+
+    // Default addresses (in a real app, you might get these from user profile)
+    const shippingAddress = "444 Main Street, Anytown, ST 12345";
+    const billingAddress = "444 Main Street, Anytown, ST 12345";
+    const referenceNumber = 'Draft order';
+
+    // Call the order service to save as draft
+    this.orderService.saveDraft(
+      cartItems,
+      shippingAddress,
+      billingAddress,
+      referenceNumber,
+      currentUser.id
+    ).subscribe({
+      next: (response) => {
+        console.log('Order saved as draft:', response);
+
+        // Show success notification
+        this.quickCartService.cartService.showNotification('Order saved as draft successfully!', 'success');
+
+        // Close the quick cart
+        this.onClose();
+      },
+      error: (error) => {
+        console.error('Error saving draft:', error);
+        // Handle error (maybe show an error notification)
+        this.quickCartService.cartService.showNotification('Error saving draft. Please try again.', 'remove');
+      }
+    });
+  }
+
 }

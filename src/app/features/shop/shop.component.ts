@@ -13,6 +13,7 @@ import { AuthService } from '@core/auth/auth.service';
 import { Breadcrumb, Product } from '@core/models';
 import { Machine } from '@models/machine-type.model';
 import { IconComponent } from '@shared/components/icon/icon.component';
+import { ArticleItemShimmerComponent } from '@shared/components/product/article-item/article-item-shimmer.component';
 
 @Component({
   selector: 'app-shop',
@@ -24,7 +25,8 @@ import { IconComponent } from '@shared/components/icon/icon.component';
     BreadcrumbsComponent,
     ProductCardComponent,
     ArticleItemComponent,
-    IconComponent
+    IconComponent,
+    ArticleItemShimmerComponent,
   ],
   templateUrl: 'shop.component.html',
   styleUrls: ['shop.component.scss']
@@ -71,12 +73,12 @@ export class ShopComponent implements OnInit {
 
     this.discountedControl.valueChanges.subscribe(() => this.filterProducts());
 
-    // Get client name if available
+    // Get the client name if available
     const clientInfo = this.authService.getClientInfo();
     if (clientInfo) {
       this.clientName = clientInfo.name;
 
-      // Update breadcrumbs with client name
+      // Update breadcrumbs with the client name
       this.breadcrumbs = [
         { label: 'Shop', link: '/shop' },
         { label: `${this.clientName} Products`, link: '/shop/machines' }
@@ -91,7 +93,7 @@ export class ShopComponent implements OnInit {
   private loadProducts(): void {
     this.loading = true;
 
-    // Check if user has a client
+    // Check if a user has a client
     if (this.authService.hasClient()) {
       const clientId = this.authService.getCurrentUser()?.client?.id;
       if (clientId) {
@@ -186,7 +188,7 @@ export class ShopComponent implements OnInit {
    * @returns The discount percentage or 0 if no discount
    */
   getDiscountPercentage(product: Product): number {
-    // If discountPercentage is explicitly set
+
     if (product.discountPercentage !== undefined && product.discountPercentage !== null) {
       return product.discountPercentage;
     }
@@ -202,7 +204,7 @@ export class ShopComponent implements OnInit {
   selectProduct(product: Product): void {
     this.selectedProduct = product;
     if (product) {
-      // Update breadcrumbs with client name if available
+      // Update breadcrumbs with the client name if available
       if (this.clientName) {
         this.breadcrumbs = [
           { label: 'Shop', link: '/shop' },
@@ -229,7 +231,7 @@ export class ShopComponent implements OnInit {
   closeDetails(): void {
     this.selectedProduct = null;
 
-    // Reset breadcrumbs with client name if available
+    // Reset breadcrumbs with the client name if available
     if (this.clientName) {
       this.breadcrumbs = [
         { label: 'Shop', link: '/shop' },

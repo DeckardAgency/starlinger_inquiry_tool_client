@@ -18,6 +18,7 @@ import { ProductService } from '@services/http/product.service';
 import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 import { ManualCartItem } from '@models/manual-cart-item.model';
 import { Breadcrumb, Product } from '@core/models';
+import {ArticleItemShimmerComponent} from '@shared/components/product/article-item/article-item-shimmer.component';
 
 export interface UploadedFile {
   name: string;
@@ -52,7 +53,8 @@ export interface SpreadsheetTemplateData {
     ArticleItemComponent,
     AdvancedImagePreviewModalComponent,
     AgGridModule,
-    SpreadsheetComponent
+    SpreadsheetComponent,
+    ArticleItemShimmerComponent
   ],
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']
