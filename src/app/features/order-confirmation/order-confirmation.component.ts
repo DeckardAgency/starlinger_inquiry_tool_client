@@ -19,7 +19,5 @@ export class OrderConfirmationComponent implements OnInit {
       { label: 'Order Confirmation' }
     ];
 
-    ngOnInit(): void {
-        throw new Error('Method not implemented.');
-    }
+    ngOnInit(): void {}
 }

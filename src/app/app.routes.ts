@@ -8,7 +8,10 @@ import { ManualEntryTemplateComponent } from '@features/manual-entry/template/ma
 import { ManualEntryCartComponent } from '@features/manual-entry-cart/manual-entry-cart.component';
 import { InquiryToolComponent } from '@features/inquiry-tool/inquiry-tool.component';
 import { CartComponent } from '@features/cart/cart.component';
-import {OrderConfirmationComponent} from '@features/order-confirmation/order-confirmation.component';
+import { OrderConfirmationComponent } from '@features/order-confirmation/order-confirmation.component';
+import { ActiveInquiriesComponent } from '@features/my-inquiries/active/active-inquiries.component';
+import { DraftInquiriesComponent } from '@features/my-inquiries/drafts/draft-inquiries.component';
+import { InquiryHistoryComponent } from '@features/my-inquiries/history/inquiry-history.component';
 
 export const routes: Routes = [
   {
@@ -67,5 +70,23 @@ export const routes: Routes = [
     path: 'order-confirmation',
     component: OrderConfirmationComponent,
     title: 'Inquiry Tool | Order Confirmation'
+  },
+  {
+    path: 'my-inquiries/active',
+    component: ActiveInquiriesComponent,
+    canActivate: [AuthGuard],
+    title: 'Inquiry Tool | Active Inquiries'
+  },
+  {
+    path: 'my-inquiries/drafts',
+    component: DraftInquiriesComponent,
+    canActivate: [AuthGuard],
+    title: 'Inquiry Tool | Draft Inquiries'
+  },
+  {
+    path: 'my-inquiries/history',
+    component: InquiryHistoryComponent,
+    canActivate: [AuthGuard],
+    title: 'Inquiry Tool | Inquiry History'
   }
 ];

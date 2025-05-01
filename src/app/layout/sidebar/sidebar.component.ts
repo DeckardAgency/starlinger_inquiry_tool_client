@@ -1,20 +1,38 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { SidebarService } from '@services/sidebar.service';
 import { AuthService } from '@core/auth/auth.service';
-import { IconComponent } from '@shared/components/icon/icon.component';
 import { User } from '@core/models';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { LoginModalComponent } from '@shared/components/modals/login-modal/login-modal.component';
+import { LoginModalService } from '@services/login-modal.service';
+import { SupportModalComponent } from '@shared/components/modals/support-modal/support-modal.component';
+import { SupportModalService } from '@services/support-modal.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, IconComponent],
+  imports: [CommonModule, RouterModule, LoginModalComponent, SupportModalComponent],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('200ms ease-in', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-out', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class SidebarComponent implements OnInit {
   isInquiriesExpanded = signal<boolean>(false);
+  isUserDropdownOpen = signal<boolean>(false);
+  isLoginModalOpen = signal<boolean>(false);
+  isSupportModalOpen = signal<boolean>(false);
   currentUser: User | null = null;
   userFullName: string = '';
   userRole: string = '';
@@ -23,7 +41,10 @@ export class SidebarComponent implements OnInit {
   constructor(
     private sidebarService: SidebarService,
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef,
+    public loginModalService: LoginModalService,
+    public supportModalService: SupportModalService
   ) {}
 
   ngOnInit(): void {
@@ -36,6 +57,54 @@ export class SidebarComponent implements OnInit {
     // Initialize with current user
     this.currentUser = this.authService.getCurrentUser();
     this.updateUserDisplay();
+
+    // Subscribe to login modal state
+    this.loginModalService.isOpen$.subscribe(isOpen => {
+      this.isLoginModalOpen.set(isOpen);
+    });
+
+    // Subscribe to support modal state
+    this.supportModalService.isOpen$.subscribe(isOpen => {
+      this.isSupportModalOpen.set(isOpen);
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    // Check if click was outside the user dropdown area
+    if (
+      this.isUserDropdownOpen() &&
+      !this.elementRef.nativeElement.querySelector('.sidebar__user').contains(event.target)
+    ) {
+      this.isUserDropdownOpen.set(false);
+    }
+  }
+
+  toggleUserDropdown(event: Event) {
+    // Stop event propagation to prevent the document click handler from firing immediately
+    event.stopPropagation();
+    this.isUserDropdownOpen.update(value => !value);
+  }
+
+  openLoginModal() {
+    // Close the user dropdown when opening the login modal
+    this.isUserDropdownOpen.set(false);
+    this.loginModalService.open();
+  }
+
+  openSupportModal(event: Event) {
+    // Prevent the default navigation behavior
+    event.preventDefault();
+    // Open the support modal
+    this.supportModalService.open();
+  }
+
+  onLoginSuccess() {
+    // Refresh user display after login
+    this.currentUser = this.authService.getCurrentUser();
+    this.updateUserDisplay();
+    // Optional: reload current page or navigate to dashboard
+    // window.location.reload();
   }
 
   updateUserDisplay(): void {

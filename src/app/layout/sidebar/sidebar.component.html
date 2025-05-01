@@ -45,7 +45,7 @@
               </a>
             </li>
             <li class="sidebar__item">
-              <button class="sidebar__link sidebar__link--disabled sidebar__submenu-toggle"
+              <button class="sidebar__link sidebar__submenu-toggle"
                       (click)="toggleInquiriesMenu()"
                       [class.sidebar__submenu-toggle--expanded]="isInquiriesExpanded()">
                 <span class="icon-folder sidebar__icon">
@@ -58,7 +58,7 @@
               @if (isInquiriesExpanded()) {
                 <ul class="sidebar__nested-list">
                   <li class="sidebar__item sidebar__item--indented">
-                    <a routerLink="/active-inquiries" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                    <a routerLink="/my-inquiries/active" routerLinkActive="sidebar__link--active" class="sidebar__link">
                       <span class="icon-active sidebar__icon">
                         <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 6v2.667m0 2.666h.007m1.993-10H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
@@ -66,11 +66,19 @@
                     </a>
                   </li>
                   <li class="sidebar__item sidebar__item--indented">
-                    <a routerLink="/inquiry-history" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                    <a routerLink="/my-inquiries/drafts" routerLinkActive="sidebar__link--active" class="sidebar__link">
                       <span class="icon-history sidebar__icon">
                         <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 1.333V4a1.333 1.333 0 0 0 1.334 1.333h2.666M6 10l1.333 1.333L10 8.667m0-7.334H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                       </span>
                       <span class="sidebar__link-text">History</span>
+                    </a>
+                  </li>
+                  <li class="sidebar__item sidebar__item--indented">
+                    <a routerLink="/my-inquiries/history" routerLinkActive="sidebar__link--active" class="sidebar__link">
+                      <span class="icon-history sidebar__icon">
+                        <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.333 1.333V4a1.333 1.333 0 0 0 1.334 1.333h2.666M6 10l1.333 1.333L10 8.667m0-7.334H4a1.333 1.333 0 0 0-1.333 1.334v10.666A1.333 1.333 0 0 0 4 14.667h8a1.333 1.333 0 0 0 1.333-1.334V4.667L10 1.333Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </span>
+                      <span class="sidebar__link-text">Drafts</span>
                     </a>
                   </li>
                 </ul>
@@ -106,7 +114,7 @@
     <div class="sidebar__footer">
       <ul class="sidebar__list">
         <li class="sidebar__item">
-          <a routerLink="/support" routerLinkActive="sidebar__link--active" class="sidebar__link sidebar__link--disabled">
+          <a (click)="openSupportModal($event)" routerLink="/support" routerLinkActive="sidebar__link--active" class="sidebar__link">
             <span class="icon-support sidebar__icon">
               <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a)"><path d="m3.287 3.287 2.826 2.826m3.774 0 2.826-2.826m-2.826 6.6 2.826 2.826m-6.6-2.826-2.826 2.826M14.667 8A6.667 6.667 0 1 1 1.333 8a6.667 6.667 0 0 1 13.334 0Zm-4 0a2.667 2.667 0 1 1-5.334 0 2.667 2.667 0 0 1 5.334 0Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h16v16H0z"/></clipPath></defs></svg>
             </span>
@@ -125,15 +133,43 @@
         @if (authService.isAuthenticated()) {
           <li class="sidebar__item">
             <div class="sidebar__user">
-              <span class="icon-user sidebar__icon">
-                <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" *ngIf="isCollapsed()"><path d="M12.667 14v-1.333A2.667 2.667 0 0 0 10 10H6a2.667 2.667 0 0 0-2.667 2.667V14m7.334-9.333a2.667 2.667 0 1 1-5.334 0 2.667 2.667 0 0 1 5.334 0Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <span class="sidebar__user-initials" *ngIf="!isCollapsed()">{{ userInitials }}</span>
-              </span>
-              <div class="sidebar__user-info">
-                <span class="sidebar__user-name">{{ userFullName }}</span>
-                <span class="sidebar__user-role">{{ userRole }}</span>
-                <span class="sidebar__user-logout" (click)="logout()" role="button">Logout</span>
+              <div class="sidebar__user-row" (click)="toggleUserDropdown($event)" role="button">
+                <span class="icon-user sidebar__icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M12.6667 14V12.6667C12.6667 11.9594 12.3857 11.2811 11.8856 10.781C11.3855 10.281 10.7072 10 10 10H6C5.29275 10 4.61448 10.281 4.11438 10.781C3.61428 11.2811 3.33333 11.9594 3.33333 12.6667V14M10.6667 4.66667C10.6667 6.13943 9.47276 7.33333 8 7.33333C6.52724 7.33333 5.33333 6.13943 5.33333 4.66667C5.33333 3.19391 6.52724 2 8 2C9.47276 2 10.6667 3.19391 10.6667 4.66667Z" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <div class="sidebar__user-info">
+                  <span class="sidebar__user-name">{{ userFullName }}</span>
+                  <span class="sidebar__user-role">{{ userRole }}</span>
+                </div>
+                <span class="sidebar__user-icon-arrow" [class.sidebar__user-icon-arrow--rotated]="isUserDropdownOpen()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M4 6L8 10L12 6" stroke="#3F3F46" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
               </div>
+
+              @if (isUserDropdownOpen()) {
+                <div class="sidebar__user-dropdown" @fadeInOut>
+                  <div class="sidebar__user-switch-user" role="button" (click)="openLoginModal()">
+                    <span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M14 8C14 6.4087 13.3679 4.88258 12.2426 3.75736C11.1174 2.63214 9.5913 2 8 2C6.32263 2.00631 4.71265 2.66082 3.50667 3.82667L2 5.33333M2 5.33333V2M2 5.33333H5.33333M2 8C2 9.5913 2.63214 11.1174 3.75736 12.2426C4.88258 13.3679 6.4087 14 8 14C9.67737 13.9937 11.2874 13.3392 12.4933 12.1733L14 10.6667M14 10.6667H10.6667M14 10.6667V14" stroke="#09090B" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                    Switch user
+                  </div>
+                  <div class="sidebar__user-logout" (click)="logout()" role="button">
+                    <span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H6M10.6667 11.3333L14 8M14 8L10.6667 4.66667M14 8H6" stroke="#09090B" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                    Logout
+                  </div>
+                </div>
+              }
             </div>
           </li>
         }
@@ -141,3 +177,16 @@
     </div>
   </div>
 </div>
+
+<!-- Login Modal -->
+<app-login-modal
+  [isOpen]="isLoginModalOpen()"
+  (isOpenChange)="loginModalService.close()"
+  (loginSuccess)="onLoginSuccess()">
+</app-login-modal>
+
+<!-- Support Modal -->
+<app-support-modal
+  [isOpen]="isSupportModalOpen()"
+  (isOpenChange)="supportModalService.close()">
+</app-support-modal>

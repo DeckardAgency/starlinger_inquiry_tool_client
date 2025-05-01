@@ -1,0 +1,33 @@
+<div class="draft-inquiries-container">
+  <h2>Draft Inquiries</h2>
+
+  <div class="drafts-header">
+    <div class="search-box">
+      <input type="text" placeholder="Search drafts..." class="search-input">
+    </div>
+    <button class="create-new-btn">+ New Inquiry</button>
+  </div>
+
+  <div class="drafts-list" *ngIf="draftInquiries.length > 0">
+    <div class="draft-item" *ngFor="let draft of draftInquiries">
+      <div class="draft-content">
+        <h3>{{ draft.title }}</h3>
+        <div class="draft-info">
+          <span>Created: {{ draft.createdDate | date:'mediumDate' }}</span>
+          <span>Last saved: {{ draft.lastSaved | date:'short' }}</span>
+        </div>
+      </div>
+      <div class="draft-actions">
+        <button class="edit-btn" (click)="continueDraft(draft.id)">Continue</button>
+        <button class="delete-btn" (click)="deleteDraft(draft.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="draftInquiries.length === 0">
+    <div class="empty-icon">📝</div>
+    <h3>No Draft Inquiries</h3>
+    <p>You don't have any saved drafts. Start a new inquiry when you're ready.</p>
+    <button class="start-btn">Start New Inquiry</button>
+  </div>
+</div>
