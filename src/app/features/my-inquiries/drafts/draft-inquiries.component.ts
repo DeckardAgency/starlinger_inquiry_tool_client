@@ -9,11 +9,15 @@ import { of } from 'rxjs';
 import { OrderResponse, OrderService } from '@services/http/order.service';
 import { AuthService } from '@core/auth/auth.service';
 import { Inquiry } from '@core/models/inquiry.model';
+import {
+  DraftOrderTableComponent,
+  DraftOrderTableItem
+} from '@shared/components/draft-order-table/draft-order-table.component';
 
 @Component({
   selector: 'app-draft-inquiries',
   standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryCardComponent, RouterLink],
+  imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryCardComponent, RouterLink, DraftOrderTableComponent],
   templateUrl: './draft-inquiries.component.html',
   styleUrls: ['./draft-inquiries.component.scss']
 })
@@ -26,6 +30,132 @@ export class DraftInquiriesComponent implements OnInit {
   draftInquiries: Inquiry[] = [];
   isLoading = false;
   error: string | null = null;
+
+  draftOrderItems: DraftOrderTableItem[] = [
+    {
+      dateCreated: '28-04-2025',
+      type: 'Order',
+      referenceNumber: '000123-ABC',
+      customer: {
+        initials: 'AK',
+        name: 'Anes Kapetanovic'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '27-04-2025',
+      type: 'Order',
+      referenceNumber: '000124-XYZ',
+      customer: {
+        initials: 'MK',
+        name: 'Mira Kulic'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '26-04-2025',
+      type: 'Inquiry',
+      referenceNumber: '004231-UGR',
+      customer: {
+        initials: 'ME',
+        name: 'Martin Ertl'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '25-04-2025',
+      type: 'Inquiry',
+      referenceNumber: '001456-ZXY',
+      customer: {
+        initials: 'IJ',
+        name: 'Ivan Jozic'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '24-04-2025',
+      type: 'Order',
+      referenceNumber: '000125-DEF',
+      customer: {
+        initials: 'SK',
+        name: 'Sara Kovač',
+        avatar: 'assets/avatar1.jpg'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '23-04-2025',
+      type: 'Order',
+      referenceNumber: '000126-GHI',
+      customer: {
+        initials: 'TM',
+        name: 'Tomislav Marić'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '22-04-2025',
+      type: 'Inquiry',
+      referenceNumber: '003234-LJK',
+      customer: {
+        initials: 'ZP',
+        name: 'Zoran Petrović',
+        avatar: 'assets/avatar2.jpg'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '21-04-2025',
+      type: 'Order',
+      referenceNumber: '007890-QWE',
+      customer: {
+        initials: 'LB',
+        name: 'Lucia Babić'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '20-04-2025',
+      type: 'Order',
+      referenceNumber: '008901-RTY',
+      customer: {
+        initials: 'DH',
+        name: 'Damir Horvat'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '19-04-2025',
+      type: 'Inquiry',
+      referenceNumber: '005678-MNB',
+      customer: {
+        initials: 'JP',
+        name: 'Jana Pavlović',
+        avatar: 'assets/avatar3.jpg'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '18-04-2025',
+      type: 'Order',
+      referenceNumber: '009012-VCX',
+      customer: {
+        initials: 'NR',
+        name: 'Nikola Radić'
+      },
+      status: 'Draft'
+    },
+    {
+      dateCreated: '17-04-2025',
+      type: 'Inquiry',
+      referenceNumber: '006789-POI',
+      customer: {
+        initials: 'MM',
+        name: 'Marko Matić'
+      },
+      status: 'Draft'
+    }
+  ];
 
   // API status values that exist in the system
   readonly API_STATUSES = ['draft', 'pending', 'paid', 'processing', 'shipped', 'delivered', 'canceled'];
