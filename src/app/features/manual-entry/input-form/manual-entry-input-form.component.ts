@@ -1,20 +1,23 @@
-// src/app/manual-entry/manual-entry.component.ts
+// src/app/manual-entry/manual-entry-input-form.component.ts
 import { Component, OnInit, HostListener, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import { ArticleItemComponent } from '@shared/components/product/article-item/article-item.component';
+import { MachineArticleItemComponent } from '@shared/components/machine/machine-article-item/machine-article-item.component';
 import {
   AdvancedImagePreviewModalComponent
 } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
-import { ProductService } from '@services/http/product.service';
+import { MachineService } from '@services/http/machine.service';
 import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 import { ManualCartItem } from '@models/manual-cart-item.model';
-import { Breadcrumb, Product } from '@core/models';
-import {IconComponent} from '@shared/components/icon/icon.component';
-import {ArticleItemShimmerComponent} from '@shared/components/product/article-item/article-item-shimmer.component';
+import { Breadcrumb } from '@core/models';
+import { Machine } from '@core/models/machine.model';
+import { IconComponent } from '@shared/components/icon/icon.component';
+import {
+  MachineArticleItemShimmerComponent
+} from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
 
 export interface MachineType {
   id: string;
@@ -29,7 +32,7 @@ export interface UploadedFile {
   file: File;
   status: 'uploading' | 'success' | 'error';
   progress: number;
-  previewUrl?: string; // New property for image preview
+  previewUrl?: string; // Property for image preview
 }
 
 export interface Part {
@@ -53,19 +56,19 @@ export interface Part {
     ReactiveFormsModule,
     RouterModule,
     BreadcrumbsComponent,
-    ArticleItemComponent,
+    MachineArticleItemComponent,
     AdvancedImagePreviewModalComponent,
     IconComponent,
-    ArticleItemShimmerComponent
+    MachineArticleItemShimmerComponent
   ],
   templateUrl: './manual-entry-input-form.component.html',
   styleUrls: ['./manual-entry-input-form.component.scss']
 })
 export class ManualEntryInputFormComponent implements OnInit {
   // Machine data properties
-  machines: Product[] = [];
-  filteredMachines: Product[] = [];
-  selectedMachine: Product | null = null;
+  machines: Machine[] = [];
+  filteredMachines: Machine[] = [];
+  selectedMachine: Machine | null = null;
   loading = true;
   error: string | null = null;
   totalItems = 0;
@@ -165,7 +168,7 @@ export class ManualEntryInputFormComponent implements OnInit {
   }
 
   constructor(
-    private productService: ProductService,
+    private machineService: MachineService,
     private manualQuickCartService: ManualQuickCartService
   ) {
     this.searchControl.valueChanges.pipe(
@@ -181,9 +184,9 @@ export class ManualEntryInputFormComponent implements OnInit {
 
   private loadMachines(): void {
     this.loading = true;
-    this.productService.getProducts().subscribe({
+    this.machineService.getMachines().subscribe({
       next: (response) => {
-        // Treat products as machines for this component
+        // Use machines instead of products
         this.machines = response.member;
         this.totalItems = response.totalItems;
         this.filteredMachines = this.machines;
@@ -197,7 +200,7 @@ export class ManualEntryInputFormComponent implements OnInit {
     });
   }
 
-  selectMachine(machine: Product): void {
+  selectMachine(machine: Machine): void {
     // Save the current parts state if a machine is already selected
     if (this.selectedMachine) {
       this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
@@ -208,7 +211,7 @@ export class ManualEntryInputFormComponent implements OnInit {
       this.breadcrumbs = [
         { label: 'Dashboard', link: '/dashboard' },
         { label: 'Manual Entry', link: '/manual-entry' },
-        { label: machine.name }
+        { label: machine.articleDescription }
       ];
 
       // Check if we have saved parts for this machine
@@ -275,15 +278,18 @@ export class ManualEntryInputFormComponent implements OnInit {
     const searchTerm = this.searchControl.value?.toLowerCase();
     if (searchTerm) {
       filtered = filtered.filter(machine =>
-        machine.name.toLowerCase().includes(searchTerm)
+        machine.articleDescription.toLowerCase().includes(searchTerm) ||
+        machine.articleNumber.toLowerCase().includes(searchTerm) ||
+        machine.ibSerialNumber.toString().includes(searchTerm) ||
+        machine.ibStationNumber.toString().includes(searchTerm)
       );
     }
 
     // Use activeFilters for machine type filtering
     if (this.activeFilters.length > 0) {
-      // Simple filtering by machine name containing filter text
+      // Simple filtering by machine description containing filter text
       filtered = filtered.filter(machine =>
-        this.activeFilters.some(filter => machine.name.includes(filter))
+        this.activeFilters.some(filter => machine.articleDescription.includes(filter))
       );
     }
 
@@ -509,10 +515,11 @@ export class ManualEntryInputFormComponent implements OnInit {
       const manualCartItems: ManualCartItem[] = this.parts.map(part => {
         return {
           machineId: this.selectedMachine!.id,
-          machineName: this.selectedMachine!.name,
+          machineName: this.selectedMachine!.articleDescription,
           // Only include successfully uploaded files
           files: part.files.filter(file => file.status === 'success'),
-          // Include spreadsheet data
+          // Include part data
+          partData: part.data
         } as unknown as ManualCartItem;
       });
 

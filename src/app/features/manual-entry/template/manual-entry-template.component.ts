@@ -1,3 +1,4 @@
+// src/app/manual-entry/manual-entry-template.component.ts
 import { Component, OnInit, HostListener, ViewChild, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -9,16 +10,19 @@ import { AgGridModule } from 'ag-grid-angular';
 import { ColDef } from 'ag-grid-community';
 import { SpreadsheetComponent } from '../components/spreadsheet/spreadsheet.component';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import { ArticleItemComponent } from '@shared/components/product/article-item/article-item.component';
+import { MachineArticleItemComponent } from '@shared/components/machine/machine-article-item/machine-article-item.component';
 import {
   AdvancedImagePreviewModalComponent
 } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
 import { MachineType } from '@models/machine-type.model';
-import { ProductService } from '@services/http/product.service';
+import { MachineService } from '@services/http/machine.service';
 import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 import { ManualCartItem } from '@models/manual-cart-item.model';
-import { Breadcrumb, Product } from '@core/models';
-import {ArticleItemShimmerComponent} from '@shared/components/product/article-item/article-item-shimmer.component';
+import { Breadcrumb } from '@core/models';
+import { Machine } from '@core/models/machine.model';
+import {
+  MachineArticleItemShimmerComponent
+} from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
 
 export interface UploadedFile {
   name: string;
@@ -50,20 +54,20 @@ export interface SpreadsheetTemplateData {
     ReactiveFormsModule,
     RouterModule,
     BreadcrumbsComponent,
-    ArticleItemComponent,
+    MachineArticleItemComponent,
     AdvancedImagePreviewModalComponent,
     AgGridModule,
     SpreadsheetComponent,
-    ArticleItemShimmerComponent
+    MachineArticleItemShimmerComponent
   ],
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']
 })
 export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   // Machine data properties
-  machines: Product[] = [];
-  filteredMachines: Product[] = [];
-  selectedMachine: Product | null = null;
+  machines: Machine[] = [];
+  filteredMachines: Machine[] = [];
+  selectedMachine: Machine | null = null;
   rowData = [
     { A: "Product (part) name", B: "..."},
     { A: "Short description", B: "..."},
@@ -196,7 +200,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   }
 
   constructor(
-    private productService: ProductService,
+    private machineService: MachineService,
     private manualQuickCartService: ManualQuickCartService
   ) {
     this.searchControl.valueChanges.pipe(
@@ -221,9 +225,9 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
 
   private loadMachines(): void {
     this.loading = true;
-    this.productService.getProducts().subscribe({
+    this.machineService.getMachines().subscribe({
       next: (response) => {
-        // Treat products as machines for this component
+        // Use machines instead of products
         this.machines = response.member;
         this.totalItems = response.totalItems;
         this.filteredMachines = this.machines;
@@ -237,7 +241,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     });
   }
 
-  selectMachine(machine: Product): void {
+  selectMachine(machine: Machine): void {
     // Save the current parts state if a machine is already selected
     if (this.selectedMachine) {
       this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
@@ -248,7 +252,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       this.breadcrumbs = [
         { label: 'Dashboard', link: '/dashboard' },
         { label: 'Manual Entry', link: '/manual-entry' },
-        { label: machine.name }
+        { label: machine.articleDescription }
       ];
 
       // Check if we have saved parts for this machine
@@ -315,7 +319,10 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     const searchTerm = this.searchControl.value?.toLowerCase();
     if (searchTerm) {
       filtered = filtered.filter(machine =>
-        machine.name.toLowerCase().includes(searchTerm)
+        machine.articleDescription.toLowerCase().includes(searchTerm) ||
+        machine.articleNumber.toLowerCase().includes(searchTerm) ||
+        machine.ibSerialNumber.toString().includes(searchTerm) ||
+        machine.ibStationNumber.toString().includes(searchTerm)
       );
     }
 
@@ -323,13 +330,14 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     if (this.activeFilters.length > 0) {
       // Simple filtering by machine name containing filter text
       filtered = filtered.filter(machine =>
-        this.activeFilters.some(filter => machine.name.includes(filter))
+        this.activeFilters.some(filter => machine.articleDescription.includes(filter))
       );
     }
 
     this.filteredMachines = filtered;
   }
 
+  // Rest of the methods remain the same...
   // Updated validation methods - check for files or spreadsheet data
   isCurrentPartValid(): boolean {
     if (this.parts.length === 0) return false;
@@ -373,9 +381,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Rest of the component's methods (file handling, etc.) remain the same
-  // ...
-
+  // Rest of the methods from the original component...
   onFileSelected(event: Event, partIndex: number): void {
     const input = event.target as HTMLInputElement;
     if (input.files) {
@@ -552,7 +558,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       const manualCartItems: ManualCartItem[] = this.parts.map(part => {
         return {
           machineId: this.selectedMachine!.id,
-          machineName: this.selectedMachine!.name,
+          machineName: this.selectedMachine!.articleDescription,
           // Only include successfully uploaded files
           files: part.files.filter(file => file.status === 'success'),
           // Include spreadsheet data
