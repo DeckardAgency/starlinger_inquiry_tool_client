@@ -3,7 +3,10 @@
 
   <div class="manual-entry__header">
     <div class="manual-entry__header-left">
-      <h1 class="manual-entry__title">Available machines <span class="manual-entry__title--total-items">{{ totalItems }}</span></h1>
+      <h1 class="manual-entry__title">Available machines
+        <span class="manual-entry__title--total-items" *ngIf="!loading">{{ totalItems }}</span>
+        <span class="manual-entry__title--total-items shimmer-effect" *ngIf="loading"></span>
+      </h1>
     </div>
 
     <div class="manual-entry__header-right">

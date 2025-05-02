@@ -45,6 +45,15 @@ export class ActiveInquiriesComponent implements OnInit {
     this.loadUserOrders();
   }
 
+  /**
+   * Calculate how many shimmer placeholders are needed to fill up to MAX_DASHBOARD_INQUIRIES
+   * @returns Array with the number of placeholders needed
+   */
+  getPlaceholdersNeeded(): number[] {
+    const placeholdersCount = Math.max(0, this.MAX_DASHBOARD_INQUIRIES - this.activeInquiries.length);
+    return Array(placeholdersCount).fill(0).map((_, i) => i);
+  }
+
   loadUserOrders(): void {
     this.isLoading = true;
     this.error = null;

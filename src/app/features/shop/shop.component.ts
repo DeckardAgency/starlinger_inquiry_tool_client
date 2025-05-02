@@ -92,6 +92,7 @@ export class ShopComponent implements OnInit {
 
   private loadProducts(): void {
     this.loading = true;
+    this.totalItems = 0; // Reset totalItems when starting to load
 
     // Check if a user has a client
     if (this.authService.hasClient()) {
@@ -104,9 +105,11 @@ export class ShopComponent implements OnInit {
           next: (response) => {
             console.log('Product response received:', response);
             this.products = response.member;
-            this.totalItems = response.totalItems;
-            this.filteredProducts = this.products;
-            this.loading = false;
+            setTimeout(() => {
+              this.totalItems = response.totalItems;
+              this.filteredProducts = this.products;
+              this.loading = false;
+            }, 1000); // Simulate network delay to show shimmer effect
           },
           error: (err) => {
             this.error = 'Failed to load products. Please try again later.';
@@ -125,9 +128,11 @@ export class ShopComponent implements OnInit {
         next: (response) => {
           console.log('Product response received:', response);
           this.products = response.member;
-          this.totalItems = response.totalItems;
-          this.filteredProducts = this.products;
-          this.loading = false;
+          setTimeout(() => {
+            this.totalItems = response.totalItems;
+            this.filteredProducts = this.products;
+            this.loading = false;
+          }, 1000); // Simulate network delay to show shimmer effect
         },
         error: (err) => {
           this.error = 'Failed to load products. Please try again later.';

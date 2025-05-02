@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import {InquiryModalComponent} from '../../modals/inquiry-modal/inquiry-modal.component';
 import {InquiryModalService} from '@services/inquiry-modal.service';
+import {IconComponent} from '@shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-quick-actions',
   standalone: true,
-  imports: [CommonModule, RouterModule, InquiryModalComponent],
+  imports: [CommonModule, RouterModule, InquiryModalComponent, IconComponent],
   templateUrl: "quick-actions.component.html",
   styleUrls: ["quick-actions.component.scss"]
 })

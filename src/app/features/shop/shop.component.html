@@ -4,7 +4,10 @@
 
   <div class="shop__header">
     <div class="shop__header-left">
-      <h1 class="shop__title">Availible parts <span class="shop__title--total-items">{{ totalItems }}</span></h1>
+      <h1 class="shop__title">Availible parts
+        <span class="shop__title--total-items" *ngIf="!loading">{{ totalItems }}</span>
+        <span class="shop__title--total-items shimmer-effect" *ngIf="loading"></span>
+      </h1>
     </div>
 
     <div class="shop__header-right">

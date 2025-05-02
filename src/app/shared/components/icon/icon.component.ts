@@ -206,4 +206,12 @@ const ICONS: {[key: string]: string} = {
 
   fileWarning: `<svg fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 7.5v3.333m0 3.334h.008m2.492-12.5H5a1.667 1.667 0 0 0-1.667 1.666v13.334A1.666 1.666 0 0 0 5 18.333h10a1.666 1.666 0 0 0 1.667-1.666V5.833L12.5 1.667Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 
+  filePlusTwo: `<svg fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 33h21a3 3 0 0 0 3-3V10.5L22.5 3H9a3 3 0 0 0-3 3v6m15-9v6a3 3 0 0 0 3 3h6M4.5 22.5h9M9 18v9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
+  clipboardList: `<svg fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24.333 6h3a3 3 0 0 1 3 3v21a3 3 0 0 1-3 3h-18a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h3m6 10.5h6m-6 7.5h6m-12-7.5h.015m-.015 7.5h.015m1.485-21h9a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-9a1.5 1.5 0 0 1-1.5-1.5v-3a1.5 1.5 0 0 1 1.5-1.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
+  contact: `<svg fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M26.167 27a3 3 0 0 0-3-3h-9a3 3 0 0 0-3 3m1.5-24v3m12-3v3m-16.5 0h21a3 3 0 0 1 3 3v21a3 3 0 0 1-3 3h-21a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3Zm13.5 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
+  buttonArrowRight: `<svg fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m6 12 4-4-4-4" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+
 };

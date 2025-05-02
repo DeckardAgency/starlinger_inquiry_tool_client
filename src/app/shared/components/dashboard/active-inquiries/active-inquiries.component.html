@@ -35,10 +35,16 @@
       </div>
     } @else {
       <div class="active-inquiries__grid">
+        <!-- Actual inquiry cards -->
         @for (inquiry of activeInquiries; track inquiry.id) {
           <app-inquiry-card
             [inquiry]="inquiry">
           </app-inquiry-card>
+        }
+
+        <!-- Fill with shimmer placeholders if less than 3 inquiries -->
+        @for (placeholder of getPlaceholdersNeeded(); track placeholder) {
+          <app-inquiry-card-shimmer></app-inquiry-card-shimmer>
         }
       </div>
     }

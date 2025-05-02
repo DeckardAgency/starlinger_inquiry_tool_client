@@ -76,6 +76,20 @@
     color: #71717A;
     font-size: 0.875rem;
     font-weight: 400;
+
+    // Shimmer effect styles
+    &.shimmer-effect {
+      display: inline-block;
+      width: 22px;
+      height: 16px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      border-radius: 4px;
+      animation: shimmer 1.5s infinite;
+      vertical-align: middle;
+      position: relative;
+      top: 5px;
+    }
   }
 
   &__filters {
@@ -644,5 +658,15 @@
     width: 100%;
     z-index: 80;
     background-color: #fafafa;
+  }
+}
+
+// Shimmer animation
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
