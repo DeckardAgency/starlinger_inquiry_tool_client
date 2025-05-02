@@ -8,27 +8,21 @@
   @fadeIn
 >
   <div class="article-item__image">
-<!--    <img-->
-<!--      [src]="machine.imageGallery?.length ? machine.imageGallery[0] : 'https://via.assets.so/img.jpg?w=90&h=90'"-->
-<!--      [alt]="machine.articleDescription"-->
-<!--      onerror="this.src='https://via.assets.so/img.jpg?w=90&h=90'"-->
-<!--      loading="lazy"-->
-<!--    >-->
+    <img
+      [src]="machine?.imageGallery?.length ? machine.imageGallery[0] : 'https://via.assets.so/img.jpg?w=90&h=90'"
+      [alt]="machine.articleDescription"
+      onerror="this.src='https://via.assets.so/img.jpg?w=90&h=90'"
+      loading="lazy"
+    >
   </div>
   <div class="article-item__content">
     <div class="article-item__header">
-      <span class="article-item__label">Article Number</span>
+      <span class="article-item__label">Machine ID</span>
       <h3 class="article-item__name">{{ machine.articleNumber }}</h3>
     </div>
     <div class="article-item__machine">
-      <span class="article-item__label">Machine Description</span>
+      <span class="article-item__label">Machine name</span>
       <p class="article-item__machine-name">{{ machine.articleDescription }}</p>
-    </div>
-    <div class="article-item__details">
-      <span class="article-item__label">Serial/Station</span>
-      <p class="article-item__detail-text">
-        #{{ machine.ibSerialNumber }} / #{{ machine.ibStationNumber }}
-      </p>
     </div>
   </div>
 </article>

@@ -25,13 +25,8 @@
         </button>
       </div>
     } @else if (activeInquiries.length === 0) {
-      <div class="active-inquiries__empty">
-        <app-icon name="inbox" size="32px" color="#71717A"></app-icon>
-        <p>You don't have any active inquiries at the moment.</p>
-        <a routerLink="/products" class="active-inquiries__shop-link">
-          <app-icon name="shoppingCart" size="16px" color="#ffffff"></app-icon>
-          Browse Products
-        </a>
+      <div class="active-inquiries__grid">
+        <app-inquiry-card-shimmer *ngFor="let i of [1,2,3]"></app-inquiry-card-shimmer>
       </div>
     } @else {
       <div class="active-inquiries__grid">

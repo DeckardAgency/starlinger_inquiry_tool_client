@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { InquiryCardComponent } from '@shared/components/inquiry-card/inquiry-card.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { catchError, finalize } from 'rxjs/operators';
@@ -17,7 +16,6 @@ import { InquiryCardShimmerComponent } from '@shared/components/inquiry-card/inq
   imports: [
     CommonModule,
     RouterModule,
-    BreadcrumbsComponent,
     InquiryCardComponent,
     IconComponent,
     InquiryCardShimmerComponent
