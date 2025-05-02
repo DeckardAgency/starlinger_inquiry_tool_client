@@ -105,11 +105,9 @@ export class ShopComponent implements OnInit {
           next: (response) => {
             console.log('Product response received:', response);
             this.products = response.member;
-            setTimeout(() => {
-              this.totalItems = response.totalItems;
-              this.filteredProducts = this.products;
-              this.loading = false;
-            }, 1000); // Simulate network delay to show shimmer effect
+            this.totalItems = response.totalItems;
+            this.filteredProducts = this.products;
+            this.loading = false;
           },
           error: (err) => {
             this.error = 'Failed to load products. Please try again later.';
@@ -128,11 +126,9 @@ export class ShopComponent implements OnInit {
         next: (response) => {
           console.log('Product response received:', response);
           this.products = response.member;
-          setTimeout(() => {
-            this.totalItems = response.totalItems;
-            this.filteredProducts = this.products;
-            this.loading = false;
-          }, 1000); // Simulate network delay to show shimmer effect
+          this.totalItems = response.totalItems;
+          this.filteredProducts = this.products;
+          this.loading = false;
         },
         error: (err) => {
           this.error = 'Failed to load products. Please try again later.';
