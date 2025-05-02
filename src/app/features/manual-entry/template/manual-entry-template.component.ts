@@ -23,6 +23,7 @@ import { Machine } from '@core/models/machine.model';
 import {
   MachineArticleItemShimmerComponent
 } from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
+import {IconComponent} from '@shared/components/icon/icon.component';
 
 export interface UploadedFile {
   name: string;
@@ -58,7 +59,8 @@ export interface SpreadsheetTemplateData {
     AdvancedImagePreviewModalComponent,
     AgGridModule,
     SpreadsheetComponent,
-    MachineArticleItemShimmerComponent
+    MachineArticleItemShimmerComponent,
+    IconComponent
   ],
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']

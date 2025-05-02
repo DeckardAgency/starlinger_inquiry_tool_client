@@ -620,19 +620,15 @@
   }
 
   &__view-btn {
-    padding: 12px;
+    padding: 0;
+    margin: 0;
     border: 0;
-    border-radius: 6px;
     background: white;
     color: #232323;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    &:hover {
-      background: rgba(9, 9, 11, 0.10);
-    }
 
     &.active {
       background: rgba(9, 9, 11, 0.10);
@@ -641,14 +637,24 @@
     }
 
     a {
+      padding: 12px 24px;
+      border-radius: 6px;
       text-decoration: none;
       display: flex;
       align-items: center;
       color: inherit;
+
+      &:hover {
+        background: rgba(9, 9, 11, 0.10);
+      }
     }
 
     &--active {
-      //background-color: red;
+      background: rgba(9, 9, 11, 0.10);
+    }
+
+    app-icon {
+      margin-right: 8px;
     }
   }
 

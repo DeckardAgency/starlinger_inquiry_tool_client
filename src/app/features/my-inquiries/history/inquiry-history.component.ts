@@ -1,30 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import {IconComponent} from '@shared/components/icon/icon.component';
-import {InquiryCardComponent} from '@shared/components/inquiry-card/inquiry-card.component';
-import {RouterLink} from '@angular/router';
-import {InquiryTableComponent} from '@shared/components/inquiry-table/inquiry-table.component';
-import {InquiryHistory} from '@core/models';
+import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
+import { IconComponent } from '@shared/components/icon/icon.component';
+import { InquiryTableComponent } from '@shared/components/inquiry-table/inquiry-table.component';
+import { InquiryHistory } from '@core/models';
 
 @Component({
   selector: 'app-inquiry-history',
   standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryCardComponent, RouterLink, InquiryTableComponent],
+  imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryTableComponent],
   templateUrl: './inquiry-history.component.html',
   styleUrls: ['./inquiry-history.component.scss']
 })
 export class InquiryHistoryComponent implements OnInit {
-  ngOnInit(): void {
-      // throw new Error('Method not implemented.');
-  }
+  loading = true;
+
   breadcrumbs = [
     { label: 'My inquiries', link: '/my-inquiries' },
     { label: 'History' }
   ];
-
-  tabs = ['All Inquiries', 'Completed', 'Confirmed', 'Processing', 'Cancelled'];
-  activeTab = 'All Inquiries';
 
   // Completed inquiries
   completedInquiries: InquiryHistory[] = [
@@ -149,62 +143,23 @@ export class InquiryHistoryComponent implements OnInit {
   ];
 
   // Cancelled inquiries
-  cancelledInquiries: InquiryHistory[] = [
-    {
-      id: '0005',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'AK',
-        name: 'Anes Kapetanovic'
-      },
-      partsOrdered: 24,
-      status: 'Cancelled'
-    },
-    {
-      id: '0012',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '12-03-2024',
-      customer: {
-        initials: 'PW',
-        name: 'Peter Wilson'
-      },
-      partsOrdered: 18,
-      status: 'Cancelled'
-    },
-    {
-      id: '0013',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '12-03-2024',
-      customer: {
-        initials: 'SD',
-        name: 'Sarah Davis'
-      },
-      partsOrdered: 67,
-      status: 'Cancelled'
-    }
-  ];
+  cancelledInquiries: InquiryHistory[] = [];
 
   // Combine all inquiries for the "All Inquiries" tab
-  allInquiries: InquiryHistory[] = [
-    ...this.completedInquiries,
-    ...this.confirmedInquiries,
-    ...this.processingInquiries,
-    ...this.cancelledInquiries
-  ].sort((a, b) => b.id.localeCompare(a.id)); // Sort by ID in descending order
+  allInquiries: InquiryHistory[] = [];
 
-  get inquiryHistory(): InquiryHistory[] {
-    switch (this.activeTab) {
-      case 'Completed':
-        return this.completedInquiries;
-      case 'Confirmed':
-        return this.confirmedInquiries;
-      case 'Processing':
-        return this.processingInquiries;
-      case 'Cancelled':
-        return this.cancelledInquiries;
-      default:
-        return this.allInquiries;
-    }
+  ngOnInit(): void {
+    // Simulate data loading with a delay
+    this.loading = true;
+    setTimeout(() => {
+      this.allInquiries = [
+        ...this.completedInquiries,
+        ...this.confirmedInquiries,
+        ...this.processingInquiries,
+        ...this.cancelledInquiries
+      ].sort((a, b) => b.id.localeCompare(a.id)); // Sort by ID in descending order
+
+      this.loading = false;
+    }, 2000); // 2 second delay to simulate loading
   }
 }

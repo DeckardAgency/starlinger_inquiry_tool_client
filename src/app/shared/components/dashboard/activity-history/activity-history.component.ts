@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {InquiryTableComponent} from '@shared/components/inquiry-table/inquiry-table.component';
@@ -11,9 +11,8 @@ import {InquiryHistory} from '@core/models';
   templateUrl: "activity-history.component.html",
   styleUrls: ['./activity-history.component.scss']
 })
-export class ActivityHistoryComponent {
-  tabs = ['All Inquiries', 'Completed', 'Confirmed', 'Processing', 'Cancelled'];
-  activeTab = 'All Inquiries';
+export class ActivityHistoryComponent implements OnInit {
+  loading = true;
 
   // Completed inquiries
   completedInquiries: InquiryHistory[] = [
@@ -138,62 +137,23 @@ export class ActivityHistoryComponent {
   ];
 
   // Cancelled inquiries
-  cancelledInquiries: InquiryHistory[] = [
-    {
-      id: '0005',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'AK',
-        name: 'Anes Kapetanovic'
-      },
-      partsOrdered: 24,
-      status: 'Cancelled'
-    },
-    {
-      id: '0012',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '12-03-2024',
-      customer: {
-        initials: 'PW',
-        name: 'Peter Wilson'
-      },
-      partsOrdered: 18,
-      status: 'Cancelled'
-    },
-    {
-      id: '0013',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '12-03-2024',
-      customer: {
-        initials: 'SD',
-        name: 'Sarah Davis'
-      },
-      partsOrdered: 67,
-      status: 'Cancelled'
-    }
-  ];
+  cancelledInquiries: InquiryHistory[] = [];
 
   // Combine all inquiries for the "All Inquiries" tab
-  allInquiries: InquiryHistory[] = [
-    ...this.completedInquiries,
-    ...this.confirmedInquiries,
-    ...this.processingInquiries,
-    ...this.cancelledInquiries
-  ].sort((a, b) => b.id.localeCompare(a.id)); // Sort by ID in descending order
+  allInquiries: InquiryHistory[] = [];
 
-  get inquiryHistory(): InquiryHistory[] {
-    switch (this.activeTab) {
-      case 'Completed':
-        return this.completedInquiries;
-      case 'Confirmed':
-        return this.confirmedInquiries;
-      case 'Processing':
-        return this.processingInquiries;
-      case 'Cancelled':
-        return this.cancelledInquiries;
-      default:
-        return this.allInquiries;
-    }
+  ngOnInit(): void {
+    // Simulate data loading with a delay
+    this.loading = true;
+    setTimeout(() => {
+      this.allInquiries = [
+        ...this.completedInquiries,
+        ...this.confirmedInquiries,
+        ...this.processingInquiries,
+        ...this.cancelledInquiries
+      ].sort((a, b) => b.id.localeCompare(a.id)); // Sort by ID in descending order
+
+      this.loading = true;
+    }, 2000); // 2 second delay to simulate loading
   }
 }

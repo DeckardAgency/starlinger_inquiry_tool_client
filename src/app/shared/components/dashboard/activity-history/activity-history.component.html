@@ -11,17 +11,5 @@
       <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m6 12 4-4-4-4" stroke="#DC2626" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
   </div>
-
-  <div class="activity-history__tabs">
-    <button
-      *ngFor="let tab of tabs"
-      class="activity-history__tab"
-      [class.activity-history__tab--active]="activeTab === tab"
-      (click)="activeTab = tab"
-    >
-      {{ tab }}
-    </button>
-  </div>
-
-  <app-inquiry-table [inquiries]="inquiryHistory"></app-inquiry-table>
+  <app-inquiry-table [inquiries]="allInquiries" [loading]="loading"></app-inquiry-table>
 </section>

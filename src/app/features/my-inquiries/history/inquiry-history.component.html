@@ -8,16 +8,6 @@
     </h2>
   </div>
   <div class="inquiries-history__body">
-    <div class="inquiries-history__tabs">
-      <button
-        *ngFor="let tab of tabs"
-        class="inquiries-history__tab"
-        [class.inquiries-history__tab--active]="activeTab === tab"
-        (click)="activeTab = tab"
-      >
-        {{ tab }}
-      </button>
-    </div>
-    <app-inquiry-table [inquiries]="inquiryHistory"></app-inquiry-table>
+    <app-inquiry-table [inquiries]="allInquiries" [loading]="loading"></app-inquiry-table>
   </div>
 </div>
