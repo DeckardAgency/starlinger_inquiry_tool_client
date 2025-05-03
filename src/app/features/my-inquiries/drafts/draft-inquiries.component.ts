@@ -17,7 +17,7 @@ import {
 @Component({
   selector: 'app-draft-inquiries',
   standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryCardComponent, RouterLink, DraftOrderTableComponent],
+  imports: [CommonModule, BreadcrumbsComponent, IconComponent, DraftOrderTableComponent],
   templateUrl: './draft-inquiries.component.html',
   styleUrls: ['./draft-inquiries.component.scss']
 })

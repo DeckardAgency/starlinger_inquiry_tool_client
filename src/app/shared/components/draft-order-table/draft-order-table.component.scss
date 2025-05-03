@@ -1,9 +1,8 @@
 /* draft-order-table.component.scss */
 .order-table-container {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   background-color: #fff;
 }
 
@@ -16,16 +15,17 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  border: 1px solid #E4E4E7;
 
   th, td {
-    padding: 16px;
+    padding: 1rem;
     border-bottom: 1px solid #f1f1f1;
   }
 
   th {
     font-weight: 600;
     color: #333;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     position: sticky;
     top: 0;
     z-index: 1;
@@ -78,6 +78,9 @@
   }
 
   tbody tr {
+    background-color: #FAFAFA;
+    font-weight: 300;
+
     &:hover {
       background-color: #f9f9f9;
     }
@@ -89,25 +92,26 @@
 
   .badge {
     display: inline-block;
-    padding: 6px 12px;
+    padding: 4px 8px;
     border-radius: 16px;
-    font-size: 0.85em;
-    font-weight: 500;
+    font-size: 0.75em;
+    font-weight: 600;
+
 
     &.order {
-      background-color: #eaf5ea;
-      color: #2e7d32;
+      background-color: #237804;
+      color: #ffffff;
     }
 
     &.inquiry {
-      background-color: #e8eaf6;
-      color: #3f51b5;
+      background-color: #3B0075;
+      color: #ffffff;
     }
 
     &.status {
       &.draft {
-        background-color: #fff3e0;
-        color: #e65100;
+        background-color: #AD7F00;
+        color: #ffffff;
       }
     }
   }
@@ -120,8 +124,8 @@
     }
 
     .avatar {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background-color: #e0e0e0;
       display: flex;
@@ -133,8 +137,8 @@
     }
 
     .avatar-img {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
     }
@@ -154,9 +158,6 @@
     }
 
     .more-options-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
       border: none;
       background-color: transparent;
       cursor: pointer;
@@ -177,19 +178,20 @@
 
     .dropdown-menu {
       position: absolute;
-      top: 100%;
-      right: 0;
+      top: 0;
+      right: 32px;
       background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      border-radius: 6px;
+      border: 1px solid  #E4E4E7;
+      box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.10), 0px 2px 4px -1px rgba(0, 0, 0, 0.06);
       z-index: 10;
-      min-width: 180px;
+      min-width: 150px;
       overflow: hidden;
 
       .menu-item {
         display: flex;
         align-items: center;
-        padding: 14px 16px;
+        padding: 10px;
         cursor: pointer;
         transition: background-color 0.2s ease;
 
@@ -203,12 +205,12 @@
         }
 
         .menu-icon {
-          width: 24px;
-          height: 24px;
+          width: 16px;
+          height: 16px;
           margin-right: 16px;
           background-repeat: no-repeat;
           background-position: center;
-          background-size: 24px;
+          background-size: 16px;
         }
 
         .edit-icon {
@@ -220,9 +222,9 @@
         }
 
         .menu-text {
-          font-size: 16px;
+          font-size: 0.875rem;
           color: #333;
-          font-weight: 500;
+          font-weight: 400;
         }
       }
     }
@@ -282,5 +284,73 @@
         font-size: 0.75em;
       }
     }
+  }
+}
+
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer-block {
+  display: inline-block;
+  height: 24px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
+}
+
+.date-shimmer {
+  width: 90px;
+}
+
+.badge-shimmer {
+  width: 60px;
+  border-radius: 16px;
+}
+
+.reference-shimmer {
+  width: 120px;
+}
+
+.avatar-shimmer {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.name-shimmer {
+  width: 140px;
+  margin-left: 12px;
+}
+
+.status-shimmer {
+  width: 60px;
+  border-radius: 16px;
+}
+
+.action-shimmer {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+/* Responsive shimmer adjustments */
+@media screen and (max-width: 768px) {
+  .avatar-shimmer {
+    width: 28px;
+    height: 28px;
+  }
+
+  .name-shimmer {
+    width: 100px;
+    margin-left: 8px;
   }
 }

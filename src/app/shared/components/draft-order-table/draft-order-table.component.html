@@ -16,7 +16,7 @@
       </tr>
       </thead>
       <tbody>
-      <ng-container *ngIf="!loading; else loadingTemplate">
+      <ng-container *ngIf="!loading; else shimmerTemplate">
         <tr *ngFor="let item of items; trackBy: trackByFn" (click)="stopPropagation($event)">
           <td>{{ item.dateCreated }}</td>
           <td>
@@ -38,7 +38,13 @@
           <td class="actions-cell">
             <div class="menu-container">
               <button class="more-options-btn" (click)="openMoreOptions($event, item)" aria-label="More options">
-                <span class="dots">⋮</span>
+                <span class="dots">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                    <path d="M8.50016 8.66666C8.86835 8.66666 9.16683 8.36818 9.16683 7.99999C9.16683 7.6318 8.86835 7.33332 8.50016 7.33332C8.13197 7.33332 7.8335 7.6318 7.8335 7.99999C7.8335 8.36818 8.13197 8.66666 8.50016 8.66666Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8.50016 3.99999C8.86835 3.99999 9.16683 3.70151 9.16683 3.33332C9.16683 2.96513 8.86835 2.66666 8.50016 2.66666C8.13197 2.66666 7.8335 2.96513 7.8335 3.33332C7.8335 3.70151 8.13197 3.99999 8.50016 3.99999Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8.50016 13.3333C8.86835 13.3333 9.16683 13.0348 9.16683 12.6667C9.16683 12.2985 8.86835 12 8.50016 12C8.13197 12 7.8335 12.2985 7.8335 12.6667C7.8335 13.0348 8.13197 13.3333 8.50016 13.3333Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
               </button>
               <div class="dropdown-menu" *ngIf="item.showMenu">
                 <div class="menu-item" (click)="handleAction($event, item, 'edit')" role="button" tabindex="0">
@@ -64,11 +70,29 @@
         </tr>
       </ng-container>
 
-      <!-- Loading template -->
-      <ng-template #loadingTemplate>
-        <tr *ngFor="let i of [1,2,3,4,5]">
-          <td colspan="6">
-            <div class="loading-skeleton"></div>
+      <!-- Shimmer loading template -->
+      <ng-template #shimmerTemplate>
+        <tr *ngFor="let i of shimmerRows">
+          <td>
+            <div class="shimmer-block date-shimmer"></div>
+          </td>
+          <td>
+            <div class="shimmer-block badge-shimmer"></div>
+          </td>
+          <td>
+            <div class="shimmer-block reference-shimmer"></div>
+          </td>
+          <td>
+            <div class="customer-container">
+              <div class="shimmer-block avatar-shimmer"></div>
+              <div class="shimmer-block name-shimmer"></div>
+            </div>
+          </td>
+          <td>
+            <div class="shimmer-block status-shimmer"></div>
+          </td>
+          <td class="actions-cell">
+            <div class="shimmer-block action-shimmer"></div>
           </td>
         </tr>
       </ng-template>

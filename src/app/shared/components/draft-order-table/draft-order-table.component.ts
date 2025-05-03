@@ -33,6 +33,9 @@ export class DraftOrderTableComponent implements OnInit {
   @Input() loading: boolean = false;
   @Output() actionSelected = new EventEmitter<OrderAction>();
 
+  // Array for shimmer rows (between 5-8 rows as requested)
+  shimmerRows = Array(6).fill(0); // Default to 6 rows, adjust as needed
+
   sortDirection: 'asc' | 'desc' = 'desc'; // Default newest first
   sortField: string = 'dateCreated';
 
@@ -50,6 +53,10 @@ export class DraftOrderTableComponent implements OnInit {
   ngOnInit(): void {
     // Initial sort by date (newest first)
     this.sortItems();
+
+    // Randomize the number of shimmer rows between 5-8
+    const rowCount = Math.floor(Math.random() * 4) + 5; // Random number between 5-8
+    this.shimmerRows = Array(rowCount).fill(0);
   }
 
   sortItems(): void {
