@@ -28,4 +28,12 @@
     (viewInquiry)="onViewInquiry()"
     (close)="hideManualNotification()"
   ></app-manual-notification>
+
+  <!-- Login Modal Component -->
+  <app-login-modal
+    [isOpen]="(loginModalService.isOpen$ | async) === true && !isAuthenticated"
+    [allowClose]="false"
+    (isOpenChange)="onLoginModalOpenChange($event)"
+    (loginSuccess)="onLoginSuccess()">
+  </app-login-modal>
 </div>

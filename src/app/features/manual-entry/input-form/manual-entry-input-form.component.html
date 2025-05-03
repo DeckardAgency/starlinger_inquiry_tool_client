@@ -183,7 +183,7 @@
                       [ngModelOptions]="{standalone: true}"
                       class="form-control"
                       rows="5"
-                      placeholder="Hello! I need a replacement part for my {{ selectedMachine?.articleDescription }}. Not sure about the exact part needed, please check the attached files for more info."
+                      placeholder="Hello! I need a replacement part for my. Not sure about the exact part needed, please check the attached files for more info."
                       (input)="checkPartValidity()"
                     ></textarea>
                     @if (!part.data.shortDescription && part.touched) {
