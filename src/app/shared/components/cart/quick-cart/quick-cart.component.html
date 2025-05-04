@@ -8,12 +8,14 @@
       <span class="quick-cart__icon">
         <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 5 5 1.667h10L17.5 5m-15 0v11.667a1.667 1.667 0 0 0 1.667 1.666h11.666a1.667 1.667 0 0 0 1.667-1.666V5m-15 0h15m-4.167 3.333a3.333 3.333 0 0 1-6.666 0" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
-      <h2>Cart overview</h2>
+      <h2 class="quick-cart__title">Cart overview</h2>
       <span class="quick-cart__count">{{ quickCartService.getTotalItems() }}</span>
     </div>
     <button class="quick-cart__close" (click)="onClose()">
-      <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <g opacity="0.7">
+          <path d="M12 4L4 12M4 4L12 12" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
       </svg>
     </button>
   </div>
@@ -47,12 +49,12 @@
               </div>
             </div>
             <div class="cart-item__quantity">
-              <button class="cart-item__qty-btn" (click)="decrementItemQuantity(item.product.id, item.quantity)">-</button>
+              <button class="cart-item__qty-btn cart-item__qty-btn--minus" (click)="decrementItemQuantity(item.product.id, item.quantity)">-</button>
               <input type="text" class="cart-item__qty-input" [value]="item.quantity" (change)="updateItemQuantity(item.product.id, $event)" />
-              <button class="cart-item__qty-btn" (click)="incrementItemQuantity(item.product.id, item.quantity)">+</button>
+              <button class="cart-item__qty-btn cart-item__qty-btn--plus" (click)="incrementItemQuantity(item.product.id, item.quantity)">+</button>
               <button class="cart-item__remove" (click)="removeItem(item.product.id)">
-                <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M2.5 5h15M6.667 5V3.333A1.667 1.667 0 0 1 8.333 1.667h3.334a1.667 1.667 0 0 1 1.666 1.666V5m2.5 0v11.667a1.667 1.667 0 0 1-1.666 1.666H5.833a1.667 1.667 0 0 1-1.666-1.666V5h11.666Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6H21M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6M8 6V4C8 3 9 2 10 2H14C15 2 16 3 16 4V6M10 11V17M14 11V17" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </button>
             </div>
