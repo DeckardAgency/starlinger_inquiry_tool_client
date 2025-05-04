@@ -6,28 +6,31 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="product-card shimmer-container">
-      <div class="product-card__image shimmer-effect"></div>
+    <div class="product-card-shimmer">
+      <div class="product-card shimmer-container">
+        <div class="product-card__image shimmer-effect"></div>
 
-      <div class="product-card__specs">
-        <div class="product-card__spec shimmer-effect" *ngFor="let i of [1,2,3]"></div>
-      </div>
+        <div class="product-card__title shimmer-effect"></div>
 
-      <div class="product-card__title shimmer-effect"></div>
-      <div class="product-card__description shimmer-effect"></div>
-      <div class="product-card__price shimmer-effect"></div>
+        <div class="product-card__specs"></div>
 
-      <div class="product-card__details">
-        <div class="product-card__detail shimmer-effect" *ngFor="let i of [1,2]"></div>
-      </div>
 
-      <div class="product-card__actions">
-        <div class="product-card__quantity shimmer-effect"></div>
-        <div class="product-card__add-btn shimmer-effect"></div>
+        <div class="product-card__description shimmer-effect"></div>
+        <div class="product-card__price shimmer-effect"></div>
+
+        <div class="product-card__actions" style="display: flex; justify-content: space-between">
+          <div class="product-card__quantity shimmer-effect"></div>
+          <div class="product-card__add-btn shimmer-effect"></div>
+        </div>
       </div>
     </div>
   `,
   styles: [`
+    .product-card-shimmer {
+      padding: 24px;
+      background-color: #ffffff;
+      border-radius: 6px;
+    }
     .shimmer-container .shimmer-effect {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
@@ -36,7 +39,7 @@ import { CommonModule } from '@angular/common';
     }
 
     .product-card__image.shimmer-effect {
-      height: 250px;
+      height: 600px;
       width: 100%;
       margin-bottom: 24px;
       border-radius: 8px;

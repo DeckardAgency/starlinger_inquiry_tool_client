@@ -61,7 +61,8 @@ export class ShopComponent implements OnInit {
   isFilterOpen = false;
   activeFilters: string[] = [];
   breadcrumbs: Breadcrumb[] = [
-    { label: 'Shop' }
+    { label: 'Shop' },
+    { label: 'All Parts', link: '/shop' },
   ];
 
   constructor(
@@ -83,7 +84,8 @@ export class ShopComponent implements OnInit {
 
       // Update breadcrumbs with the client name
       this.breadcrumbs = [
-        { label: 'Shop' }
+        { label: 'Shop' },
+        { label: 'All Parts', link: '/shop' },
       ];
     }
   }
@@ -142,31 +144,6 @@ export class ShopComponent implements OnInit {
   }
 
   /**
-   * Get the effective price to display for a product
-   * @param product The product
-   * @returns The price to display
-   */
-  getProductPrice(product: Product): number {
-    // First check if effectivePrice is available (new model)
-    if (product.effectivePrice !== undefined) {
-      return product.effectivePrice;
-    }
-
-    // Fallback to clientPrice if available
-    if (product.clientPrice !== undefined) {
-      return product.clientPrice;
-    }
-
-    // Fallback to regularPrice if available
-    if (product.regularPrice !== undefined) {
-      return product.regularPrice;
-    }
-
-    // Last resort: use legacy price field or return 0
-    return product.price || 0;
-  }
-
-  /**
    * Check if a product has a discount
    * @param product The product
    * @returns True if the product has a discount
@@ -185,25 +162,6 @@ export class ShopComponent implements OnInit {
     return false;
   }
 
-  /**
-   * Get the discount percentage for a product
-   * @param product The product
-   * @returns The discount percentage or 0 if no discount
-   */
-  getDiscountPercentage(product: Product): number {
-
-    if (product.discountPercentage !== undefined && product.discountPercentage !== null) {
-      return product.discountPercentage;
-    }
-
-    // Calculate discount if regularPrice and clientPrice are available
-    if (product.regularPrice !== undefined && product.clientPrice !== undefined && product.regularPrice > 0) {
-      return Math.round((1 - product.clientPrice / product.regularPrice) * 100);
-    }
-
-    return 0;
-  }
-
   selectProduct(product: Product): void {
     this.selectedProduct = product;
 
@@ -218,11 +176,13 @@ export class ShopComponent implements OnInit {
       if (this.clientName) {
         this.breadcrumbs = [
           { label: 'Shop', link: '/shop' },
+          { label: 'All Parts', link: '/shop' },
           { label: product.name }
         ];
       } else {
         this.breadcrumbs = [
           { label: 'Shop', link: '/shop' },
+          { label: 'All Parts', link: '/shop' },
           { label: product.name }
         ];
       }
@@ -241,7 +201,7 @@ export class ShopComponent implements OnInit {
         } else {
           this.isListProductDetailsLoading = false;
         }
-      }, 1000);
+      }, 300);
     }
   }
 
@@ -305,7 +265,6 @@ export class ShopComponent implements OnInit {
     this.filterProducts();
   }
 
-  // Add selected product to cart from the detail view
   addSelectedProductToCart(): void {
     if (this.selectedProduct) {
       const quantity = this.quantityControl.value || 1;

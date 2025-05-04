@@ -121,7 +121,7 @@ $spacing-xl: 24px;
   &__specs {
     display: flex;
     gap: $spacing-xl;
-    margin-bottom: $spacing-lg;
+    margin-bottom: $spacing-xl;
   }
 
   &__spec {
@@ -158,18 +158,26 @@ $spacing-xl: 24px;
     }
   }
 
+  &__spec--divider {
+    padding-right: 12px;
+    border-right: 1px solid #E4E4E7;
+  }
+
   // Title and Description
   &__title {
+    padding: 0;
+    margin: 0;
     font-size: 24px;
     font-weight: 600;
     color: $color-text-dark;
-    margin-bottom: $spacing-md;
   }
 
   &__description {
+    padding: 0;
+    margin-top: 8px;
+    margin-bottom: $spacing-xl;
     color: $color-text-medium;
     line-height: 1.5;
-    margin-bottom: $spacing-xl;
   }
 
   // Price Section
@@ -202,9 +210,9 @@ $spacing-xl: 24px;
   &__details {
     display: flex;
     gap: $spacing-lg;
-    padding: $spacing-xl 0;
-    border-top: 1px solid $color-border;
-    border-bottom: 1px solid $color-border;
+    padding: 0;
+    //border-top: 1px solid $color-border;
+    //border-bottom: 1px solid $color-border;
     margin-bottom: $spacing-xl;
   }
 
@@ -319,6 +327,11 @@ $spacing-xl: 24px;
       align-items: center;
       justify-content: center;
     }
+  }
+
+  &__add-btn-icon {
+    margin-left: 16px;
+    display: flex;
   }
 }
 

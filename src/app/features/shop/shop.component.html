@@ -17,7 +17,7 @@
             <button
               class="shop__view-btn"
               [class.active]="viewMode === 'grid'"
-              (click)="viewMode = 'grid'"
+              (click)="viewMode = 'grid'; closeDetails()"
             >
             <span class="material-icons">
               <app-icon name="grid" size="16px" color="#232323"></app-icon>
@@ -27,7 +27,7 @@
             <button
               class="shop__view-btn"
               [class.active]="viewMode === 'list'"
-              (click)="viewMode = 'list'"
+              (click)="viewMode = 'list'; closeDetails()"
             >
             <span class="material-icons">
               <app-icon name="list" size="16px" color="#232323"></app-icon>

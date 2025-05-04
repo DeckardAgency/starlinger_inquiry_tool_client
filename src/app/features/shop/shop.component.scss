@@ -326,7 +326,7 @@
   // Details styles
   &__details {
     flex: 1;
-    margin-top: -70px;
+    margin-top: -54px;
 
     &--full {
       width: 100%;
@@ -793,6 +793,8 @@
 }
 
 .product-details {
+  width: 100%;
+
   @media (max-width: 480px) {
     position: absolute;
     top: 145px;
