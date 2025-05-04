@@ -446,7 +446,16 @@
     padding: 0 16px;
     margin-bottom: 16px;
     display: flex;
+    align-items: center;
     gap: 12px;
+  }
+
+  &__filters-icon {
+    display: flex;
+  }
+
+  &__filters-title {
+    font-size: 18px;
   }
 
   &__search {
