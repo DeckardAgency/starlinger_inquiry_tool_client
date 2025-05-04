@@ -39,7 +39,7 @@ export class ShopComponent implements OnInit {
   relatedProducts: Product[] = [];
   loading = true;
   error: string | null = null;
-  viewMode: 'grid' | 'list' = 'list';
+  viewMode: 'grid' | 'list' = 'grid';
   totalItems = 0;
   clientName: string = '';
 
