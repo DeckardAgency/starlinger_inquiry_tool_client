@@ -812,3 +812,69 @@
     background-position: 200% 0;
   }
 }
+
+
+.shimmer-container {
+  .shimmer-effect {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+  }
+}
+
+.shop__details-image.shimmer-effect {
+  height: 400px;
+  width: 100%;
+}
+
+.shop__spec-item.shimmer-effect {
+  height: 40px;
+  width: 100%;
+}
+
+.shop__details-name.shimmer-effect {
+  height: 32px;
+  width: 80%;
+  margin-bottom: 16px;
+}
+
+.shop__details-description.shimmer-effect {
+  height: 72px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.shop__details-price.shimmer-effect {
+  height: 32px;
+  width: 40%;
+  margin-bottom: 24px;
+}
+
+.shop__details-machine.shimmer-effect,
+.shop__details-tech.shimmer-effect {
+  height: 48px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.shop__quantity.shimmer-effect {
+  height: 40px;
+  width: 120px;
+}
+
+.shop__add-cart.shimmer-effect {
+  height: 40px;
+  flex: 1;
+}
+
+.shop__related-title.shimmer-effect {
+  height: 24px;
+  width: 200px;
+  margin-bottom: 24px;
+}
+
+.related-product-shimmer {
+  height: 240px;
+  width: 100%;
+}

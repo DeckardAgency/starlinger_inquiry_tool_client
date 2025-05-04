@@ -14,6 +14,7 @@ import { Breadcrumb, Product } from '@core/models';
 import { Machine } from '@models/machine-type.model';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { ArticleItemShimmerComponent } from '@shared/components/product/article-item/article-item-shimmer.component';
+import {ProductCardShimmerComponent} from '@shared/components/product/product-card/product-card-shimmer.component';
 
 @Component({
   selector: 'app-shop',
@@ -27,6 +28,7 @@ import { ArticleItemShimmerComponent } from '@shared/components/product/article-
     ArticleItemComponent,
     IconComponent,
     ArticleItemShimmerComponent,
+    ProductCardShimmerComponent,
   ],
   templateUrl: 'shop.component.html',
   styleUrls: ['shop.component.scss']
@@ -42,6 +44,8 @@ export class ShopComponent implements OnInit {
   viewMode: 'grid' | 'list' = 'grid';
   totalItems = 0;
   clientName: string = '';
+  isProductDetailsLoading = false;
+  isListProductDetailsLoading = false;
 
   searchControl = new FormControl('');
   discountedControl = new FormControl(false);
@@ -57,8 +61,7 @@ export class ShopComponent implements OnInit {
   isFilterOpen = false;
   activeFilters: string[] = [];
   breadcrumbs: Breadcrumb[] = [
-    { label: 'Shop', link: '/shop' },
-    { label: 'All machines', link: '/shop/machines' }
+    { label: 'Shop' }
   ];
 
   constructor(
@@ -80,8 +83,7 @@ export class ShopComponent implements OnInit {
 
       // Update breadcrumbs with the client name
       this.breadcrumbs = [
-        { label: 'Shop', link: '/shop' },
-        { label: `${this.clientName} Products`, link: '/shop/machines' }
+        { label: 'Shop' }
       ];
     }
   }
@@ -204,18 +206,23 @@ export class ShopComponent implements OnInit {
 
   selectProduct(product: Product): void {
     this.selectedProduct = product;
+
+    if (this.viewMode === 'grid') {
+      this.isProductDetailsLoading = true;
+    } else {
+      this.isListProductDetailsLoading = true;
+    }
+
     if (product) {
       // Update breadcrumbs with the client name if available
       if (this.clientName) {
         this.breadcrumbs = [
           { label: 'Shop', link: '/shop' },
-          { label: `${this.clientName} Products`, link: '/shop/machines' },
           { label: product.name }
         ];
       } else {
         this.breadcrumbs = [
           { label: 'Shop', link: '/shop' },
-          { label: 'All machines', link: '/shop/machines' },
           { label: product.name }
         ];
       }
@@ -226,6 +233,15 @@ export class ShopComponent implements OnInit {
 
       // Reset quantity when selecting a new product
       this.quantityControl.setValue(1);
+
+      // Simulate loading time using setTimeout
+      setTimeout(() => {
+        if (this.viewMode === 'grid') {
+          this.isProductDetailsLoading = false;
+        } else {
+          this.isListProductDetailsLoading = false;
+        }
+      }, 1000);
     }
   }
 
