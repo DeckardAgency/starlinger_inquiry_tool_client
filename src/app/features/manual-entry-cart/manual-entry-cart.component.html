@@ -1,5 +1,13 @@
 <div class="inquiry-cart">
-  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+  <div class="inquiry-cart__top">
+    <div class="inquiry-cart__breadcrumbs-wrapper">
+      <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </div>
+    <div class="inquiry-cart__switcher-wrapper">
+      <app-cart-switcher></app-cart-switcher>
+    </div>
+  </div>
 
   <div class="inquiry-cart__header">
     <h1 class="inquiry-cart__title">

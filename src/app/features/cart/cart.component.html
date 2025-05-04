@@ -1,6 +1,13 @@
 <div class="cart">
+  <div class="cart__top">
+    <div class="cart__breadcrumbs-wrapper">
+      <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+    </div>
+    <div class="cart__switcher-wrapper">
+      <app-cart-switcher></app-cart-switcher>
+    </div>
+  </div>
 
-  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
   <div class="cart__header">
     <h1 class="cart__title">
@@ -54,7 +61,7 @@
             </div>
 
             <div class="cart__discount">
-              <div class="cart__discounted-price">{{ item.product.discountPercentage }}</div>
+              <div *ngIf="item.product.discountPercentage" class="cart__discounted-price">-{{ item.product.discountPercentage }}%</div>
             </div>
 
             <div class="cart__quantity-controls">

@@ -11,11 +11,12 @@ import { Breadcrumb, CartItem } from '@core/models';
 import { OrderResponse, OrderService } from '@services/http/order.service';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { AuthService } from '@core/auth/auth.service';
+import { CartSwitcherComponent } from '@shared/components/cart-switcher/cart-switcher.component';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, BreadcrumbsComponent, IconComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, BreadcrumbsComponent, IconComponent, CartSwitcherComponent],
   templateUrl: 'cart.component.html',
   styleUrls: ['cart.component.scss']
 })

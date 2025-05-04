@@ -1,8 +1,15 @@
 :host {
   display: block;
-  max-width: 1200px;
+}
+
+.order-confirmation {
   margin: 0 auto;
-  padding: 20px;
+  font-family: "Inter", serif;
+
+  &__header {
+    border-top: 1px solid #E4E4E7;
+  }
+  &__body {}
 }
 
 .confirmation-container {

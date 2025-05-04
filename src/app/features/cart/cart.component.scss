@@ -2,9 +2,27 @@
   margin: 0 auto;
   font-family: "Inter", serif;
 
+  &__top {
+    padding: 2px 0;
+    display: flex;
+  }
+
+  &__breadcrumbs-wrapper {
+    max-width: 100%;
+    width: 50%;
+  }
+  &__switcher-wrapper {
+    max-width: 100%;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
   &__header {
     margin-bottom: 24px;
     padding: 16px;
+    border-top: 1px solid #E4E4E7;
     border-bottom: 1px solid #E4E4E7;
   }
 

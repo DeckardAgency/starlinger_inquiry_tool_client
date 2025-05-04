@@ -8,11 +8,12 @@ import { ManualCartItem } from '@models/manual-cart-item.model';
 import { ManualCartService } from '@services/cart/manual-cart.service';
 import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 import { Breadcrumb, SectionState } from '@core/models';
+import {CartSwitcherComponent} from '@shared/components/cart-switcher/cart-switcher.component';
 
 @Component({
   selector: 'app-manual-entry-cart',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent, CartSwitcherComponent],
   templateUrl: './manual-entry-cart.component.html',
   styleUrls: ['./manual-entry-cart.component.scss']
 })
@@ -24,9 +25,7 @@ export class ManualEntryCartComponent implements OnInit, OnDestroy {
   sectionStates: { [key: number]: SectionState } = {};
 
   breadcrumbs: Breadcrumb[] = [
-    { label: 'Dashboard', link: '/dashboard' },
-    { label: 'Manual Entry', link: '/manual-entry' },
-    { label: 'Inquiry Overview' }
+    { label: 'Manual Entry Cart' }
   ];
 
   constructor(

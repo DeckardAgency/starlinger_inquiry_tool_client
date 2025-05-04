@@ -198,4 +198,8 @@ export class QuickCartComponent implements OnInit, OnDestroy {
     });
   }
 
+  navigateToCart(): void {
+    this.quickCartService.close();
+    this.router.navigate(['/cart']);
+  }
 }

@@ -71,9 +71,9 @@
 
   @if (product.clientPrice > 0) {
     <div class="product-card__price">
-      <span class="product-card__price-original">€ {{ formatPrice(product.clientPrice) }}</span>
-      <span class="product-card__price-discount">-20%</span>
-      <span class="product-card__price-final">€ {{ formatPrice(product.clientPrice * 0.8) }}</span>
+      <span *ngIf="product.discountPercentage" class="product-card__price-original">€ {{ formatPrice(product.clientPrice) }}</span>
+      <span *ngIf="product.discountPercentage" class="product-card__price-discount">-{{ product.discountPercentage }}%</span>
+      <span class="product-card__price-final">€ {{ formatPrice(product.clientPrice) }}</span>
     </div>
   }
 

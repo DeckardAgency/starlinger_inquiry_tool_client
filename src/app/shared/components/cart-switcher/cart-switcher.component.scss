@@ -1,0 +1,43 @@
+/* cart-switcher.component.scss */
+
+.cart-switcher {
+  display: flex;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 0 solid #F4F4F5;
+  background-color: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: all 0.2s ease;
+
+  &:hover:not(.disabled) {
+    background-color: #F4F4F5;
+    border-color: #F4F4F5;
+  }
+
+  &:active:not(.disabled) {
+  }
+}
+
+.disabled {
+  cursor: not-allowed;
+  background-color: #F4F4F5;
+  box-shadow: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .cart-switcher {
+    flex-direction: column;
+  }
+}

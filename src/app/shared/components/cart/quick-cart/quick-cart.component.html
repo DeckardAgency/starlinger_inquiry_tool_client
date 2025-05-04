@@ -106,7 +106,7 @@
           </span>
           Save draft
         </button>
-        <button class="quick-cart__order" [disabled]="(quickCartService.getTotalItems() === 0)">
+        <button class="quick-cart__order" [disabled]="(quickCartService.getTotalItems() === 0)" (click)="navigateToCart()">
           Checkout
           <span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
