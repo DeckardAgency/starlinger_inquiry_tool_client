@@ -1,9 +1,8 @@
 .breadcrumbs {
   display: flex;
   align-items: center;
-  padding: 20px 16px;
+  padding: 1.25rem 1rem;
   font-family: "Inter", serif;
-  //border-bottom: 1px solid #E4E4E7;
 
   &__home {
     color: #64748b;
@@ -18,14 +17,14 @@
 
   &__separator {
     display: flex;
-    margin: 0 8px;
+    margin: 0 0.5rem;
     color: #94a3b8;
   }
 
   &__link {
     color: #64748b;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: normal;
 
     &:hover {
@@ -36,5 +35,6 @@
   &__current {
     color: #232323;
     font-weight: 400;
+    font-size: 0.875rem;
   }
 }
