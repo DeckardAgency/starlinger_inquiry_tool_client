@@ -18,6 +18,9 @@ import { IconComponent } from '@shared/components/icon/icon.component';
 import {
   MachineArticleItemShimmerComponent
 } from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
+import {environment} from '@env/environment';
+import { AuthService } from '@core/auth/auth.service';
+import {InquiryRequest, InquiryService} from '@services/http/inquiry.service';
 
 export interface MachineType {
   id: string;
@@ -169,7 +172,9 @@ export class ManualEntryInputFormComponent implements OnInit {
 
   constructor(
     private machineService: MachineService,
-    private manualQuickCartService: ManualQuickCartService
+    private manualQuickCartService: ManualQuickCartService,
+    private authService: AuthService,
+    private inquiryService: InquiryService,
   ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
@@ -523,8 +528,89 @@ export class ManualEntryInputFormComponent implements OnInit {
         } as unknown as ManualCartItem;
       });
 
+      // Create array for all machines in the submission
+      const machineEntries = [];
+
+      // Add the currently selected machine
+      machineEntries.push({
+        machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${this.selectedMachine.id}`,
+        notes: "string",
+        products: this.parts.map(part => ({
+          partName: part.data.partName,
+          partNumber: part.data.partNumber,
+          shortDescription: part.data.shortDescription,
+          additionalNotes: part.data.additionalNotes
+        }))
+      });
+
+      // Add other machines from the machinePartsMap
+      this.machinePartsMap.forEach((parts, machineId) => {
+        // Skip the current machine as we've already added it
+        if (machineId === this.selectedMachine?.id) {
+          return;
+        }
+
+        // Only add machines that have at least one part
+        if (parts.length > 0) {
+          machineEntries.push({
+            machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${machineId}`,
+            notes: "string",
+            products: parts.map(part => ({
+              partName: part.data.partName,
+              partNumber: part.data.partNumber,
+              shortDescription: part.data.shortDescription,
+              additionalNotes: part.data.additionalNotes
+            }))
+          });
+        }
+      });
+
+      // Get the current user ID from auth service
+      const currentUser = this.authService.getCurrentUser();
+      const userId = currentUser?.id || 'current-user';
+
+      // Log the submission data
+
+
       // Add parts to manual cart and open the inquiry overview
       this.manualQuickCartService.addToCart(manualCartItems);
+
+      const inquiryData: InquiryRequest = {
+        status: "pending",
+        notes: "Inquiry created via manual entry form",
+        contactEmail: currentUser?.email || "string",
+        contactPhone: 'string',
+        isDraft: false,
+        user: `${environment.apiBaseUrl}${environment.apiPath}/users/${userId}`,
+        machines: machineEntries
+      };
+
+      console.log('Form submission data:', inquiryData);
+
+      this.inquiryService.createInquiry(inquiryData).subscribe({
+        next: (response) => {
+          console.log('Inquiry created successfully:', response);
+
+          // Add parts to manual cart and open the inquiry overview
+          this.manualQuickCartService.addToCart(manualCartItems);
+
+          // Remove the saved parts for this machine (since they've been submitted)
+          if (this.selectedMachine) {
+            this.machinePartsMap.delete(this.selectedMachine.id);
+          }
+
+          // Reset the form state
+          this.parts = [];
+          this.addPart();
+
+          // Show success message or navigate to a confirmation page
+          // this.router.navigate(['/inquiries', response.id]);
+        },
+        error: (error) => {
+          console.error('Error creating inquiry:', error);
+          // Handle error (show error message, etc.)
+        }
+      });
 
       // Remove the saved parts for this machine (since they've been submitted)
       if (this.selectedMachine) {

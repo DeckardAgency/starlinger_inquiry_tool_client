@@ -1,3 +1,52 @@
 <div>
-    <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+  <div class="confirmation-container">
+    <div class="confirmation-content">
+      <div class="icon-container">
+        <svg viewBox="0 0 24 24" width="64" height="64">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+          <path d="M7 13l3 3 7-7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+
+      <h2 class="confirmation-title">Thanks for placing your Order.</h2>
+
+      <div class="order-details">
+        <p class="order-number">Order number: STRL-0012XBA</p>
+        <p class="area-manager">Your Area Manager is mr. John Doe</p>
+      </div>
+
+      <div class="contact-buttons">
+        <a href="tel:" class="btn btn-outline">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Call
+        </a>
+        <a href="mailto:" class="btn btn-outline">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          E-mail
+        </a>
+      </div>
+    </div>
+
+    <div class="navigation-buttons">
+      <a routerLink="/dashboard" class="btn btn-outline">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <polyline points="15 18 9 12 15 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Back to Dashboard
+      </a>
+      <a routerLink="/my-inquiries/active" class="btn btn-primary">
+        View active Inquiries
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <polyline points="9 18 15 12 9 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    </div>
+  </div>
 </div>
