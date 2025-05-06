@@ -12,6 +12,8 @@ import { OrderConfirmationComponent } from '@features/order-confirmation/order-c
 import { ActiveInquiriesComponent } from '@features/my-inquiries/active/active-inquiries.component';
 import { DraftInquiriesComponent } from '@features/my-inquiries/drafts/draft-inquiries.component';
 import { InquiryHistoryComponent } from '@features/my-inquiries/history/inquiry-history.component';
+import { OrderDetailComponent } from '@features/inquiry-detail/shop/order-detail.component';
+import { InquiryDetailComponent } from '@features/inquiry-detail/manual-entry/inquiry-detail.component';
 
 export const routes: Routes = [
   {
@@ -88,5 +90,17 @@ export const routes: Routes = [
     component: InquiryHistoryComponent,
     canActivate: [AuthGuard],
     title: 'Inquiry Tool | Inquiry History'
+  },
+  {
+    path: 'my-inquiries/active/inquiry/:id/view',
+    component: InquiryDetailComponent,
+    canActivate: [AuthGuard],
+    title: 'Inquiry Tool | Inquiry Details'
+  },
+  {
+    path: 'my-inquiries/active/order/:id/view',
+    component: OrderDetailComponent,
+    canActivate: [AuthGuard],
+    title: 'Inquiry Tool | Order Details'
   }
 ];

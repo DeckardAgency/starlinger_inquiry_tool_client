@@ -147,6 +147,22 @@ export class OrderService {
   }
 
   /**
+   * Get orders by order number
+   */
+  getOrdersByOrderNumber(orderNumber: string): Observable<OrdersCollection> {
+    // Define headers explicitly for this request
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/ld+json')
+      .set('Accept', 'application/ld+json');
+
+    // Create the query parameters with orderNumber filter
+    const params = new HttpParams().set('orderNumber', orderNumber);
+
+    // Use the headers and params for GET requests
+    return this.http.get<OrdersCollection>(this.apiUrl, { headers, params });
+  }
+
+  /**
    * Get all orders by user email
    */
   getOrdersByUserEmail(email: string): Observable<OrdersCollection> {

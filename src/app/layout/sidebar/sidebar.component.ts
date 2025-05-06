@@ -45,8 +45,8 @@ import { filter } from 'rxjs/operators';
   ]
 })
 export class SidebarComponent implements OnInit {
-  isInquiriesExpanded = signal<boolean>(false);
-  isUserDropdownOpen = signal<boolean>(false);
+  isInquiriesExpanded = signal<boolean>(true);
+  isUserDropdownOpen = signal<boolean>(true);
   isLoginModalOpen = signal<boolean>(false);
   isSupportModalOpen = signal<boolean>(false);
   currentUser: User | null = null;
@@ -94,16 +94,18 @@ export class SidebarComponent implements OnInit {
         this.isInquiriesExpanded.set(currentUrl.includes('/my-inquiries/'));
       });
 
-    // Set initial state of inquiries menu based on current URL
+    // Set initial state of inquiry menu based on current URL
     this.isInquiriesExpanded.set(this.router.url.includes('/my-inquiries/'));
   }
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
-    // Check if click was outside the user dropdown area
+    // Check if the click was outside the user dropdown area
+    const userElement = this.elementRef.nativeElement.querySelector('.sidebar__user');
     if (
       this.isUserDropdownOpen() &&
-      !this.elementRef.nativeElement.querySelector('.sidebar__user').contains(event.target)
+      userElement &&
+      !userElement.contains(event.target)
     ) {
       this.isUserDropdownOpen.set(false);
     }
@@ -129,16 +131,16 @@ export class SidebarComponent implements OnInit {
   }
 
   onLoginSuccess() {
-    // Refresh user display after login
+    // Refresh the user display after login
     this.currentUser = this.authService.getCurrentUser();
     this.updateUserDisplay();
-    // Optional: reload current page or navigate to dashboard
+    // Optional: reload the current page or navigate to dashboard
     // window.location.reload();
   }
 
   updateUserDisplay(): void {
     if (this.currentUser) {
-      // Set user full name
+      // Set the user full name
       if (this.currentUser.firstName && this.currentUser.lastName) {
         this.userFullName = `${this.currentUser.firstName} ${this.currentUser.lastName}`;
         // Generate initials from name (first letter of first and last name)

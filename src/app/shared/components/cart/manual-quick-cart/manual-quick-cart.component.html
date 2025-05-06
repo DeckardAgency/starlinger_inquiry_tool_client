@@ -75,19 +75,27 @@
                 <div class="inquiry-section__content">
                   <div class="detail-item">
                     <div class="detail-item__label">Part (product) name</div>
-                    <div class="detail-item__value">{{ item.partName }}</div>
+                    <div class="detail-item__value">{{ item.partData?.partName }}</div>
                   </div>
 
-                  @if (item.partNumber) {
+                  @if (item.partData?.partNumber) {
                     <div class="detail-item">
                       <div class="detail-item__label">Part number</div>
-                      <div class="detail-item__value">{{ item.partNumber }}</div>
+                      <div class="detail-item__value">{{ item.partData?.partNumber }}</div>
                     </div>
                   }
 
                   <div class="detail-item">
                     <div class="detail-item__label">Detailed description</div>
-                    <div class="detail-item__value">{{ item.shortDescription }}</div>
+                    <div class="detail-item__value">{{ item.partData?.shortDescription }}</div>
+                  </div>
+                </div>
+
+                <!-- Replace the Notes section with this: -->
+                <div class="inquiry-section__content">
+                  <div class="notes-content">
+                    <div class="notes-content__label">Additional notes</div>
+                    <div class="notes-content__text">{{ item.partData?.additionalNotes }}</div>
                   </div>
                 </div>
               }
@@ -165,7 +173,7 @@
                 <div class="inquiry-section__content">
                   <div class="notes-content">
                     <div class="notes-content__label">Additional notes</div>
-                    <div class="notes-content__text">{{ item.additionalNotes }}</div>
+                    <div class="notes-content__text">{{ item.partData?.additionalNotes }}</div>
                   </div>
                 </div>
               }

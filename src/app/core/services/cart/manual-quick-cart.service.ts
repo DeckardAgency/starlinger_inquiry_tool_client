@@ -68,7 +68,8 @@ export class ManualQuickCartService {
     let partName = "Part";
     this.manualCartService.getCartItems().subscribe(items => {
       if (items.length > index) {
-        partName = items[index].partName || `Part ${index + 1}`;
+        // Access the part name through the partData object
+        partName = items[index].partData?.partName || `Part ${index + 1}`;
       }
     }).unsubscribe();
 
