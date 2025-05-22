@@ -1,0 +1,145 @@
+<div class="spreadsheet">
+  <!-- Header Section -->
+  <div class="spreadsheet__header">
+    <h2 class="spreadsheet__title">Starlinger Part Request Template</h2>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="spreadsheet__tabs">
+    <button
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
+      (click)="switchTab('demo')">
+      Demo example
+    </button>
+    <button
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
+      (click)="switchTab('client')">
+      Client data
+    </button>
+  </div>
+
+  <!-- Spreadsheet Table -->
+  <div class="spreadsheet__table-container">
+    <table class="spreadsheet__table">
+      <thead class="spreadsheet__table-head">
+      <tr class="spreadsheet__table-row">
+        <th class="spreadsheet__cell spreadsheet__cell--row-header"></th>
+        <th class="spreadsheet__cell spreadsheet__cell--column-header">A</th>
+        <th class="spreadsheet__cell spreadsheet__cell--column-header">B</th>
+      </tr>
+      </thead>
+      <tbody class="spreadsheet__table-body">
+      <!-- Main Header Row -->
+      <tr class="spreadsheet__table-row spreadsheet__table-row--header">
+        <td class="spreadsheet__cell spreadsheet__cell--row-number">1</td>
+        <td class="spreadsheet__cell spreadsheet__cell--main-header" colspan="2">
+          Starlinger part request template
+        </td>
+      </tr>
+
+      <!-- Product Name Row -->
+      <tr class="spreadsheet__table-row">
+        <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
+        <td class="spreadsheet__cell spreadsheet__cell--field-label">
+          Product (part) name
+        </td>
+        <td class="spreadsheet__cell spreadsheet__cell--input">
+          <input
+            type="text"
+            class="spreadsheet__input"
+            [(ngModel)]="getCurrentData()[0].productName"
+            [readonly]="activeTab === 'demo'"
+            placeholder="Enter product name">
+        </td>
+      </tr>
+
+      <!-- Short Description Row -->
+      <tr class="spreadsheet__table-row">
+        <td class="spreadsheet__cell spreadsheet__cell--row-number">3</td>
+        <td class="spreadsheet__cell spreadsheet__cell--field-label">
+          Short description
+        </td>
+        <td class="spreadsheet__cell spreadsheet__cell--input">
+            <textarea
+              class="spreadsheet__input spreadsheet__input--textarea"
+              [(ngModel)]="getCurrentData()[0].shortDescription"
+              [readonly]="activeTab === 'demo'"
+              placeholder="Enter short description"
+              rows="3"></textarea>
+        </td>
+      </tr>
+
+      <!-- Additional Notes Row -->
+      <tr class="spreadsheet__table-row">
+        <td class="spreadsheet__cell spreadsheet__cell--row-number">4</td>
+        <td class="spreadsheet__cell spreadsheet__cell--field-label">
+          Additional notes
+        </td>
+        <td class="spreadsheet__cell spreadsheet__cell--input">
+            <textarea
+              class="spreadsheet__input spreadsheet__input--textarea"
+              [(ngModel)]="getCurrentData()[0].additionalNotes"
+              [readonly]="activeTab === 'demo'"
+              placeholder="Enter additional notes"
+              rows="4"></textarea>
+        </td>
+      </tr>
+
+      <!-- Dynamic Additional Rows -->
+      <tr
+        *ngFor="let row of getCurrentData().slice(1); let i = index"
+        class="spreadsheet__table-row spreadsheet__table-row--data">
+        <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ i + 5 }}</td>
+        <td class="spreadsheet__cell spreadsheet__cell--input">
+          <input
+            type="text"
+            class="spreadsheet__input"
+            [(ngModel)]="row.productName"
+            [readonly]="activeTab === 'demo'"
+            placeholder="Product name">
+        </td>
+        <td class="spreadsheet__cell spreadsheet__cell--input">
+          <input
+            type="text"
+            class="spreadsheet__input"
+            [(ngModel)]="row.shortDescription"
+            [readonly]="activeTab === 'demo'"
+            placeholder="Description">
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="spreadsheet__actions">
+    <button
+      class="spreadsheet__button spreadsheet__button--secondary"
+      (click)="addRow()"
+      [disabled]="activeTab === 'demo'">
+      Add Row
+    </button>
+    <button
+      class="spreadsheet__button spreadsheet__button--danger"
+      (click)="clearData()"
+      [disabled]="activeTab === 'demo'">
+      Clear All
+    </button>
+    <button
+      class="spreadsheet__button spreadsheet__button--primary"
+      (click)="exportToExcel()">
+      Finish & Export to Excel
+    </button>
+  </div>
+
+  <!-- Status Message -->
+  <div
+    *ngIf="statusMessage"
+    class="spreadsheet__status"
+    [class.spreadsheet__status--success]="isSuccess"
+    [class.spreadsheet__status--error]="!isSuccess">
+    {{ statusMessage }}
+  </div>
+</div>
