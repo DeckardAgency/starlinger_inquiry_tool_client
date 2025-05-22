@@ -1,12 +1,16 @@
+import {MediaItem} from '@models/media.model';
+import {UploadedFile} from '@features/manual-entry/template/manual-entry-template.component';
+
 export interface ManualCartItem {
-  id?: string;
+  id: string;
   machineId: string;
   machineName: string;
-  files?: any[]; // Or define a more specific type for files
   partData: {
     partName: string;
-    partNumber?: string;
+    partNumber: string;
     shortDescription: string;
-    additionalNotes?: string;
+    additionalNotes: string;
+    mediaItems?: MediaItem[]; // MediaItems are now inside partData
   };
+  files: UploadedFile[];
 }

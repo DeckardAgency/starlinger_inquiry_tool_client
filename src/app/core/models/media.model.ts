@@ -1,7 +1,8 @@
 export interface MediaItem {
-  '@id': string;
-  '@type': string;
-  id: string;
+  '@context'?: string;     // JSON-LD context
+  '@id': string;           // The IRI identifier for the media item
+  '@type': string;         // The JSON-LD type
+  id: string;              // The local ID
   filename: string;
   mimeType: string;
   filePath: string;
