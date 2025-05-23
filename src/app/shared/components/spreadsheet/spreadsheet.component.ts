@@ -12,26 +12,39 @@ import { SpreadsheetRow, TabType, ExportOptions } from './spreadsheet.interface'
   styleUrls: ['./spreadsheet.component.scss']
 })
 export class SpreadsheetComponent implements OnInit {
-  activeTab: TabType = 'demo';
+  activeTab: TabType = 'client';
   statusMessage: string = '';
   isSuccess: boolean = false;
 
-  demoData: SpreadsheetRow = {
-    id: 1,
-    productName: 'Starlinger Recycling Extruder RE 100',
-    shortDescription: 'High-performance recycling extruder for processing post-consumer plastic waste. Features advanced filtration system and energy-efficient design.',
-    additionalNotes: 'Requires 380V power supply. Includes comprehensive training package and 2-year warranty. Installation support available.'
-  };
+  demoData: SpreadsheetRow[] = [
+    {
+      id: 1,
+      productName: 'Power panel T30 4,3" WQVGA color touch',
+      shortDescription: 'Hello! I need a replacement part for my 200XE Winding Machine. Not sure about the exact part needed, please check the attached files for more info.',
+      additionalNotes: 'Please get back to us ASAP, we need this part urgent, production stopped!'
+    }
+  ];
 
-  clientData: SpreadsheetRow = {
-    id: 1,
-    productName: '',
-    shortDescription: '',
-    additionalNotes: ''
-  };
+  clientData: SpreadsheetRow[] = [];
 
   ngOnInit(): void {
+    this.initializeClientData();
     this.clearStatusMessage();
+  }
+
+  /**
+   * Initialize client data with 100 empty rows
+   */
+  private initializeClientData(): void {
+    this.clientData = [];
+    for (let i = 1; i <= 100; i++) {
+      this.clientData.push({
+        id: i,
+        productName: '',
+        shortDescription: '',
+        additionalNotes: ''
+      });
+    }
   }
 
   /**
@@ -45,7 +58,7 @@ export class SpreadsheetComponent implements OnInit {
   /**
    * Get current data based on active tab
    */
-  getCurrentData(): SpreadsheetRow {
+  getCurrentData(): SpreadsheetRow[] {
     return this.activeTab === 'demo' ? this.demoData : this.clientData;
   }
 
@@ -54,12 +67,7 @@ export class SpreadsheetComponent implements OnInit {
    */
   clearData(): void {
     if (this.activeTab === 'client') {
-      this.clientData = {
-        id: 1,
-        productName: '',
-        shortDescription: '',
-        additionalNotes: ''
-      };
+      this.initializeClientData();
       this.showStatusMessage('Client data cleared successfully!', true);
     }
   }
@@ -103,17 +111,26 @@ export class SpreadsheetComponent implements OnInit {
   /**
    * Prepare data for Excel export
    */
-  private prepareExportData(data: SpreadsheetRow): any[][] {
+  private prepareExportData(data: SpreadsheetRow[]): any[][] {
     const exportData: any[][] = [];
 
     // Add header
     exportData.push(['Starlinger Part Request Template']);
     exportData.push([]);
 
-    // Add main data entry
-    exportData.push(['Product (part) name', data.productName]);
-    exportData.push(['Short description', data.shortDescription]);
-    exportData.push(['Additional notes', data.additionalNotes]);
+    // Add data entries
+    data.forEach((row, index) => {
+      if (row.productName || row.shortDescription || row.additionalNotes) {
+        exportData.push(['Product (part) name', row.productName]);
+        exportData.push(['Short description', row.shortDescription]);
+        exportData.push(['Additional notes', row.additionalNotes]);
+
+        // Add empty row between groups (except for the last entry)
+        if (index < data.length - 1) {
+          exportData.push([]);
+        }
+      }
+    });
 
     return exportData;
   }

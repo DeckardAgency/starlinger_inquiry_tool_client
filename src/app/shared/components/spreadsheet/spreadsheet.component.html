@@ -8,15 +8,15 @@
   <div class="spreadsheet__tabs">
     <button
       class="spreadsheet__tab-button"
-      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
-      (click)="switchTab('demo')">
-      Demo example
-    </button>
-    <button
-      class="spreadsheet__tab-button"
       [class.spreadsheet__tab-button--active]="activeTab === 'client'"
       (click)="switchTab('client')">
       Client data
+    </button>
+    <button
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
+      (click)="switchTab('demo')">
+      Demo example
     </button>
   </div>
 
@@ -39,53 +39,62 @@
         </td>
       </tr>
 
-      <!-- Product Name Row -->
-      <tr class="spreadsheet__table-row">
-        <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
-        <td class="spreadsheet__cell spreadsheet__cell--field-label">
-          Product (part) name
-        </td>
-        <td class="spreadsheet__cell spreadsheet__cell--input">
-          <input
-            type="text"
-            class="spreadsheet__input"
-            [(ngModel)]="getCurrentData().productName"
-            [readonly]="activeTab === 'demo'"
-            placeholder="Enter product name">
-        </td>
-      </tr>
-
-      <!-- Short Description Row -->
-      <tr class="spreadsheet__table-row">
-        <td class="spreadsheet__cell spreadsheet__cell--row-number">3</td>
-        <td class="spreadsheet__cell spreadsheet__cell--field-label">
-          Short description
-        </td>
-        <td class="spreadsheet__cell spreadsheet__cell--input">
-            <textarea
-              class="spreadsheet__input spreadsheet__input--textarea"
-              [(ngModel)]="getCurrentData().shortDescription"
+      <!-- Dynamic Rows for Each Product Group -->
+      <ng-container *ngFor="let row of getCurrentData(); let i = index">
+        <!-- Product Name Row -->
+        <tr class="spreadsheet__table-row">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 2 }}</td>
+          <td class="spreadsheet__cell spreadsheet__cell--field-label">
+            Product (part) name
+          </td>
+          <td class="spreadsheet__cell spreadsheet__cell--input">
+            <input
+              type="text"
+              class="spreadsheet__input"
+              [(ngModel)]="row.productName"
               [readonly]="activeTab === 'demo'"
-              placeholder="Enter short description"
-              rows="3"></textarea>
-        </td>
-      </tr>
+              placeholder="Enter product name">
+          </td>
+        </tr>
 
-      <!-- Additional Notes Row -->
-      <tr class="spreadsheet__table-row">
-        <td class="spreadsheet__cell spreadsheet__cell--row-number">4</td>
-        <td class="spreadsheet__cell spreadsheet__cell--field-label">
-          Additional notes
-        </td>
-        <td class="spreadsheet__cell spreadsheet__cell--input">
-            <textarea
-              class="spreadsheet__input spreadsheet__input--textarea"
-              [(ngModel)]="getCurrentData().additionalNotes"
-              [readonly]="activeTab === 'demo'"
-              placeholder="Enter additional notes"
-              rows="4"></textarea>
-        </td>
-      </tr>
+        <!-- Short Description Row -->
+        <tr class="spreadsheet__table-row">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 3 }}</td>
+          <td class="spreadsheet__cell spreadsheet__cell--field-label">
+            Short description
+          </td>
+          <td class="spreadsheet__cell spreadsheet__cell--input">
+              <textarea
+                class="spreadsheet__input spreadsheet__input--textarea"
+                [(ngModel)]="row.shortDescription"
+                [readonly]="activeTab === 'demo'"
+                placeholder="Enter short description"
+                rows="3"></textarea>
+          </td>
+        </tr>
+
+        <!-- Additional Notes Row -->
+        <tr class="spreadsheet__table-row">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 4 }}</td>
+          <td class="spreadsheet__cell spreadsheet__cell--field-label">
+            Additional notes
+          </td>
+          <td class="spreadsheet__cell spreadsheet__cell--input">
+              <textarea
+                class="spreadsheet__input spreadsheet__input--textarea"
+                [(ngModel)]="row.additionalNotes"
+                [readonly]="activeTab === 'demo'"
+                placeholder="Enter additional notes"
+                rows="4"></textarea>
+          </td>
+        </tr>
+
+        <!-- Empty Row Between Groups -->
+        <tr class="spreadsheet__table-row">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 5 }}</td>
+          <td class="spreadsheet__cell" colspan="2" style="height: 20px; background-color: #f8f9fa;"></td>
+        </tr>
+      </ng-container>
       </tbody>
     </table>
   </div>
