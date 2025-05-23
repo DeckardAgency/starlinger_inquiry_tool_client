@@ -21,10 +21,9 @@ interface Annotation {
 }
 
 @Component({
-  selector: 'app-advanced-image-preview-modal',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-advanced-image-preview-modal',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="image-modal-overlay" (click)="handleClose()">
       <div class="image-modal-content" (click)="$event.stopPropagation()">
         <!-- Modal header with image name and edit title -->
@@ -193,7 +192,7 @@ interface Annotation {
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     :host {
       --modal-bg: #ffffff;
       --modal-border: #e0e0e0;

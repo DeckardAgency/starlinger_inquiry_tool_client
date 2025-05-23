@@ -22,11 +22,10 @@ export interface OrderAction {
 }
 
 @Component({
-  selector: 'app-draft-order-table',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './draft-order-table.component.html',
-  styleUrls: ['./draft-order-table.component.scss']
+    selector: 'app-draft-order-table',
+    imports: [CommonModule],
+    templateUrl: './draft-order-table.component.html',
+    styleUrls: ['./draft-order-table.component.scss']
 })
 export class DraftOrderTableComponent implements OnInit {
   @Input() items: DraftOrderTableItem[] = [];

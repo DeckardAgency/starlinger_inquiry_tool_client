@@ -4,11 +4,10 @@ import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-cart-switcher',
-  standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule],
-  templateUrl: './cart-switcher.component.html',
-  styleUrls: ['./cart-switcher.component.scss']
+    selector: 'app-cart-switcher',
+    imports: [CommonModule, RouterLink, RouterModule],
+    templateUrl: './cart-switcher.component.html',
+    styleUrls: ['./cart-switcher.component.scss']
 })
 export class CartSwitcherComponent implements OnInit {
   currentUrl: string = '';

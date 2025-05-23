@@ -7,19 +7,18 @@ import { getImageVariationUrl } from '@utils/format-utils';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'app-machine-article-item',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './machine-article-item.component.html',
-  styleUrls: ['./machine-article-item.component.scss'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('400ms ease-in', style({ opacity: 1 }))
-      ])
-    ])
-  ]
+    selector: 'app-machine-article-item',
+    imports: [CommonModule],
+    templateUrl: './machine-article-item.component.html',
+    styleUrls: ['./machine-article-item.component.scss'],
+    animations: [
+        trigger('fadeIn', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('400ms ease-in', style({ opacity: 1 }))
+            ])
+        ])
+    ]
 })
 export class MachineArticleItemComponent {
   @Input() machine!: Machine;

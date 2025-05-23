@@ -20,10 +20,9 @@ ModuleRegistry.registerModules([
 ]);
 
 @Component({
-  selector: 'app-spreadsheet',
-  standalone: true,
-  imports: [CommonModule, AgGridModule],
-  template: `
+    selector: 'app-spreadsheet',
+    imports: [CommonModule, AgGridModule],
+    template: `
     <div class="spreadsheet-container" [class.fullscreen]="isFullscreen">
       <div class="spreadsheet-grid-container" #agGridContainer>
         <ag-grid-angular
@@ -68,7 +67,7 @@ ModuleRegistry.registerModules([
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .spreadsheet-container {
       display: flex;
       flex-direction: column;

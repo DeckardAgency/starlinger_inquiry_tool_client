@@ -10,11 +10,10 @@ import {Router} from '@angular/router';
 import {OrderService} from '@services/http/order.service';
 
 @Component({
-  selector: 'app-quick-cart',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './quick-cart.component.html',
-  styleUrls: ['./quick-cart.component.scss']
+    selector: 'app-quick-cart',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './quick-cart.component.html',
+    styleUrls: ['./quick-cart.component.scss']
 })
 export class QuickCartComponent implements OnInit, OnDestroy {
   @Input() isOpen = false;

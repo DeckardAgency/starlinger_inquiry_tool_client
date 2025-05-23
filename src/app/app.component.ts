@@ -20,21 +20,20 @@ import {LoginModalComponent} from '@shared/components/modals/login-modal/login-m
 import {AuthService} from '@core/auth/auth.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    RouterOutlet,
-    SidebarComponent,
-    TopBarComponent,
-    QuickCartComponent,
-    ManualQuickCartComponent,
-    CartNotificationComponent,
-    ManualNotificationComponent,
-    AsyncPipe,
-    LoginModalComponent
-  ],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    imports: [
+        RouterOutlet,
+        SidebarComponent,
+        TopBarComponent,
+        QuickCartComponent,
+        ManualQuickCartComponent,
+        CartNotificationComponent,
+        ManualNotificationComponent,
+        AsyncPipe,
+        LoginModalComponent
+    ],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'starlinger_inquiry_tool_client';

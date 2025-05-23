@@ -15,11 +15,10 @@ import {
 } from '@shared/components/draft-order-table/draft-order-table.component';
 
 @Component({
-  selector: 'app-draft-inquiries',
-  standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, IconComponent, DraftOrderTableComponent],
-  templateUrl: './draft-inquiries.component.html',
-  styleUrls: ['./draft-inquiries.component.scss']
+    selector: 'app-draft-inquiries',
+    imports: [CommonModule, BreadcrumbsComponent, IconComponent, DraftOrderTableComponent],
+    templateUrl: './draft-inquiries.component.html',
+    styleUrls: ['./draft-inquiries.component.scss']
 })
 export class DraftInquiriesComponent implements OnInit {
   breadcrumbs = [

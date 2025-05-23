@@ -7,19 +7,18 @@ import { animate, style, transition, trigger } from '@angular/animations';
 
 
 @Component({
-  selector: 'app-article-item',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './article-item.component.html',
-  styleUrls: ['./article-item.component.scss'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('400ms ease-in', style({ opacity: 1 }))
-      ])
-    ])
-  ]
+    selector: 'app-article-item',
+    imports: [CommonModule],
+    templateUrl: './article-item.component.html',
+    styleUrls: ['./article-item.component.scss'],
+    animations: [
+        trigger('fadeIn', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('400ms ease-in', style({ opacity: 1 }))
+            ])
+        ])
+    ]
 })
 export class ArticleItemComponent {
   @Input() product!: Product;

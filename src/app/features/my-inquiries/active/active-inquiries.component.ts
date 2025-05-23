@@ -12,11 +12,10 @@ import { Inquiry } from '@core/models/inquiry.model';
 import {InquiryCardShimmerComponent} from '@shared/components/inquiry-card/inquiry-card-shimmer.component';
 
 @Component({
-  selector: 'app-active-inquiries',
-  standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, InquiryCardComponent, IconComponent, RouterLink, InquiryCardShimmerComponent],
-  templateUrl: './active-inquiries.component.html',
-  styleUrls: ['./active-inquiries.component.scss']
+    selector: 'app-active-inquiries',
+    imports: [CommonModule, BreadcrumbsComponent, InquiryCardComponent, IconComponent, RouterLink, InquiryCardShimmerComponent],
+    templateUrl: './active-inquiries.component.html',
+    styleUrls: ['./active-inquiries.component.scss']
 })
 export class ActiveInquiriesComponent implements OnInit {
   breadcrumbs = [

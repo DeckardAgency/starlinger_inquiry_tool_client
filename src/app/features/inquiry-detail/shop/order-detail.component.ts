@@ -32,11 +32,10 @@ interface LogMessage {
 }
 
 @Component({
-  selector: 'app-inquiry-detail',
-  standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, IconComponent, RouterModule],
-  templateUrl: './order-detail.component.html',
-  styleUrls: ['./order-detail.component.scss']
+    selector: 'app-inquiry-detail',
+    imports: [CommonModule, BreadcrumbsComponent, IconComponent, RouterModule],
+    templateUrl: './order-detail.component.html',
+    styleUrls: ['./order-detail.component.scss']
 })
 export class OrderDetailComponent implements OnInit {
   inquiryId: string = '#0001';

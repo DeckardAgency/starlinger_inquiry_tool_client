@@ -6,11 +6,10 @@ import {BreadcrumbsComponent} from '@shared/components/ui/breadcrumbs/breadcrumb
 import {Breadcrumb} from '@core/models';
 
 @Component({
-  selector: 'app-order-confirmation',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent],
-  templateUrl: './order-confirmation.component.html',
-  styleUrls: ['./order-confirmation.component.scss']
+    selector: 'app-order-confirmation',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent],
+    templateUrl: './order-confirmation.component.html',
+    styleUrls: ['./order-confirmation.component.scss']
 })
 export class OrderConfirmationComponent implements OnInit {
 

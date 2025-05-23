@@ -8,11 +8,10 @@ import { SlickCarouselModule, SlickCarouselComponent } from 'ngx-slick-carousel'
 import {IconComponent} from '@shared/components/icon/icon.component';
 
 @Component({
-  selector: 'app-product-card',
-  standalone: true,
-  imports: [CommonModule, FormsModule, SlickCarouselModule, IconComponent],
-  styleUrls: ['./product-card.component.scss'],
-  templateUrl: './product-card.component.html',
+    selector: 'app-product-card',
+    imports: [CommonModule, FormsModule, SlickCarouselModule, IconComponent],
+    styleUrls: ['./product-card.component.scss'],
+    templateUrl: './product-card.component.html'
 })
 export class ProductCardComponent implements OnInit, OnChanges, AfterViewInit {
   environment = environment;

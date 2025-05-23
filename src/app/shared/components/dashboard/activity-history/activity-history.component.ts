@@ -5,11 +5,10 @@ import {InquiryTableComponent} from '@shared/components/inquiry-table/inquiry-ta
 import {InquiryHistory} from '@core/models';
 
 @Component({
-  selector: 'app-activity-history',
-  standalone: true,
-  imports: [CommonModule, RouterModule, InquiryTableComponent],
-  templateUrl: "activity-history.component.html",
-  styleUrls: ['./activity-history.component.scss']
+    selector: 'app-activity-history',
+    imports: [CommonModule, RouterModule, InquiryTableComponent],
+    templateUrl: "activity-history.component.html",
+    styleUrls: ['./activity-history.component.scss']
 })
 export class ActivityHistoryComponent implements OnInit {
   loading = true;

@@ -7,11 +7,10 @@ import {InquiryModalService} from '@services/inquiry-modal.service';
 import {IconComponent} from '@shared/components/icon/icon.component';
 
 @Component({
-  selector: 'app-quick-actions',
-  standalone: true,
-  imports: [CommonModule, RouterModule, InquiryModalComponent, IconComponent],
-  templateUrl: "quick-actions.component.html",
-  styleUrls: ["quick-actions.component.scss"]
+    selector: 'app-quick-actions',
+    imports: [CommonModule, RouterModule, InquiryModalComponent, IconComponent],
+    templateUrl: "quick-actions.component.html",
+    styleUrls: ["quick-actions.component.scss"]
 })
 export class QuickActionsComponent implements OnDestroy {
   isModalOpen = false;

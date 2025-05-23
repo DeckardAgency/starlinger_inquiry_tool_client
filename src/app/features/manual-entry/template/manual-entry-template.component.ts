@@ -47,23 +47,22 @@ export interface SpreadsheetTemplateData {
 }
 
 @Component({
-  selector: 'app-manual-entry-template',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterModule,
-    BreadcrumbsComponent,
-    MachineArticleItemComponent,
-    AdvancedImagePreviewModalComponent,
-    AgGridModule,
-    SpreadsheetComponent,
-    MachineArticleItemShimmerComponent,
-    IconComponent
-  ],
-  templateUrl: './manual-entry-template.component.html',
-  styleUrls: ['./manual-entry-template.component.scss']
+    selector: 'app-manual-entry-template',
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        RouterModule,
+        BreadcrumbsComponent,
+        MachineArticleItemComponent,
+        AdvancedImagePreviewModalComponent,
+        AgGridModule,
+        SpreadsheetComponent,
+        MachineArticleItemShimmerComponent,
+        IconComponent
+    ],
+    templateUrl: './manual-entry-template.component.html',
+    styleUrls: ['./manual-entry-template.component.scss']
 })
 export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   // Machine data properties

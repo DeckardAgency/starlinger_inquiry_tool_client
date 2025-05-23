@@ -14,11 +14,10 @@ import { AuthService } from '@core/auth/auth.service';
 import { CartSwitcherComponent } from '@shared/components/cart-switcher/cart-switcher.component';
 
 @Component({
-  selector: 'app-cart',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, BreadcrumbsComponent, IconComponent, CartSwitcherComponent],
-  templateUrl: 'cart.component.html',
-  styleUrls: ['cart.component.scss']
+    selector: 'app-cart',
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, BreadcrumbsComponent, IconComponent, CartSwitcherComponent],
+    templateUrl: 'cart.component.html',
+    styleUrls: ['cart.component.scss']
 })
 export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];

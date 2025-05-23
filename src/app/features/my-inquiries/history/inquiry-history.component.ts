@@ -6,11 +6,10 @@ import { InquiryTableComponent } from '@shared/components/inquiry-table/inquiry-
 import { InquiryHistory } from '@core/models';
 
 @Component({
-  selector: 'app-inquiry-history',
-  standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryTableComponent],
-  templateUrl: './inquiry-history.component.html',
-  styleUrls: ['./inquiry-history.component.scss']
+    selector: 'app-inquiry-history',
+    imports: [CommonModule, BreadcrumbsComponent, IconComponent, InquiryTableComponent],
+    templateUrl: './inquiry-history.component.html',
+    styleUrls: ['./inquiry-history.component.scss']
 })
 export class InquiryHistoryComponent implements OnInit {
   loading = true;

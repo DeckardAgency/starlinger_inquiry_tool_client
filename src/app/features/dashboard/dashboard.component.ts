@@ -5,19 +5,18 @@ import { ActiveInquiriesComponent } from '@shared/components/dashboard/active-in
 import { ActivityHistoryComponent } from '@shared/components/dashboard/activity-history/activity-history.component';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [
-    CommonModule,
-    QuickActionsComponent,
-    ActiveInquiriesComponent,
-    ActivityHistoryComponent,
-    QuickActionsComponent,
-    ActiveInquiriesComponent,
-    ActivityHistoryComponent
-  ],
-  templateUrl: "dashboard.component.html",
-  styleUrls: ['./dashboard.component.scss']
+    selector: 'app-dashboard',
+    imports: [
+        CommonModule,
+        QuickActionsComponent,
+        ActiveInquiriesComponent,
+        ActivityHistoryComponent,
+        QuickActionsComponent,
+        ActiveInquiriesComponent,
+        ActivityHistoryComponent
+    ],
+    templateUrl: "dashboard.component.html",
+    styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
   breadcrumbs = [

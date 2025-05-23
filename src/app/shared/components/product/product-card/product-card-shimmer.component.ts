@@ -2,10 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-product-card-shimmer',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-product-card-shimmer',
+    imports: [CommonModule],
+    template: `
     <div class="product-card-shimmer">
       <div class="product-card shimmer-container">
         <div class="product-card__image shimmer-effect"></div>
@@ -25,7 +24,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .product-card-shimmer {
       padding: 24px;
       background-color: #ffffff;

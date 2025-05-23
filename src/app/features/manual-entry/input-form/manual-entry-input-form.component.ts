@@ -53,21 +53,20 @@ export interface Part {
 }
 
 @Component({
-  selector: 'app-manual-entry-input-form',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterModule,
-    BreadcrumbsComponent,
-    MachineArticleItemComponent,
-    AdvancedImagePreviewModalComponent,
-    IconComponent,
-    MachineArticleItemShimmerComponent
-  ],
-  templateUrl: './manual-entry-input-form.component.html',
-  styleUrls: ['./manual-entry-input-form.component.scss']
+    selector: 'app-manual-entry-input-form',
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        RouterModule,
+        BreadcrumbsComponent,
+        MachineArticleItemComponent,
+        AdvancedImagePreviewModalComponent,
+        IconComponent,
+        MachineArticleItemShimmerComponent
+    ],
+    templateUrl: './manual-entry-input-form.component.html',
+    styleUrls: ['./manual-entry-input-form.component.scss']
 })
 export class ManualEntryInputFormComponent implements OnInit {
   // Machine data properties

@@ -3,22 +3,21 @@ import { CommonModule } from '@angular/common';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'app-cart-notification',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './cart-notification.component.html',
-  styleUrls: ['./cart-notification.component.scss'],
-  animations: [
-    trigger('slideInOut', [
-      transition(':enter', [
-        style({ transform: 'translateY(100%)', opacity: 0 }),
-        animate('300ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate('300ms ease-in', style({ transform: 'translateY(100%)', opacity: 0 }))
-      ])
-    ])
-  ]
+    selector: 'app-cart-notification',
+    imports: [CommonModule],
+    templateUrl: './cart-notification.component.html',
+    styleUrls: ['./cart-notification.component.scss'],
+    animations: [
+        trigger('slideInOut', [
+            transition(':enter', [
+                style({ transform: 'translateY(100%)', opacity: 0 }),
+                animate('300ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
+            ]),
+            transition(':leave', [
+                animate('300ms ease-in', style({ transform: 'translateY(100%)', opacity: 0 }))
+            ])
+        ])
+    ]
 })
 export class CartNotificationComponent implements OnInit, OnDestroy {
   @Input() visible = false;

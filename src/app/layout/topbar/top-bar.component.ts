@@ -8,11 +8,10 @@ import {ManualCartService} from '@services/cart/manual-cart.service';
 import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
 
 @Component({
-  selector: 'app-top-bar',
-  standalone: true,
-  imports: [SearchComponent],
-  templateUrl: './top-bar.component.html',
-  styleUrls: ['./top-bar.component.scss']
+    selector: 'app-top-bar',
+    imports: [SearchComponent],
+    templateUrl: './top-bar.component.html',
+    styleUrls: ['./top-bar.component.scss']
 })
 export class TopBarComponent implements OnInit {
   currentRoute: string = '';

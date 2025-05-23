@@ -7,11 +7,10 @@ import { ManualCartItem } from '@models/manual-cart-item.model';
 import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 
 @Component({
-  selector: 'app-manual-quick-cart',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './manual-quick-cart.component.html',
-  styleUrls: ['./manual-quick-cart.component.scss']
+    selector: 'app-manual-quick-cart',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './manual-quick-cart.component.html',
+    styleUrls: ['./manual-quick-cart.component.scss']
 })
 export class ManualQuickCartComponent implements OnInit, OnDestroy {
   @Input() isOpen = false;

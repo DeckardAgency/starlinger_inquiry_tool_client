@@ -11,11 +11,10 @@ import { Breadcrumb, SectionState } from '@core/models';
 import {CartSwitcherComponent} from '@shared/components/cart-switcher/cart-switcher.component';
 
 @Component({
-  selector: 'app-manual-entry-cart',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent, CartSwitcherComponent],
-  templateUrl: './manual-entry-cart.component.html',
-  styleUrls: ['./manual-entry-cart.component.scss']
+    selector: 'app-manual-entry-cart',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, BreadcrumbsComponent, CartSwitcherComponent],
+    templateUrl: './manual-entry-cart.component.html',
+    styleUrls: ['./manual-entry-cart.component.scss']
 })
 export class ManualEntryCartComponent implements OnInit, OnDestroy {
   cartItems: ManualCartItem[] = [];

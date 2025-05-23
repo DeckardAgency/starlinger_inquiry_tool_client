@@ -17,21 +17,20 @@ import { ArticleItemShimmerComponent } from '@shared/components/product/article-
 import {ProductCardShimmerComponent} from '@shared/components/product/product-card/product-card-shimmer.component';
 
 @Component({
-  selector: 'app-shop',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    BreadcrumbsComponent,
-    ProductCardComponent,
-    ArticleItemComponent,
-    IconComponent,
-    ArticleItemShimmerComponent,
-    ProductCardShimmerComponent,
-  ],
-  templateUrl: 'shop.component.html',
-  styleUrls: ['shop.component.scss']
+    selector: 'app-shop',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        RouterModule,
+        BreadcrumbsComponent,
+        ProductCardComponent,
+        ArticleItemComponent,
+        IconComponent,
+        ArticleItemShimmerComponent,
+        ProductCardShimmerComponent,
+    ],
+    templateUrl: 'shop.component.html',
+    styleUrls: ['shop.component.scss']
 })
 export class ShopComponent implements OnInit {
   environment = environment;

@@ -4,10 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
-  selector: 'app-support-modal',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-support-modal',
+    imports: [CommonModule, FormsModule],
+    template: `
     <div *ngIf="isOpen" class="modal-overlay" (click)="closeOnBackdrop($event)" [@fadeAnimation]>
       <div class="modal-container" [@slideAnimation]>
         <div class="modal-header">
@@ -122,7 +121,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -297,26 +296,26 @@ import { animate, style, transition, trigger } from '@angular/animations';
       }
     }
   `],
-  animations: [
-    trigger('fadeAnimation', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('200ms ease-out', style({ opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate('200ms ease-in', style({ opacity: 0 }))
-      ])
-    ]),
-    trigger('slideAnimation', [
-      transition(':enter', [
-        style({ transform: 'translateY(-50px)', opacity: 0 }),
-        animate('300ms 100ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate('200ms ease-in', style({ transform: 'translateY(-50px)', opacity: 0 }))
-      ])
-    ])
-  ]
+    animations: [
+        trigger('fadeAnimation', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('200ms ease-out', style({ opacity: 1 }))
+            ]),
+            transition(':leave', [
+                animate('200ms ease-in', style({ opacity: 0 }))
+            ])
+        ]),
+        trigger('slideAnimation', [
+            transition(':enter', [
+                style({ transform: 'translateY(-50px)', opacity: 0 }),
+                animate('300ms 100ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
+            ]),
+            transition(':leave', [
+                animate('200ms ease-in', style({ transform: 'translateY(-50px)', opacity: 0 }))
+            ])
+        ])
+    ]
 })
 export class SupportModalComponent {
   @Input() isOpen = false;
