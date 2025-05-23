@@ -633,7 +633,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       const currentUser = this.authService.getCurrentUser();
       const userId = currentUser?.id || 'current-user';
 
-      // Add parts to manual cart and open the inquiry overview
+      // Add parts to the manual cart and open the inquiry overview
       this.manualQuickCartService.addToCart(manualCartItems);
 
       const inquiryData: InquiryRequest = {

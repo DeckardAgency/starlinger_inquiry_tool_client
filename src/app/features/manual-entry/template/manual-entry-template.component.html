@@ -262,17 +262,6 @@
                 </div>
               }
 
-              <!-- Add Part Button (Only visible when current part is complete) -->
-              @if (isCurrentPartValid()) {
-                <div class="part-repeater__add-section">
-                  <p class="part-repeater__add-text">Do you want to add more parts to the inquiry?</p>
-                  <button type="button" class="part-repeater__add-btn" (click)="addPart()">
-                    <app-icon name="addPart" size="16px"></app-icon>
-                    Add Part
-                  </button>
-                </div>
-              }
-
               <!-- Form Actions -->
               <div class="form-actions">
                 <button type="button" class="btn btn-secondary" (click)="closeDetails()">Cancel</button>
