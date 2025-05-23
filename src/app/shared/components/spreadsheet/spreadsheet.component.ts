@@ -15,6 +15,7 @@ export class SpreadsheetComponent implements OnInit {
   activeTab: TabType = 'client';
   statusMessage: string = '';
   isSuccess: boolean = false;
+  isExpanded: boolean = false;
 
   demoData: SpreadsheetRow[] = [
     {
@@ -169,6 +170,17 @@ export class SpreadsheetComponent implements OnInit {
     this.statusMessage = message;
     this.isSuccess = success;
     setTimeout(() => this.clearStatusMessage(), 5000);
+  }
+
+  /**
+   * Toggle expanded/fullscreen view
+   */
+  toggleExpandedView(): void {
+    this.isExpanded = !this.isExpanded;
+    this.showStatusMessage(
+      this.isExpanded ? 'Expanded to full view' : 'Returned to compact view',
+      true
+    );
   }
 
   /**

@@ -42,6 +42,21 @@ $breakpoint-tablet: 768px;
   padding: 20px;
   font-family: $font-family;
 
+  // Modifier for expanded/fullscreen mode
+  &--expanded {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background-color: white;
+    max-width: none;
+    margin: 0;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
   // Header Element
   &__header {
     text-align: center;
@@ -98,6 +113,12 @@ $breakpoint-tablet: 768px;
     max-height: 500px; // Limit height to show approximately first product group
     overflow-y: auto; // Enable vertical scrolling
     position: relative;
+
+    // Modifier for expanded view
+    &--expanded {
+      max-height: calc(100vh - 200px); // Full height minus header and buttons
+      height: calc(100vh - 200px);
+    }
 
     // Custom scrollbar styling
     &::-webkit-scrollbar {

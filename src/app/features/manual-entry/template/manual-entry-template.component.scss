@@ -19,10 +19,6 @@
     }
 
     &__item {
-      //background-color: #f8fafc;
-      //border: 1px solid #e2e8f0;
-      //border-radius: 8px;
-      //padding: 16px;
       margin-bottom: 20px;
     }
 
@@ -100,7 +96,7 @@
 
   // File upload styles
   .file-upload-container {
-    border: none; // Remove border from container
+    border: none;
     border-radius: 8px;
     background-color: transparent;
   }
@@ -171,7 +167,6 @@
       color: #232323;
       margin: 0;
       padding: 0;
-      /* text small/leading-normal/regular */
       font-size: 0.875rem;
       font-style: normal;
       font-weight: 400;
@@ -201,10 +196,6 @@
       margin-bottom: 10px;
       height: 64px;
 
-      &:last-child {
-
-      }
-
       &.file-error {
         border-radius: 6px;
         border: 1px solid #DC2626;
@@ -218,7 +209,6 @@
       }
 
       &.file-uploading {
-        //background-color: #f0fdf4;
         border-radius: 4px;
       }
     }
@@ -354,10 +344,6 @@
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-
-      &:hover {
-        //background-color: #f0fdf4;
-      }
 
       svg {
         stroke: #237804;
@@ -714,10 +700,7 @@
 
   // Form styles
   &__form {
-    //padding: 16px;
-    //background-color: #ffffff;
-    //border-radius: 8px;
-    //border: 1px solid #e2e8f0;
+    // Empty
   }
 
   .form-group {

@@ -1,4 +1,4 @@
-<div class="spreadsheet">
+<div class="spreadsheet" [class.spreadsheet--expanded]="isExpanded">
   <!-- Header Section -->
   <div class="spreadsheet__header">
     <h2 class="spreadsheet__title">Starlinger Part Request Template</h2>
@@ -21,7 +21,7 @@
   </div>
 
   <!-- Spreadsheet Table -->
-  <div class="spreadsheet__table-container">
+  <div class="spreadsheet__table-container" [class.spreadsheet__table-container--expanded]="isExpanded">
     <table class="spreadsheet__table">
       <thead class="spreadsheet__table-head">
       <tr class="spreadsheet__table-row">
@@ -101,6 +101,11 @@
 
   <!-- Action Buttons -->
   <div class="spreadsheet__actions">
+    <button
+      class="spreadsheet__button spreadsheet__button--secondary"
+      (click)="toggleExpandedView()">
+      {{ isExpanded ? 'Exit Full View' : 'Expand View' }}
+    </button>
     <button
       class="spreadsheet__button spreadsheet__button--danger"
       (click)="clearData()"

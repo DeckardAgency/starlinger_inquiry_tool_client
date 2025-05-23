@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { QuickActionsComponent } from '@shared/components/dashboard/quick-actions/quick-actions.component';
 import { ActiveInquiriesComponent } from '@shared/components/dashboard/active-inquiries/active-inquiries.component';
 import { ActivityHistoryComponent } from '@shared/components/dashboard/activity-history/activity-history.component';
-import {SpreadsheetComponent} from '@shared/components/spreadsheet/spreadsheet.component';
 
 @Component({
     selector: 'app-dashboard',
@@ -14,8 +13,7 @@ import {SpreadsheetComponent} from '@shared/components/spreadsheet/spreadsheet.c
     ActivityHistoryComponent,
     QuickActionsComponent,
     ActiveInquiriesComponent,
-    ActivityHistoryComponent,
-    SpreadsheetComponent
+    ActivityHistoryComponent
   ],
     templateUrl: "dashboard.component.html",
     styleUrls: ['./dashboard.component.scss']
