@@ -23,6 +23,7 @@ import { MediaItem } from '@models/media.model';
 import { environment } from '@env/environment';
 import { AuthService } from '@core/auth/auth.service';
 import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
+import {SpreadsheetComponent} from '@shared/components/spreadsheet/spreadsheet.component';
 
 export interface UploadedFile {
   name: string;
@@ -53,7 +54,8 @@ export interface Part {
     MachineArticleItemComponent,
     AdvancedImagePreviewModalComponent,
     MachineArticleItemShimmerComponent,
-    IconComponent
+    IconComponent,
+    SpreadsheetComponent
   ],
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']

@@ -20,22 +20,10 @@ export class SpreadsheetComponent implements OnInit {
   demoData: SpreadsheetRow[] = [
     {
       id: 1,
-      productName: 'Part One demo name',
-      shortDescription: 'Part One demo description',
-      additionalNotes: 'Part One Additional notes'
+      productName: 'Power panel T30 4,3" WQVGA color touch',
+      shortDescription: 'Hello! I need a replacement part for my 200XE Winding Machine. Not sure about the exact part needed, please check the attached files for more info.',
+      additionalNotes: 'Please get back to us ASAP, we need this part urgent, production stopped!'
     },
-    {
-      id: 2,
-      productName: 'Part Two demo name',
-      shortDescription: 'Part Two demo description',
-      additionalNotes: 'Part Two Additional notes'
-    },
-    {
-      id: 3,
-      productName: 'Part Three demo name',
-      shortDescription: 'Part Three demo description',
-      additionalNotes: 'Part Three Additional notes'
-    }
   ];
 
   clientData: SpreadsheetRow[] = [];

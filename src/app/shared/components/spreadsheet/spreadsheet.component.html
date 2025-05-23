@@ -1,24 +1,7 @@
 <div class="spreadsheet" [class.spreadsheet--expanded]="isExpanded">
   <!-- Header Section -->
-  <div class="spreadsheet__header">
-    <h2 class="spreadsheet__title">Starlinger Part Request Template</h2>
-  </div>
-
-  <!-- Tab Navigation -->
-  <div class="spreadsheet__tabs">
-    <button
-      class="spreadsheet__tab-button"
-      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
-      (click)="switchTab('client')">
-      Client data
-    </button>
-    <button
-      class="spreadsheet__tab-button"
-      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
-      (click)="switchTab('demo')">
-      Demo example
-    </button>
-  </div>
+<!--  <div class="spreadsheet__header">-->
+<!--  </div>-->
 
   <!-- Spreadsheet Table -->
   <div class="spreadsheet__table-container" [class.spreadsheet__table-container--expanded]="isExpanded">
@@ -99,25 +82,41 @@
     </table>
   </div>
 
-  <!-- Action Buttons -->
-  <div class="spreadsheet__actions">
+  <!-- Tab Navigation -->
+  <div class="spreadsheet__tabs">
     <button
-      class="spreadsheet__button spreadsheet__button--secondary"
-      (click)="toggleExpandedView()">
-      {{ isExpanded ? 'Exit Full View' : 'Expand View' }}
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
+      (click)="switchTab('client')">
+      Client data
     </button>
     <button
-      class="spreadsheet__button spreadsheet__button--danger"
-      (click)="clearData()"
-      [disabled]="activeTab === 'demo'">
-      Clear All
-    </button>
-    <button
-      class="spreadsheet__button spreadsheet__button--primary"
-      (click)="exportToExcel()">
-      Finish & Export to Excel
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
+      (click)="switchTab('demo')">
+      Demo example
     </button>
   </div>
+
+  <!-- Action Buttons -->
+<!--  <div class="spreadsheet__actions">-->
+<!--    <button-->
+<!--      class="spreadsheet__button spreadsheet__button&#45;&#45;secondary"-->
+<!--      (click)="toggleExpandedView()">-->
+<!--      {{ isExpanded ? 'Exit Full View' : 'Expand View' }}-->
+<!--    </button>-->
+<!--    <button-->
+<!--      class="spreadsheet__button spreadsheet__button&#45;&#45;danger"-->
+<!--      (click)="clearData()"-->
+<!--      [disabled]="activeTab === 'demo'">-->
+<!--      Clear All-->
+<!--    </button>-->
+<!--    <button-->
+<!--      class="spreadsheet__button spreadsheet__button&#45;&#45;primary"-->
+<!--      (click)="exportToExcel()">-->
+<!--      Finish & Export to Excel-->
+<!--    </button>-->
+<!--  </div>-->
 
   <!-- Status Message -->
   <div

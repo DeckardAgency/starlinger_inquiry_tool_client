@@ -26,21 +26,17 @@ $blue-50: #e3f2fd;
 $blue-100: #e8f0fe;
 $blue-600: #1a73e8;
 
-$font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 $font-size-sm: 14px;
 $font-size-base: 16px;
 
-$border-radius: 4px;
+$border-radius: 0.375rem;
 $box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
 $breakpoint-tablet: 768px;
 
 // Main Spreadsheet Block
 .spreadsheet {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: $font-family;
 
   // Modifier for expanded/fullscreen mode
   &--expanded {
@@ -73,8 +69,9 @@ $breakpoint-tablet: 768px;
   // Tabs Element
   &__tabs {
     display: flex;
-    margin-bottom: 1px;
-    border-bottom: 1px solid $gray-300;
+    justify-content: center;
+    border: 1px solid $gray-300;
+    background-color: #ffffff;
   }
 
   &__tab-button {
@@ -107,9 +104,10 @@ $breakpoint-tablet: 768px;
   &__table-container {
     background-color: white;
     border: 1px solid $gray-300;
+    border-bottom: 0;
     border-radius: $border-radius;
     overflow: hidden;
-    box-shadow: $box-shadow;
+    //box-shadow: $box-shadow;
     max-height: 500px; // Limit height to show approximately first product group
     overflow-y: auto; // Enable vertical scrolling
     position: relative;
@@ -166,7 +164,7 @@ $breakpoint-tablet: 768px;
     &--header {
       // Sticky main header row
       position: sticky;
-      top: 40px; // Position below the column headers
+      top: 32px; // Position below the column headers
       z-index: 9;
       background-color: white;
     }
@@ -219,11 +217,10 @@ $breakpoint-tablet: 768px;
 
     // Modifier for main header
     &--main-header {
-      background-color: $blue-100;
       font-weight: 600;
-      text-align: center;
+      text-align: left;
       padding: 12px;
-      color: $blue-600;
+      color: #232323;
     }
 
     // Modifier for field label
@@ -232,7 +229,7 @@ $breakpoint-tablet: 768px;
       font-weight: 500;
       padding: 12px;
       color: $gray-700;
-      width: 200px; // Fixed width for consistent layout
+      width: 160px; // Fixed width for consistent layout
     }
 
     // Modifier for input cells
