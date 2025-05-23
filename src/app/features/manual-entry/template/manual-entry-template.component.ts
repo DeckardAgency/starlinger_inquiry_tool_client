@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 
 // Components
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
@@ -16,6 +18,11 @@ import { Breadcrumb } from '@core/models';
 import { Machine } from '@core/models/machine.model';
 import { MachineArticleItemShimmerComponent } from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
+import { MediaService } from '@services/http/media.service';
+import { MediaItem } from '@models/media.model';
+import { environment } from '@env/environment';
+import { AuthService } from '@core/auth/auth.service';
+import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
 
 export interface UploadedFile {
   name: string;
@@ -25,6 +32,9 @@ export interface UploadedFile {
   status: 'uploading' | 'success' | 'error';
   progress: number;
   previewUrl?: string;
+  mediaItem?: MediaItem; // Store the API response
+  uploadSubscription?: Subscription; // Store subscription for cancellation
+  errorMessage?: string; // Store specific error message
 }
 
 export interface Part {
@@ -126,6 +136,16 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
 
   removePart(index: number): void {
     if (this.parts.length > 1) {
+      // Cancel any ongoing uploads for this part
+      this.parts[index].files.forEach(file => {
+        if (file.uploadSubscription && !file.uploadSubscription.closed) {
+          file.uploadSubscription.unsubscribe();
+        }
+        if (file.previewUrl) {
+          URL.revokeObjectURL(file.previewUrl);
+        }
+      });
+
       this.parts.splice(index, 1);
 
       // Update the stored parts for the selected machine
@@ -141,7 +161,10 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
 
   constructor(
     private machineService: MachineService,
-    private manualQuickCartService: ManualQuickCartService
+    private manualQuickCartService: ManualQuickCartService,
+    private authService: AuthService,
+    private inquiryService: InquiryService,
+    private mediaService: MediaService // Add MediaService injection
   ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
@@ -373,7 +396,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
         }
 
         this.parts[partIndex].files.push(uploadedFile);
-        this.simulateUpload(partIndex, uploadedFile);
+        this.uploadFile(partIndex, uploadedFile);
 
         // Update the stored parts for the selected machine
         if (this.selectedMachine) {
@@ -387,28 +410,89 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     return this.allowedFileTypes.includes(file.type);
   }
 
-  private simulateUpload(partIndex: number, file: UploadedFile): void {
-    // This is just a simulation - replace with actual upload logic
-    const interval = setInterval(() => {
-      file.progress += 10;
+  // Replace simulateUpload with actual upload using MediaService
+  private uploadFile(partIndex: number, file: UploadedFile): void {
+    const uploadSubscription = this.mediaService.uploadFile(file.file).subscribe({
+      next: (event: HttpEvent<MediaItem>) => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            if (event.total) {
+              file.progress = Math.round((event.loaded / event.total) * 100);
+            }
+            break;
 
-      if (file.progress >= 100) {
-        clearInterval(interval);
-        file.status = Math.random() > 0.8 ? 'error' : 'success'; // Randomly generate some errors
+          case HttpEventType.Response:
+            if (event.body) {
+              file.status = 'success';
+              file.progress = 100;
+              file.mediaItem = event.body;
+              console.log('File uploaded successfully:', event.body);
+            }
+            break;
+        }
 
-        // Update the stored parts for the selected machine after upload is complete
+        // Update the stored parts for the selected machine after each progress update
         if (this.selectedMachine) {
           this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
         }
+      },
+      error: (error) => {
+        console.error('Upload failed:', error);
+        file.status = 'error';
+        file.progress = 0;
+
+        // Set a user-friendly error message
+        if (error.status === 413) {
+          file.errorMessage = 'File too large';
+        } else if (error.status === 415) {
+          file.errorMessage = 'Unsupported file type';
+        } else if (error.status === 0) {
+          file.errorMessage = 'Network error';
+        } else {
+          file.errorMessage = error.error?.message || 'Upload failed';
+        }
+
+        // Update the stored parts for the selected machine
+        if (this.selectedMachine) {
+          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+        }
+      },
+      complete: () => {
+        // Clean up the subscription
+        if (file.uploadSubscription) {
+          file.uploadSubscription = undefined;
+        }
       }
-    }, 300);
+    });
+
+    // Store the subscription so we can cancel it if needed
+    file.uploadSubscription = uploadSubscription;
   }
 
   removeFile(partIndex: number, file: UploadedFile): void {
+    // Cancel upload if it's in progress
+    if (file.uploadSubscription && !file.uploadSubscription.closed) {
+      file.uploadSubscription.unsubscribe();
+    }
+
+    // If the file was successfully uploaded, optionally delete it from the server
+    if (file.status === 'success' && file.mediaItem) {
+      this.mediaService.deleteMediaItem(file.mediaItem.id).subscribe({
+        next: () => {
+          console.log('File deleted from server:', file.mediaItem?.filename);
+        },
+        error: (error) => {
+          console.error('Failed to delete file from server:', error);
+          // Don't prevent local removal if server deletion fails
+        }
+      });
+    }
+
     // Revoke URL if exists to prevent memory leaks
     if (file.previewUrl) {
       URL.revokeObjectURL(file.previewUrl);
     }
+
     this.parts[partIndex].files = this.parts[partIndex].files.filter(f => f !== file);
 
     // Update the stored parts for the selected machine
@@ -418,14 +502,28 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   }
 
   cancelUpload(partIndex: number, file: UploadedFile): void {
-    // In a real app, you would cancel the actual upload request
+    // Cancel the actual upload request
+    if (file.uploadSubscription && !file.uploadSubscription.closed) {
+      file.uploadSubscription.unsubscribe();
+    }
+
+    // Remove the file from the list
     this.removeFile(partIndex, file);
   }
 
   retryUpload(partIndex: number, file: UploadedFile): void {
+    // Cancel any existing upload
+    if (file.uploadSubscription && !file.uploadSubscription.closed) {
+      file.uploadSubscription.unsubscribe();
+    }
+
+    // Reset file status and progress
     file.status = 'uploading';
     file.progress = 0;
-    this.simulateUpload(partIndex, file);
+    file.errorMessage = undefined;
+
+    // Start the upload again
+    this.uploadFile(partIndex, file);
   }
 
   hasSuccessfulUploads(partIndex: number): boolean {
@@ -475,15 +573,80 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       // Map parts to ManualCartItems for the cart service
       const manualCartItems: ManualCartItem[] = this.parts.map(part => {
         return {
+          id: this.generateUniqueId(),
           machineId: this.selectedMachine!.id,
           machineName: this.selectedMachine!.articleDescription,
           // Only include successfully uploaded files
-          files: part.files.filter(file => file.status === 'success')
+          files: part.files.filter(file => file.status === 'success'),
+          // Include MediaItem references
+          mediaItems: part.files
+            .filter(file => file.status === 'success' && file.mediaItem)
+            .map(file => file.mediaItem!)
         } as unknown as ManualCartItem;
       });
 
+      // Create an array for all machines in the submission
+      const machineEntries = [];
+
+      // Add the currently selected machine
+      machineEntries.push({
+        machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${this.selectedMachine.id}`,
+        notes: "string",
+        products: this.parts.map(part => ({
+
+          //
+          partName: '',
+          partNumber: '',
+          shortDescription: '',
+          additionalNotes: '',
+          //
+
+          // Include media item references if needed for API
+          mediaItems: part.files
+            .filter(file => file.status === 'success' && file.mediaItem)
+            .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+        }))
+      });
+
+      // Add other machines from the machinePartsMap
+      this.machinePartsMap.forEach((parts, machineId) => {
+        // Skip the current machine as we've already added it
+        if (machineId === this.selectedMachine?.id) {
+          return;
+        }
+
+        // Only add machines that have at least one part with files
+        if (parts.length > 0 && parts.some(part => part.files.length > 0)) {
+          machineEntries.push({
+            machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${machineId}`,
+            notes: "string",
+            products: parts.map(part => ({
+              mediaItems: part.files
+                .filter(file => file.status === 'success' && file.mediaItem)
+                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+            }))
+          });
+        }
+      });
+
+      // Get the current user ID from an auth service
+      const currentUser = this.authService.getCurrentUser();
+      const userId = currentUser?.id || 'current-user';
+
       // Add parts to manual cart and open the inquiry overview
       this.manualQuickCartService.addToCart(manualCartItems);
+
+      const inquiryData: InquiryRequest = {
+        status: "pending",
+        notes: "Inquiry created via manual entry form",
+        contactEmail: currentUser?.email || "string",
+        contactPhone: 'string',
+        isDraft: false,
+        user: `${environment.apiBaseUrl}${environment.apiPath}/users/${userId}`,
+        machines: machineEntries
+      };
+
+      console.log('Template submission data:', inquiryData);
 
       // Remove the saved parts for this machine (since they've been submitted)
       if (this.selectedMachine) {
@@ -506,14 +669,31 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnDestroy(): void {
-    // Clean up all object URLs to prevent memory leaks
+    // Cancel all ongoing uploads and clean up resources
     this.machinePartsMap.forEach(parts => {
       parts.forEach(part => {
         part.files.forEach(file => {
+          // Cancel any ongoing uploads
+          if (file.uploadSubscription && !file.uploadSubscription.closed) {
+            file.uploadSubscription.unsubscribe();
+          }
+          // Clean up object URLs
           if (file.previewUrl) {
             URL.revokeObjectURL(file.previewUrl);
           }
         });
+      });
+    });
+
+    // Also clean up current parts
+    this.parts.forEach(part => {
+      part.files.forEach(file => {
+        if (file.uploadSubscription && !file.uploadSubscription.closed) {
+          file.uploadSubscription.unsubscribe();
+        }
+        if (file.previewUrl) {
+          URL.revokeObjectURL(file.previewUrl);
+        }
       });
     });
   }
@@ -549,9 +729,20 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
         part.files[fileIndex].file = editedFile;
         part.files[fileIndex].previewUrl = URL.createObjectURL(editedFile);
 
-        // If this file was already in 'success' state, mark it as edited
+        // If this file was already uploaded successfully, we need to re-upload the edited version
         if (part.files[fileIndex].status === 'success') {
-          console.log('File edited:', part.files[fileIndex].name);
+          part.files[fileIndex].status = 'uploading';
+          part.files[fileIndex].progress = 0;
+
+          // Delete the old file from server if it exists
+          if (part.files[fileIndex].mediaItem) {
+            this.mediaService.deleteMediaItem(part.files[fileIndex].mediaItem!.id).subscribe({
+              error: (error) => console.error('Failed to delete old file:', error)
+            });
+          }
+
+          // Upload the edited file
+          this.uploadFile(this.parts.indexOf(part), part.files[fileIndex]);
         }
 
         // Update the preview src to the new URL
