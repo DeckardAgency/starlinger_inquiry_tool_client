@@ -16,29 +16,19 @@ export class SpreadsheetComponent implements OnInit {
   statusMessage: string = '';
   isSuccess: boolean = false;
 
-  demoData: SpreadsheetRow[] = [
-    {
-      id: 1,
-      productName: 'Starlinger Recycling Extruder RE 100',
-      shortDescription: 'High-performance recycling extruder for processing post-consumer plastic waste. Features advanced filtration system and energy-efficient design.',
-      additionalNotes: 'Requires 380V power supply. Includes comprehensive training package and 2-year warranty. Installation support available.'
-    },
-    {
-      id: 2,
-      productName: 'Viscotex Viscosity Booster VB 350',
-      shortDescription: 'Solid-state polycondensation system for PET bottle-to-bottle recycling.',
-      additionalNotes: 'Compact design suitable for medium-scale operations.'
-    }
-  ];
+  demoData: SpreadsheetRow = {
+    id: 1,
+    productName: 'Starlinger Recycling Extruder RE 100',
+    shortDescription: 'High-performance recycling extruder for processing post-consumer plastic waste. Features advanced filtration system and energy-efficient design.',
+    additionalNotes: 'Requires 380V power supply. Includes comprehensive training package and 2-year warranty. Installation support available.'
+  };
 
-  clientData: SpreadsheetRow[] = [
-    {
-      id: 1,
-      productName: '',
-      shortDescription: '',
-      additionalNotes: ''
-    }
-  ];
+  clientData: SpreadsheetRow = {
+    id: 1,
+    productName: '',
+    shortDescription: '',
+    additionalNotes: ''
+  };
 
   ngOnInit(): void {
     this.clearStatusMessage();
@@ -55,24 +45,8 @@ export class SpreadsheetComponent implements OnInit {
   /**
    * Get current data based on active tab
    */
-  getCurrentData(): SpreadsheetRow[] {
+  getCurrentData(): SpreadsheetRow {
     return this.activeTab === 'demo' ? this.demoData : this.clientData;
-  }
-
-  /**
-   * Add a new row to client data
-   */
-  addRow(): void {
-    if (this.activeTab === 'client') {
-      const newId = this.clientData.length + 1;
-      this.clientData.push({
-        id: newId,
-        productName: '',
-        shortDescription: '',
-        additionalNotes: ''
-      });
-      this.showStatusMessage('New row added successfully!', true);
-    }
   }
 
   /**
@@ -80,13 +54,13 @@ export class SpreadsheetComponent implements OnInit {
    */
   clearData(): void {
     if (this.activeTab === 'client') {
-      this.clientData = [{
+      this.clientData = {
         id: 1,
         productName: '',
         shortDescription: '',
         additionalNotes: ''
-      }];
-      this.showStatusMessage('All client data cleared successfully!', true);
+      };
+      this.showStatusMessage('Client data cleared successfully!', true);
     }
   }
 
@@ -129,7 +103,7 @@ export class SpreadsheetComponent implements OnInit {
   /**
    * Prepare data for Excel export
    */
-  private prepareExportData(data: SpreadsheetRow[]): any[][] {
+  private prepareExportData(data: SpreadsheetRow): any[][] {
     const exportData: any[][] = [];
 
     // Add header
@@ -137,23 +111,9 @@ export class SpreadsheetComponent implements OnInit {
     exportData.push([]);
 
     // Add main data entry
-    if (data.length > 0) {
-      const mainEntry = data[0];
-      exportData.push(['Product (part) name', mainEntry.productName]);
-      exportData.push(['Short description', mainEntry.shortDescription]);
-      exportData.push(['Additional notes', mainEntry.additionalNotes]);
-      exportData.push([]);
-    }
-
-    // Add additional entries if any
-    if (data.length > 1) {
-      exportData.push(['Additional Products:']);
-      exportData.push(['Product Name', 'Description', 'Notes']);
-
-      data.slice(1).forEach((row) => {
-        exportData.push([row.productName, row.shortDescription, row.additionalNotes]);
-      });
-    }
+    exportData.push(['Product (part) name', data.productName]);
+    exportData.push(['Short description', data.shortDescription]);
+    exportData.push(['Additional notes', data.additionalNotes]);
 
     return exportData;
   }

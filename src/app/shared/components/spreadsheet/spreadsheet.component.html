@@ -49,7 +49,7 @@
           <input
             type="text"
             class="spreadsheet__input"
-            [(ngModel)]="getCurrentData()[0].productName"
+            [(ngModel)]="getCurrentData().productName"
             [readonly]="activeTab === 'demo'"
             placeholder="Enter product name">
         </td>
@@ -64,7 +64,7 @@
         <td class="spreadsheet__cell spreadsheet__cell--input">
             <textarea
               class="spreadsheet__input spreadsheet__input--textarea"
-              [(ngModel)]="getCurrentData()[0].shortDescription"
+              [(ngModel)]="getCurrentData().shortDescription"
               [readonly]="activeTab === 'demo'"
               placeholder="Enter short description"
               rows="3"></textarea>
@@ -80,33 +80,10 @@
         <td class="spreadsheet__cell spreadsheet__cell--input">
             <textarea
               class="spreadsheet__input spreadsheet__input--textarea"
-              [(ngModel)]="getCurrentData()[0].additionalNotes"
+              [(ngModel)]="getCurrentData().additionalNotes"
               [readonly]="activeTab === 'demo'"
               placeholder="Enter additional notes"
               rows="4"></textarea>
-        </td>
-      </tr>
-
-      <!-- Dynamic Additional Rows -->
-      <tr
-        *ngFor="let row of getCurrentData().slice(1); let i = index"
-        class="spreadsheet__table-row spreadsheet__table-row--data">
-        <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ i + 5 }}</td>
-        <td class="spreadsheet__cell spreadsheet__cell--input">
-          <input
-            type="text"
-            class="spreadsheet__input"
-            [(ngModel)]="row.productName"
-            [readonly]="activeTab === 'demo'"
-            placeholder="Product name">
-        </td>
-        <td class="spreadsheet__cell spreadsheet__cell--input">
-          <input
-            type="text"
-            class="spreadsheet__input"
-            [(ngModel)]="row.shortDescription"
-            [readonly]="activeTab === 'demo'"
-            placeholder="Description">
         </td>
       </tr>
       </tbody>
@@ -115,12 +92,6 @@
 
   <!-- Action Buttons -->
   <div class="spreadsheet__actions">
-    <button
-      class="spreadsheet__button spreadsheet__button--secondary"
-      (click)="addRow()"
-      [disabled]="activeTab === 'demo'">
-      Add Row
-    </button>
     <button
       class="spreadsheet__button spreadsheet__button--danger"
       (click)="clearData()"
