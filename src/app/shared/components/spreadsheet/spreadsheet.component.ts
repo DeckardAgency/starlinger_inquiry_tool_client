@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
@@ -12,6 +12,8 @@ import { SpreadsheetRow, TabType, ExportOptions } from './spreadsheet.interface'
   styleUrls: ['./spreadsheet.component.scss']
 })
 export class SpreadsheetComponent implements OnInit {
+  @Output() dataChanged = new EventEmitter<SpreadsheetRow[]>();
+
   activeTab: TabType = 'client';
   statusMessage: string = '';
   isSuccess: boolean = false;
@@ -24,6 +26,18 @@ export class SpreadsheetComponent implements OnInit {
       shortDescription: 'Hello! I need a replacement part for my 200XE Winding Machine. Not sure about the exact part needed, please check the attached files for more info.',
       additionalNotes: 'Please get back to us ASAP, we need this part urgent, production stopped!'
     },
+    {
+      id: 2,
+      productName: 'Control Unit CU-500',
+      shortDescription: 'Need replacement control unit for the extrusion line. Current unit showing error codes.',
+      additionalNotes: 'Error codes: E101, E205. Machine serial: EX-2019-0456'
+    },
+    {
+      id: 3,
+      productName: 'Servo Motor SM-200',
+      shortDescription: 'Servo motor for winding station 3 needs replacement due to overheating issues.',
+      additionalNotes: 'Motor specifications: 200W, 3000RPM, 24V DC'
+    }
   ];
 
   clientData: SpreadsheetRow[] = [];
@@ -31,14 +45,29 @@ export class SpreadsheetComponent implements OnInit {
   ngOnInit(): void {
     this.initializeClientData();
     this.clearStatusMessage();
+    // Emit initial data
+    this.emitData();
   }
 
   /**
-   * Initialize client data with 100 empty rows
+   * Emit current data to parent component
+   */
+  private emitData(): void {
+    const currentData = this.getCurrentData();
+    // Filter out empty rows before emitting
+    const filteredData = currentData.filter(row =>
+      row.productName || row.shortDescription || row.additionalNotes
+    );
+    this.dataChanged.emit(filteredData);
+  }
+
+  /**
+   * Initialize client data with 25 product groups (each with 3 fields)
    */
   private initializeClientData(): void {
     this.clientData = [];
-    for (let i = 1; i <= 100; i++) {
+    // Create 25 product entries instead of 100 separate rows
+    for (let i = 1; i <= 25; i++) {
       this.clientData.push({
         id: i,
         productName: '',
@@ -54,6 +83,13 @@ export class SpreadsheetComponent implements OnInit {
   switchTab(tab: TabType): void {
     this.activeTab = tab;
     this.clearStatusMessage();
+
+    // If switching to demo tab and it's using the demo data, emit it immediately
+    if (tab === 'demo') {
+      console.log('Switched to demo tab, emitting demo data:', this.demoData);
+    }
+
+    this.emitData();
   }
 
   /**
@@ -70,6 +106,7 @@ export class SpreadsheetComponent implements OnInit {
     if (this.activeTab === 'client') {
       this.initializeClientData();
       this.showStatusMessage('Client data cleared successfully!', true);
+      this.emitData();
     }
   }
 
@@ -119,17 +156,19 @@ export class SpreadsheetComponent implements OnInit {
     exportData.push(['Starlinger Part Request Template']);
     exportData.push([]);
 
-    // Add data entries
-    data.forEach((row, index) => {
-      if (row.productName || row.shortDescription || row.additionalNotes) {
-        exportData.push(['Product (part) name', row.productName]);
-        exportData.push(['Short description', row.shortDescription]);
-        exportData.push(['Additional notes', row.additionalNotes]);
+    // Add data entries - filter out completely empty entries
+    const nonEmptyData = data.filter(row =>
+      row.productName || row.shortDescription || row.additionalNotes
+    );
 
-        // Add empty row between groups (except for the last entry)
-        if (index < data.length - 1) {
-          exportData.push([]);
-        }
+    nonEmptyData.forEach((row, index) => {
+      exportData.push(['Product (part) name', row.productName]);
+      exportData.push(['Short description', row.shortDescription]);
+      exportData.push(['Additional notes', row.additionalNotes]);
+
+      // Add empty row between groups (except for the last entry)
+      if (index < nonEmptyData.length - 1) {
+        exportData.push([]);
       }
     });
 
@@ -177,5 +216,15 @@ export class SpreadsheetComponent implements OnInit {
   private clearStatusMessage(): void {
     this.statusMessage = '';
     this.isSuccess = false;
+  }
+
+  /**
+   * Handle data changes
+   */
+  onDataChange(): void {
+    // Use setTimeout to ensure the model is updated before emitting
+    setTimeout(() => {
+      this.emitData();
+    }, 0);
   }
 }

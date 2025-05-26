@@ -1,0 +1,176 @@
+.carousel {
+  $block: &;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+
+  // Element: Wrapper
+  &__wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  // Element: Track
+  &__track {
+    display: flex;
+    will-change: transform;
+  }
+
+  // Element: Slide
+  &__slide {
+    min-width: 100%;
+    position: relative;
+  }
+
+  // Element: Image
+  &__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  // Element: Caption
+  &__caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  // Element: Arrow (Navigation Buttons)
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: white;
+    color: #232323;
+    border: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    // Modifier: Previous arrow
+    &--prev {
+      left: 16px;
+    }
+
+    // Modifier: Next arrow
+    &--next {
+      right: 16px;
+    }
+  }
+
+  // Element: Arrow Icon
+  &__arrow-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  // Element: Dots Container
+  &__dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  // Element: Dot
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    // Modifier: Active dot
+    &--active {
+      background-color: rgba(0, 0, 0, 0.8);
+      width: 24px;
+      border-radius: 5px;
+    }
+  }
+}
+
+// Media Queries
+@media (max-width: 768px) {
+  .carousel {
+    &__arrow {
+      width: 2rem;
+      height: 2rem;
+
+      &--prev {
+        left: 8px;
+      }
+
+      &--next {
+        right: 8px;
+      }
+    }
+
+    &__arrow-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    &__caption {
+      padding: 12px;
+      font-size: 14px;
+    }
+  }
+}
+
+// Touch device specific styles
+@media (hover: none) {
+  .carousel {
+    &__wrapper {
+      cursor: default;
+    }
+  }
+}
+
+// Accessibility: Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .carousel {
+    &__track {
+      transition: none !important;
+    }
+  }
+}

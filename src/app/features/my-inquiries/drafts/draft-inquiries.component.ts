@@ -2,21 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { InquiryCardComponent } from '@shared/components/inquiry-card/inquiry-card.component';
-import { RouterLink } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { OrderResponse, OrderService } from '@services/http/order.service';
 import { AuthService } from '@core/auth/auth.service';
 import { Inquiry } from '@core/models/inquiry.model';
-import {
-  DraftOrderTableComponent,
-  DraftOrderTableItem
-} from '@shared/components/draft-order-table/draft-order-table.component';
+import { DraftOrderTableItem } from '@shared/components/draft-order-table/draft-order-table.component';
 
 @Component({
     selector: 'app-draft-inquiries',
-    imports: [CommonModule, BreadcrumbsComponent, IconComponent, DraftOrderTableComponent],
+    imports: [CommonModule, BreadcrumbsComponent, IconComponent],
     templateUrl: './draft-inquiries.component.html',
     styleUrls: ['./draft-inquiries.component.scss']
 })

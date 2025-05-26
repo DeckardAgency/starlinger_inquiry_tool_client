@@ -93,8 +93,26 @@ $breakpoint-tablet: 768px;
     &--active {
       background-color: white;
       color: $gray-700;
-      border-bottom: 1px solid white;
-      margin-bottom: -1px;
+      border-bottom: 4px solid white;
+      margin-bottom: 0px;
+      z-index: 1;
+      position: relative;
+    }
+
+    &--client {
+      background-color: rgba(35, 120, 4, 0.10);
+      color: #232323;
+      border-bottom: 4px solid #237804;
+      margin-bottom: 0px;
+      z-index: 1;
+      position: relative;
+    }
+
+    &--demo {
+      background-color: rgba(59, 0, 117, 0.10);
+      color: #232323;
+      border-bottom: 4px solid #3B0075;
+      margin-bottom: 0px;
       z-index: 1;
       position: relative;
     }
@@ -164,7 +182,7 @@ $breakpoint-tablet: 768px;
     &--header {
       // Sticky main header row
       position: sticky;
-      top: 32px; // Position below the column headers
+      top: 31px; // Position below the column headers
       z-index: 9;
       background-color: white;
     }
@@ -187,7 +205,7 @@ $breakpoint-tablet: 768px;
 
     // Modifier for row header
     &--row-header {
-      background-color: $gray-100;
+      background-color: #ffffff;
       padding: 8px;
       text-align: center;
       font-weight: 600;
@@ -197,7 +215,7 @@ $breakpoint-tablet: 768px;
 
     // Modifier for column header
     &--column-header {
-      background-color: $gray-100;
+      background-color: #ffffff;
       padding: 8px;
       text-align: center;
       font-weight: 600;
@@ -207,7 +225,7 @@ $breakpoint-tablet: 768px;
 
     // Modifier for row number
     &--row-number {
-      background-color: $gray-100;
+      background-color: #ffffff;
       padding: 8px;
       text-align: center;
       font-weight: 600;
@@ -217,7 +235,8 @@ $breakpoint-tablet: 768px;
 
     // Modifier for main header
     &--main-header {
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 500;
       text-align: left;
       padding: 12px;
       color: #232323;

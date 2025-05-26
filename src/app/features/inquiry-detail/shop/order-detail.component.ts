@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import { IconComponent } from '@shared/components/icon/icon.component';
 import { InquiryService } from '@services/http/inquiry.service';
 import { AuthService } from '@core/auth/auth.service';
 
@@ -33,7 +32,7 @@ interface LogMessage {
 
 @Component({
     selector: 'app-inquiry-detail',
-    imports: [CommonModule, BreadcrumbsComponent, IconComponent, RouterModule],
+    imports: [CommonModule, BreadcrumbsComponent, RouterModule],
     templateUrl: './order-detail.component.html',
     styleUrls: ['./order-detail.component.scss']
 })

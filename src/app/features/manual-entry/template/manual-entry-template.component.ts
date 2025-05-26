@@ -24,6 +24,7 @@ import { environment } from '@env/environment';
 import { AuthService } from '@core/auth/auth.service';
 import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
 import {SpreadsheetComponent} from '@shared/components/spreadsheet/spreadsheet.component';
+import { SpreadsheetRow } from '@shared/components/spreadsheet/spreadsheet.interface';
 
 export interface UploadedFile {
   name: string;
@@ -41,6 +42,7 @@ export interface UploadedFile {
 export interface Part {
   id: string;
   files: UploadedFile[];
+  spreadsheetData?: SpreadsheetRow[]; // Add spreadsheet data
 }
 
 @Component({
@@ -125,7 +127,8 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   addPart(): void {
     const newPart: Part = {
       id: this.generateUniqueId(),
-      files: []
+      files: [],
+      spreadsheetData: []
     };
 
     this.parts.push(newPart);
@@ -149,6 +152,23 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       });
 
       this.parts.splice(index, 1);
+
+      // Update the stored parts for the selected machine
+      if (this.selectedMachine) {
+        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+      }
+    }
+  }
+
+  // Method to handle spreadsheet data changes
+  onSpreadsheetDataChanged(data: SpreadsheetRow[], partIndex: number): void {
+    console.log('Spreadsheet data changed for part', partIndex, ':', data);
+    console.log('Number of non-empty rows:', data.filter(row =>
+      row.productName || row.shortDescription || row.additionalNotes
+    ).length);
+
+    if (partIndex >= 0 && partIndex < this.parts.length) {
+      this.parts[partIndex].spreadsheetData = data;
 
       // Update the stored parts for the selected machine
       if (this.selectedMachine) {
@@ -573,18 +593,43 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   onSubmit(): void {
     if (this.isFormValid() && this.selectedMachine) {
       // Map parts to ManualCartItems for the cart service
-      const manualCartItems: ManualCartItem[] = this.parts.map(part => {
-        return {
-          id: this.generateUniqueId(),
-          machineId: this.selectedMachine!.id,
-          machineName: this.selectedMachine!.articleDescription,
-          // Only include successfully uploaded files
-          files: part.files.filter(file => file.status === 'success'),
-          // Include MediaItem references
-          mediaItems: part.files
-            .filter(file => file.status === 'success' && file.mediaItem)
-            .map(file => file.mediaItem!)
-        } as unknown as ManualCartItem;
+      const manualCartItems: ManualCartItem[] = this.parts.flatMap(part => {
+        // Get all non-empty rows from spreadsheet data
+        const spreadsheetRows = part.spreadsheetData?.filter(row =>
+          row.productName || row.shortDescription || row.additionalNotes
+        ) || [];
+
+        if (spreadsheetRows.length > 0) {
+          // Create a cart item for each spreadsheet row
+          return spreadsheetRows.map(row => ({
+            id: this.generateUniqueId(),
+            machineId: this.selectedMachine!.id,
+            machineName: this.selectedMachine!.articleDescription,
+            // Only include successfully uploaded files
+            files: part.files.filter(file => file.status === 'success'),
+            // Include MediaItem references
+            mediaItems: part.files
+              .filter(file => file.status === 'success' && file.mediaItem)
+              .map(file => file.mediaItem!),
+            // Include spreadsheet data
+            productName: row.productName,
+            shortDescription: row.shortDescription,
+            additionalNotes: row.additionalNotes
+          } as unknown as ManualCartItem));
+        } else {
+          // No spreadsheet data, create single cart item
+          return [{
+            id: this.generateUniqueId(),
+            machineId: this.selectedMachine!.id,
+            machineName: this.selectedMachine!.articleDescription,
+            // Only include successfully uploaded files
+            files: part.files.filter(file => file.status === 'success'),
+            // Include MediaItem references
+            mediaItems: part.files
+              .filter(file => file.status === 'success' && file.mediaItem)
+              .map(file => file.mediaItem!)
+          } as unknown as ManualCartItem];
+        }
       });
 
       // Create an array for all machines in the submission
@@ -594,20 +639,25 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       machineEntries.push({
         machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${this.selectedMachine.id}`,
         notes: "string",
-        products: this.parts.map(part => ({
+        products: this.parts.map(part => {
+          // Get the first row of spreadsheet data if available
+          const spreadsheetRow = part.spreadsheetData && part.spreadsheetData.length > 0
+            ? part.spreadsheetData[0]
+            : null;
 
-          //
-          partName: '',
-          partNumber: '',
-          shortDescription: '',
-          additionalNotes: '',
-          //
+          return {
+            // Map spreadsheet data to product fields
+            partName: spreadsheetRow?.productName || '',
+            partNumber: '', // Keep empty as requested
+            shortDescription: spreadsheetRow?.shortDescription || '',
+            additionalNotes: spreadsheetRow?.additionalNotes || '',
 
-          // Include media item references if needed for API
-          mediaItems: part.files
-            .filter(file => file.status === 'success' && file.mediaItem)
-            .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
-        }))
+            // Include media item references if needed for API
+            mediaItems: part.files
+              .filter(file => file.status === 'success' && file.mediaItem)
+              .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+          };
+        })
       });
 
       // Add other machines from the machinePartsMap
@@ -622,11 +672,24 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
           machineEntries.push({
             machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${machineId}`,
             notes: "string",
-            products: parts.map(part => ({
-              mediaItems: part.files
-                .filter(file => file.status === 'success' && file.mediaItem)
-                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
-            }))
+            products: parts.map(part => {
+              // Get the first row of spreadsheet data if available
+              const spreadsheetRow = part.spreadsheetData && part.spreadsheetData.length > 0
+                ? part.spreadsheetData[0]
+                : null;
+
+              return {
+                // Map spreadsheet data to product fields
+                partName: spreadsheetRow?.productName || '',
+                partNumber: '', // Keep empty as requested
+                shortDescription: spreadsheetRow?.shortDescription || '',
+                additionalNotes: spreadsheetRow?.additionalNotes || '',
+
+                mediaItems: part.files
+                  .filter(file => file.status === 'success' && file.mediaItem)
+                  .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+              };
+            })
           });
         }
       });

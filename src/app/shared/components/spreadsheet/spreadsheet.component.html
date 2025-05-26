@@ -1,7 +1,7 @@
 <div class="spreadsheet" [class.spreadsheet--expanded]="isExpanded">
   <!-- Header Section -->
-<!--  <div class="spreadsheet__header">-->
-<!--  </div>-->
+  <!--  <div class="spreadsheet__header">-->
+  <!--  </div>-->
 
   <!-- Spreadsheet Table -->
   <div class="spreadsheet__table-container" [class.spreadsheet__table-container--expanded]="isExpanded">
@@ -36,7 +36,8 @@
               class="spreadsheet__input"
               [(ngModel)]="row.productName"
               [readonly]="activeTab === 'demo'"
-              placeholder="Enter product name">
+              placeholder="Enter product name"
+              (input)="onDataChange()">
           </td>
         </tr>
 
@@ -52,7 +53,8 @@
                 [(ngModel)]="row.shortDescription"
                 [readonly]="activeTab === 'demo'"
                 placeholder="Enter short description"
-                rows="3"></textarea>
+                rows="3"
+                (input)="onDataChange()"></textarea>
           </td>
         </tr>
 
@@ -68,7 +70,8 @@
                 [(ngModel)]="row.additionalNotes"
                 [readonly]="activeTab === 'demo'"
                 placeholder="Enter additional notes"
-                rows="4"></textarea>
+                rows="4"
+                (input)="onDataChange()"></textarea>
           </td>
         </tr>
 
@@ -85,13 +88,13 @@
   <!-- Tab Navigation -->
   <div class="spreadsheet__tabs">
     <button
-      class="spreadsheet__tab-button"
+      class="spreadsheet__tab-button spreadsheet__tab-button--client"
       [class.spreadsheet__tab-button--active]="activeTab === 'client'"
       (click)="switchTab('client')">
       Client data
     </button>
     <button
-      class="spreadsheet__tab-button"
+      class="spreadsheet__tab-button spreadsheet__tab-button--demo"
       [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
       (click)="switchTab('demo')">
       Demo example
@@ -99,24 +102,24 @@
   </div>
 
   <!-- Action Buttons -->
-<!--  <div class="spreadsheet__actions">-->
-<!--    <button-->
-<!--      class="spreadsheet__button spreadsheet__button&#45;&#45;secondary"-->
-<!--      (click)="toggleExpandedView()">-->
-<!--      {{ isExpanded ? 'Exit Full View' : 'Expand View' }}-->
-<!--    </button>-->
-<!--    <button-->
-<!--      class="spreadsheet__button spreadsheet__button&#45;&#45;danger"-->
-<!--      (click)="clearData()"-->
-<!--      [disabled]="activeTab === 'demo'">-->
-<!--      Clear All-->
-<!--    </button>-->
-<!--    <button-->
-<!--      class="spreadsheet__button spreadsheet__button&#45;&#45;primary"-->
-<!--      (click)="exportToExcel()">-->
-<!--      Finish & Export to Excel-->
-<!--    </button>-->
-<!--  </div>-->
+  <!--  <div class="spreadsheet__actions">-->
+  <!--    <button-->
+  <!--      class="spreadsheet__button spreadsheet__button&#45;&#45;secondary"-->
+  <!--      (click)="toggleExpandedView()">-->
+  <!--      {{ isExpanded ? 'Exit Full View' : 'Expand View' }}-->
+  <!--    </button>-->
+  <!--    <button-->
+  <!--      class="spreadsheet__button spreadsheet__button&#45;&#45;danger"-->
+  <!--      (click)="clearData()"-->
+  <!--      [disabled]="activeTab === 'demo'">-->
+  <!--      Clear All-->
+  <!--    </button>-->
+  <!--    <button-->
+  <!--      class="spreadsheet__button spreadsheet__button&#45;&#45;primary"-->
+  <!--      (click)="exportToExcel()">-->
+  <!--      Finish & Export to Excel-->
+  <!--    </button>-->
+  <!--  </div>-->
 
   <!-- Status Message -->
   <div

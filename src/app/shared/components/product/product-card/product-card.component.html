@@ -1,29 +1,21 @@
 <div class="product-card">
   <div class="product-card__image">
-    <ngx-slick-carousel
-      *ngIf="hasImages()"
-      #slickModal="slick-carousel"
-      [config]="slideConfig">
 
-      <!-- Featured Image First (if exists) -->
-      <div ngxSlickItem *ngIf="product.featuredImage" class="slide">
-        <img class="product-card__img" src="{{ environment.apiBaseUrl + product.featuredImage.filePath }}"
-             [alt]="product.name + ' featured'">
-      </div>
+    <!-- Show carousel if there are multiple images -->
+    <app-carousel
+      *ngIf="shouldShowCarousel()"
+      [images]="carouselImages"
+      [showArrows]="true"
+      [showDots]="false"
+      [autoPlay]="false"
+      [infiniteLoop]="true">
+    </app-carousel>
 
-      <!-- Then Loop through product.imageGallery -->
-<!--      <div ngxSlickItem *ngFor="let image of product.imageGallery" class="slide">-->
-<!--        <img class="product-card__img" src="{{ environment.apiBaseUrl + image.filePath }}"-->
-<!--             [alt]="product.name + ' image'">-->
-<!--      </div>-->
-    </ngx-slick-carousel>
-
-    <button class="carousel-arrow carousel-arrow__prev" (click)="prev()">
-      <app-icon name="carouselArowLeft" size="24px" color="#232323"></app-icon>
-    </button>
-    <button class="carousel-arrow carousel-arrow__next" (click)="next()">
-      <app-icon name="carouselArowRight" size="24px" color="#232323"></app-icon>
-    </button>
+    <!-- Show single image if there's only one -->
+    <img *ngIf="hasImages() && !shouldShowCarousel()"
+         class="product-card__img"
+         [src]="environment.apiBaseUrl + product.featuredImage!.filePath"
+         [alt]="product.name">
 
     <!-- Fallback if no images at all -->
     <img *ngIf="!hasImages()"

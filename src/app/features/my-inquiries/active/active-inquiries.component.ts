@@ -7,13 +7,12 @@ import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { OrderResponse, OrderService } from '@services/http/order.service';
 import { AuthService } from '@core/auth/auth.service';
-import { RouterLink } from '@angular/router';
 import { Inquiry } from '@core/models/inquiry.model';
 import {InquiryCardShimmerComponent} from '@shared/components/inquiry-card/inquiry-card-shimmer.component';
 
 @Component({
     selector: 'app-active-inquiries',
-    imports: [CommonModule, BreadcrumbsComponent, InquiryCardComponent, IconComponent, RouterLink, InquiryCardShimmerComponent],
+    imports: [CommonModule, BreadcrumbsComponent, InquiryCardComponent, IconComponent, InquiryCardShimmerComponent],
     templateUrl: './active-inquiries.component.html',
     styleUrls: ['./active-inquiries.component.scss']
 })

@@ -14,7 +14,7 @@ import { Breadcrumb, Product } from '@core/models';
 import { Machine } from '@models/machine-type.model';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { ArticleItemShimmerComponent } from '@shared/components/product/article-item/article-item-shimmer.component';
-import {ProductCardShimmerComponent} from '@shared/components/product/product-card/product-card-shimmer.component';
+import { ProductCardShimmerComponent } from '@shared/components/product/product-card/product-card-shimmer.component';
 
 @Component({
     selector: 'app-shop',

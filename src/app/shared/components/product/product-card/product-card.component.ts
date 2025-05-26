@@ -1,37 +1,24 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuickCartService } from '@services/cart/quick-cart.service';
 import { Product } from '@core/models';
 import { environment } from '@env/environment';
-import { SlickCarouselModule, SlickCarouselComponent } from 'ngx-slick-carousel';
-import {IconComponent} from '@shared/components/icon/icon.component';
+import { CarouselComponent, CarouselImage } from '@shared/components/carousel/carousel.component';
 
 @Component({
-    selector: 'app-product-card',
-    imports: [CommonModule, FormsModule, SlickCarouselModule, IconComponent],
-    styleUrls: ['./product-card.component.scss'],
-    templateUrl: './product-card.component.html'
+  selector: 'app-product-card',
+  imports: [CommonModule, FormsModule, CarouselComponent],
+  styleUrls: ['./product-card.component.scss'],
+  templateUrl: './product-card.component.html'
 })
 export class ProductCardComponent implements OnInit, OnChanges, AfterViewInit {
   environment = environment;
   @Input() product!: Product;
   quantity: number = 1;
+  carouselImages: CarouselImage[] = [];
 
-  // Reference to the carousel component
-  @ViewChild('slickModal') slickModal!: SlickCarouselComponent;
   private productChanged = false;
-
-  // Slick Carousel Configuration
-  slideConfig = {
-    "slidesToShow": 1,
-    "slidesToScroll": 1,
-    "arrows": false,
-    "dots": false,
-    "infinite": true,
-    "autoplay": false,
-    "variableWidth": false,
-  };
 
   constructor(private quickCartService: QuickCartService) {}
 
@@ -45,25 +32,45 @@ export class ProductCardComponent implements OnInit, OnChanges, AfterViewInit {
     if (!this.product.imageGallery) {
       this.product.imageGallery = [];
     }
+
+    // Prepare carousel images
+    this.prepareCarouselImages();
   }
 
   ngAfterViewInit() {
-    // If product changed and view is initialized, reset the carousel
-    if (this.productChanged && this.slickModal) {
-      this.slickModal.slickGoTo(0);
-      this.productChanged = false;
-    }
+
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['product'] && !changes['product'].firstChange) {
       this.productChanged = true;
+      // Update carousel images when product changes
+      this.prepareCarouselImages();
+    }
+  }
 
-      // If view is already initialized, reset the carousel immediately
-      if (this.slickModal) {
-        this.slickModal.slickGoTo(0);
-        this.productChanged = false;
-      }
+  /**
+   * Prepare images for the carousel component
+   */
+  prepareCarouselImages(): void {
+    this.carouselImages = [];
+
+    // Add a featured image first if it exists
+    if (this.product.featuredImage) {
+      this.carouselImages.push({
+        url: this.environment.apiBaseUrl + this.product.featuredImage.filePath,
+        alt: this.product.name
+      });
+    }
+
+    // Add gallery images
+    if (this.product.imageGallery && this.product.imageGallery.length > 0) {
+      this.product.imageGallery.forEach((image, index) => {
+        this.carouselImages.push({
+          url: this.environment.apiBaseUrl + image.filePath,
+          alt: `${this.product.name} - Image ${index + 1}`
+        });
+      });
     }
   }
 
@@ -78,12 +85,12 @@ export class ProductCardComponent implements OnInit, OnChanges, AfterViewInit {
     );
   }
 
-  next() {
-    this.slickModal.slickNext();
-  }
-
-  prev() {
-    this.slickModal.slickPrev();
+  /**
+   * Check if carousel should be displayed (when there are multiple images)
+   * @returns boolean indicating if carousel should be shown
+   */
+  shouldShowCarousel(): boolean {
+    return this.carouselImages.length > 1;
   }
 
   // Quantity Methods

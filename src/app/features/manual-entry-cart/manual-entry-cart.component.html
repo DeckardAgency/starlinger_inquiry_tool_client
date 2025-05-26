@@ -58,17 +58,17 @@
           <div *ngIf="getSectionState(i, 'details')" class="inquiry-cart__section-content">
             <div class="inquiry-cart__detail-row">
               <span class="inquiry-cart__detail-label">Part (product) name</span>
-              <span class="inquiry-cart__detail-value">{{ item.partData?.partName }}</span>
+              <span class="inquiry-cart__detail-value">{{ item.partData.partName }}</span>
             </div>
 
-            <div *ngIf="item.partData?.partNumber" class="inquiry-cart__detail-row">
+            <div *ngIf="item.partData.partNumber" class="inquiry-cart__detail-row">
               <span class="inquiry-cart__detail-label">Part number</span>
-              <span class="inquiry-cart__detail-value">{{ item.partData?.partNumber }}</span>
+              <span class="inquiry-cart__detail-value">{{ item.partData.partNumber }}</span>
             </div>
 
             <div class="inquiry-cart__detail-row">
               <span class="inquiry-cart__detail-label">Short description</span>
-              <p class="inquiry-cart__detail-text">{{ item.partData?.shortDescription }}</p>
+              <p class="inquiry-cart__detail-text">{{ item.partData.shortDescription }}</p>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@
           <div *ngIf="getSectionState(i, 'notes')" class="inquiry-cart__section-content">
             <div class="inquiry-cart__detail-row">
               <span class="inquiry-cart__detail-label">Additional notes</span>
-              <p class="inquiry-cart__detail-text">{{ item.partData?.additionalNotes }}</p>
+              <p class="inquiry-cart__detail-text">{{ item.partData.additionalNotes }}</p>
             </div>
           </div>
         </div>

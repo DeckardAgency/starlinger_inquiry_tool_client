@@ -77,7 +77,7 @@ export class ManualQuickCartComponent implements OnInit, OnDestroy {
   // Navigate to dashboard and close cart
   goBack(): void {
     this.onClose();
-    this.router.navigate(['/dashboard']);
+    // this.router.navigate(['/dashboard']);
   }
 
   // Save draft action
