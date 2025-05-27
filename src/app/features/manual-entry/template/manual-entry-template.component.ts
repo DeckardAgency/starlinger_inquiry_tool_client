@@ -329,9 +329,10 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
 
   isFormValid(): boolean {
     // For each part, check if there's valid data
-    return this.parts.every(part => {
-      return part.files.some(file => file.status === 'success');
-    });
+    // return this.parts.every(part => {
+    //   return part.files.some(file => file.status === 'success');
+    // });
+    return true;
   }
 
   // File upload methods
@@ -592,6 +593,10 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
 
   onSubmit(): void {
     if (this.isFormValid() && this.selectedMachine) {
+
+      console.log('parts', this.parts);
+      // console.log('parts spreadsheetData', this.parts[0].spreadsheetData);
+
       // Map parts to ManualCartItems for the cart service
       const manualCartItems: ManualCartItem[] = this.parts.flatMap(part => {
         // Get all non-empty rows from spreadsheet data
@@ -639,24 +644,35 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       machineEntries.push({
         machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${this.selectedMachine.id}`,
         notes: "string",
-        products: this.parts.map(part => {
-          // Get the first row of spreadsheet data if available
-          const spreadsheetRow = part.spreadsheetData && part.spreadsheetData.length > 0
-            ? part.spreadsheetData[0]
-            : null;
+        products: this.parts.flatMap(part => {
+          // Get all non-empty spreadsheet rows
+          const spreadsheetRows = part.spreadsheetData?.filter(row =>
+            row.productName || row.shortDescription || row.additionalNotes
+          ) || [];
 
-          return {
-            // Map spreadsheet data to product fields
-            partName: spreadsheetRow?.productName || '',
-            partNumber: '', // Keep empty as requested
-            shortDescription: spreadsheetRow?.shortDescription || '',
-            additionalNotes: spreadsheetRow?.additionalNotes || '',
-
-            // Include media item references if needed for API
-            mediaItems: part.files
-              .filter(file => file.status === 'success' && file.mediaItem)
-              .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
-          };
+          // If there are spreadsheet rows, create a product for each
+          if (spreadsheetRows.length > 0) {
+            return spreadsheetRows.map(row => ({
+              partName: row.productName || '',
+              partNumber: '', // Keep empty as requested
+              shortDescription: row.shortDescription || '',
+              additionalNotes: row.additionalNotes || '',
+              mediaItems: part.files
+                .filter(file => file.status === 'success' && file.mediaItem)
+                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+            }));
+          } else {
+            // If no spreadsheet data, create one product with empty fields but with files
+            return [{
+              partName: '',
+              partNumber: '',
+              shortDescription: '',
+              additionalNotes: '',
+              mediaItems: part.files
+                .filter(file => file.status === 'success' && file.mediaItem)
+                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+            }];
+          }
         })
       });
 
@@ -699,7 +715,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       const userId = currentUser?.id || 'current-user';
 
       // Add parts to the manual cart and open the inquiry overview
-      this.manualQuickCartService.addToCart(manualCartItems);
+      //this.manualQuickCartService.addToCart(manualCartItems);
 
       const inquiryData: InquiryRequest = {
         status: "pending",
@@ -714,13 +730,13 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
       console.log('Template submission data:', inquiryData);
 
       // Remove the saved parts for this machine (since they've been submitted)
-      if (this.selectedMachine) {
-        this.machinePartsMap.delete(this.selectedMachine.id);
-      }
+      // if (this.selectedMachine) {
+      //   this.machinePartsMap.delete(this.selectedMachine.id);
+      // }
 
       // Reset the form state but don't close details yet
-      this.parts = [];
-      this.addPart();
+      // this.parts = [];
+      // this.addPart();
     }
   }
 
