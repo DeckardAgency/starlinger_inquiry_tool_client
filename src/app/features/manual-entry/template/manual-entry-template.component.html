@@ -27,9 +27,10 @@
   </div>
 
   <div class="manual-entry__filters">
+    <div class="manual-entry__filters-title">Select machine</div>
     <div class="manual-entry__search">
         <span class="material-icons">
-          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m14 14-2.867-2.867m1.534-3.8A5.333 5.333 0 1 1 2 7.333a5.333 5.333 0 0 1 10.667 0Z" stroke="#71717A" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <app-icon name="searchInput" size="16px" color="#71717A"></app-icon>
         </span>
       <input
         type="text"
@@ -37,42 +38,6 @@
         placeholder="Filter by machine name"
         class="manual-entry__search-input"
       >
-    </div>
-
-    <div class="manual-entry__machine-filter">
-      <button class="manual-entry__filter-btn" (click)="toggleFilter()">
-        <span class="material-icons">
-          <svg width="17" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2.5 4h12M5.167 8h6.666m-4.666 4h2.666"
-                  stroke="#232323"
-                  stroke-width="1.33"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
-          </svg>
-        </span>
-        Filter by type
-        <span class="material-icons filter-arrow" [class.open]="isFilterOpen">
-          <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="m4 6 4 4 4-4" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-      </button>
-
-      @if (isFilterOpen) {
-        <div class="manual-entry__filter-dropdown">
-          @for (machine of machineTypes; track machine.id) {
-            <label class="manual-entry__filter-option">
-              <input
-                type="checkbox"
-                [checked]="machine.checked"
-                (change)="toggleMachineType(machine)"
-              >
-              <span class="manual-entry__filter-checkbox"></span>
-              <span class="manual-entry__filter-label">{{ machine.name }}</span>
-            </label>
-          }
-        </div>
-      }
     </div>
   </div>
 
