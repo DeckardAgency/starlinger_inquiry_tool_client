@@ -1,10 +1,8 @@
-import { Component, OnInit, HostListener, ViewChild, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { HttpEvent, HttpEventType } from '@angular/common/http';
-import { Subscription } from 'rxjs';
 
 // Components
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
@@ -12,37 +10,22 @@ import { MachineArticleItemComponent } from '@shared/components/machine/machine-
 import { AdvancedImagePreviewModalComponent } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
 import { MachineType } from '@models/machine-type.model';
 import { MachineService } from '@services/http/machine.service';
-import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
-import { ManualCartItem } from '@models/manual-cart-item.model';
+import {ManualCartItem, UploadedFile} from '@models/manual-cart-item.model';
 import { Breadcrumb } from '@core/models';
 import { Machine } from '@core/models/machine.model';
 import { MachineArticleItemShimmerComponent } from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { MediaService } from '@services/http/media.service';
-import { MediaItem } from '@models/media.model';
 import { environment } from '@env/environment';
 import { AuthService } from '@core/auth/auth.service';
 import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
-import {SpreadsheetComponent} from '@shared/components/spreadsheet/spreadsheet.component';
+import { SpreadsheetComponent } from '@shared/components/spreadsheet/spreadsheet.component';
 import { SpreadsheetRow } from '@shared/components/spreadsheet/spreadsheet.interface';
-
-export interface UploadedFile {
-  name: string;
-  size: number;
-  type: string;
-  file: File;
-  status: 'uploading' | 'success' | 'error';
-  progress: number;
-  previewUrl?: string;
-  mediaItem?: MediaItem; // Store the API response
-  uploadSubscription?: Subscription; // Store subscription for cancellation
-  errorMessage?: string; // Store specific error message
-}
+import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
 
 export interface Part {
   id: string;
   files: UploadedFile[];
-  spreadsheetData?: SpreadsheetRow[]; // Add spreadsheet data
+  spreadsheetData?: SpreadsheetRow[];
 }
 
 @Component({
@@ -57,7 +40,8 @@ export interface Part {
     AdvancedImagePreviewModalComponent,
     MachineArticleItemShimmerComponent,
     IconComponent,
-    SpreadsheetComponent
+    SpreadsheetComponent,
+    FileUploadComponent
   ],
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']
@@ -70,31 +54,12 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   loading = true;
   error: string | null = null;
   totalItems = 0;
-  dragCounter = 0;
 
   // Image preview modal properties
   showImagePreview = false;
   previewImageSrc = '';
   previewImageAlt = '';
   previewImageFileName = '';
-
-  // File upload properties
-  isDragging = false;
-  maxFileSize = 5 * 1024 * 1024; // 5MB
-  allowedFileTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-    'application/pdf',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'video/mp4'
-  ];
-
-  // Using ViewChildren to get all file inputs
-  @ViewChildren('fileInputElement') fileInputElements!: QueryList<ElementRef<HTMLInputElement>>;
 
   // Search and form controls
   searchControl = new FormControl('');
@@ -139,27 +104,6 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     }
   }
 
-  removePart(index: number): void {
-    if (this.parts.length > 1) {
-      // Cancel any ongoing uploads for this part
-      this.parts[index].files.forEach(file => {
-        if (file.uploadSubscription && !file.uploadSubscription.closed) {
-          file.uploadSubscription.unsubscribe();
-        }
-        if (file.previewUrl) {
-          URL.revokeObjectURL(file.previewUrl);
-        }
-      });
-
-      this.parts.splice(index, 1);
-
-      // Update the stored parts for the selected machine
-      if (this.selectedMachine) {
-        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-      }
-    }
-  }
-
   // Method to handle spreadsheet data changes
   onSpreadsheetDataChanged(data: SpreadsheetRow[], partIndex: number): void {
     console.log('Spreadsheet data changed for part', partIndex, ':', data);
@@ -183,10 +127,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
 
   constructor(
     private machineService: MachineService,
-    private manualQuickCartService: ManualQuickCartService,
     private authService: AuthService,
-    private inquiryService: InquiryService,
-    private mediaService: MediaService // Add MediaService injection
   ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
@@ -335,260 +276,8 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     return true;
   }
 
-  // File upload methods
-  triggerFileInput(partIndex: number): void {
-    // Get file inputs after view is initialized
-    if (this.fileInputElements) {
-      const fileInputArray = this.fileInputElements.toArray();
-      if (fileInputArray.length > 0 && fileInputArray[partIndex]) {
-        fileInputArray[partIndex].nativeElement.click();
-      }
-    }
-  }
-
-  onFileSelected(event: Event, partIndex: number): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.handleFiles(input.files, partIndex);
-    }
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = true;
-  }
-
-  onDragEnter(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.dragCounter++;
-    this.isDragging = true;
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.dragCounter--;
-
-    // Only set isDragging to false when we've left the outermost element
-    if (this.dragCounter === 0) {
-      this.isDragging = false;
-    }
-  }
-
-  onDrop(event: DragEvent, partIndex: number): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
-    this.dragCounter = 0; // Reset counter
-
-    if (event.dataTransfer?.files) {
-      this.handleFiles(event.dataTransfer.files, partIndex);
-    }
-  }
-
-  private handleFiles(fileList: FileList, partIndex: number): void {
-    // Ensure we have a valid part
-    if (partIndex >= 0 && partIndex < this.parts.length) {
-      Array.from(fileList).forEach(file => {
-        // Validate file type
-        if (!this.isValidFileType(file)) {
-          alert(`File type not allowed: ${file.name}`);
-          return;
-        }
-
-        // Validate file size
-        if (file.size > this.maxFileSize) {
-          alert(`File too large: ${file.name}. Maximum size is 5MB.`);
-          return;
-        }
-
-        const uploadedFile: UploadedFile = {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          file: file,
-          status: 'uploading',
-          progress: 0
-        };
-
-        // If it's an image, create a preview URL
-        if (this.isImageFile(file.name)) {
-          uploadedFile.previewUrl = URL.createObjectURL(file);
-        }
-
-        this.parts[partIndex].files.push(uploadedFile);
-        this.uploadFile(partIndex, uploadedFile);
-
-        // Update the stored parts for the selected machine
-        if (this.selectedMachine) {
-          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-        }
-      });
-    }
-  }
-
-  private isValidFileType(file: File): boolean {
-    return this.allowedFileTypes.includes(file.type);
-  }
-
-  // Replace simulateUpload with actual upload using MediaService
-  private uploadFile(partIndex: number, file: UploadedFile): void {
-    const uploadSubscription = this.mediaService.uploadFile(file.file).subscribe({
-      next: (event: HttpEvent<MediaItem>) => {
-        switch (event.type) {
-          case HttpEventType.UploadProgress:
-            if (event.total) {
-              file.progress = Math.round((event.loaded / event.total) * 100);
-            }
-            break;
-
-          case HttpEventType.Response:
-            if (event.body) {
-              file.status = 'success';
-              file.progress = 100;
-              file.mediaItem = event.body;
-              console.log('File uploaded successfully:', event.body);
-            }
-            break;
-        }
-
-        // Update the stored parts for the selected machine after each progress update
-        if (this.selectedMachine) {
-          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-        }
-      },
-      error: (error) => {
-        console.error('Upload failed:', error);
-        file.status = 'error';
-        file.progress = 0;
-
-        // Set a user-friendly error message
-        if (error.status === 413) {
-          file.errorMessage = 'File too large';
-        } else if (error.status === 415) {
-          file.errorMessage = 'Unsupported file type';
-        } else if (error.status === 0) {
-          file.errorMessage = 'Network error';
-        } else {
-          file.errorMessage = error.error?.message || 'Upload failed';
-        }
-
-        // Update the stored parts for the selected machine
-        if (this.selectedMachine) {
-          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-        }
-      },
-      complete: () => {
-        // Clean up the subscription
-        if (file.uploadSubscription) {
-          file.uploadSubscription = undefined;
-        }
-      }
-    });
-
-    // Store the subscription so we can cancel it if needed
-    file.uploadSubscription = uploadSubscription;
-  }
-
-  removeFile(partIndex: number, file: UploadedFile): void {
-    // Cancel upload if it's in progress
-    if (file.uploadSubscription && !file.uploadSubscription.closed) {
-      file.uploadSubscription.unsubscribe();
-    }
-
-    // If the file was successfully uploaded, optionally delete it from the server
-    if (file.status === 'success' && file.mediaItem) {
-      this.mediaService.deleteMediaItem(file.mediaItem.id).subscribe({
-        next: () => {
-          console.log('File deleted from server:', file.mediaItem?.filename);
-        },
-        error: (error) => {
-          console.error('Failed to delete file from server:', error);
-          // Don't prevent local removal if server deletion fails
-        }
-      });
-    }
-
-    // Revoke URL if exists to prevent memory leaks
-    if (file.previewUrl) {
-      URL.revokeObjectURL(file.previewUrl);
-    }
-
-    this.parts[partIndex].files = this.parts[partIndex].files.filter(f => f !== file);
-
-    // Update the stored parts for the selected machine
-    if (this.selectedMachine) {
-      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-    }
-  }
-
-  cancelUpload(partIndex: number, file: UploadedFile): void {
-    // Cancel the actual upload request
-    if (file.uploadSubscription && !file.uploadSubscription.closed) {
-      file.uploadSubscription.unsubscribe();
-    }
-
-    // Remove the file from the list
-    this.removeFile(partIndex, file);
-  }
-
-  retryUpload(partIndex: number, file: UploadedFile): void {
-    // Cancel any existing upload
-    if (file.uploadSubscription && !file.uploadSubscription.closed) {
-      file.uploadSubscription.unsubscribe();
-    }
-
-    // Reset file status and progress
-    file.status = 'uploading';
-    file.progress = 0;
-    file.errorMessage = undefined;
-
-    // Start the upload again
-    this.uploadFile(partIndex, file);
-  }
-
-  hasSuccessfulUploads(partIndex: number): boolean {
-    return this.parts[partIndex].files.some(file => file.status === 'success');
-  }
-
-  hasUploadsInProgress(partIndex: number): boolean {
-    return this.parts[partIndex].files.some(file => file.status === 'uploading');
-  }
-
-  getSuccessfulUploadCount(partIndex: number): number {
-    return this.parts[partIndex].files.filter(file => file.status === 'success').length;
-  }
-
-  // Image preview methods
-  openImagePreview(file: UploadedFile): void {
-    if (this.isImageFile(file.name) && file.previewUrl) {
-      this.previewImageSrc = file.previewUrl;
-      this.previewImageAlt = file.name;
-      this.previewImageFileName = file.name;
-      this.showImagePreview = true;
-    }
-  }
-
   closeImagePreview(): void {
     this.showImagePreview = false;
-  }
-
-  // Utility methods for file handling
-  isImageFile(fileName: string): boolean {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    return ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(extension || '');
-  }
-
-  formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
   onSubmit(): void {
@@ -750,33 +439,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnDestroy(): void {
-    // Cancel all ongoing uploads and clean up resources
-    this.machinePartsMap.forEach(parts => {
-      parts.forEach(part => {
-        part.files.forEach(file => {
-          // Cancel any ongoing uploads
-          if (file.uploadSubscription && !file.uploadSubscription.closed) {
-            file.uploadSubscription.unsubscribe();
-          }
-          // Clean up object URLs
-          if (file.previewUrl) {
-            URL.revokeObjectURL(file.previewUrl);
-          }
-        });
-      });
-    });
 
-    // Also clean up current parts
-    this.parts.forEach(part => {
-      part.files.forEach(file => {
-        if (file.uploadSubscription && !file.uploadSubscription.closed) {
-          file.uploadSubscription.unsubscribe();
-        }
-        if (file.previewUrl) {
-          URL.revokeObjectURL(file.previewUrl);
-        }
-      });
-    });
   }
 
   @HostListener('document:click', ['$event'])
@@ -803,36 +466,25 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
           type: part.files[fileIndex].type
         });
 
-        // Revoke the old preview URL to prevent memory leaks
-        URL.revokeObjectURL(part.files[fileIndex].previewUrl!);
+        // Update the file object
+        const updatedFile = { ...part.files[fileIndex] };
+        updatedFile.file = editedFile;
 
-        // Update the file in the array
-        part.files[fileIndex].file = editedFile;
-        part.files[fileIndex].previewUrl = URL.createObjectURL(editedFile);
-
-        // If this file was already uploaded successfully, we need to re-upload the edited version
-        if (part.files[fileIndex].status === 'success') {
-          part.files[fileIndex].status = 'uploading';
-          part.files[fileIndex].progress = 0;
-
-          // Delete the old file from server if it exists
-          if (part.files[fileIndex].mediaItem) {
-            this.mediaService.deleteMediaItem(part.files[fileIndex].mediaItem!.id).subscribe({
-              error: (error) => console.error('Failed to delete old file:', error)
-            });
-          }
-
-          // Upload the edited file
-          this.uploadFile(this.parts.indexOf(part), part.files[fileIndex]);
+        // Create new preview URL
+        if (updatedFile.previewUrl) {
+          URL.revokeObjectURL(updatedFile.previewUrl);
         }
+        updatedFile.previewUrl = URL.createObjectURL(editedFile);
+
+        // Update the files array
+        const newFiles = [...part.files];
+        newFiles[fileIndex] = updatedFile;
+
+        // Emit the change through the proper channel
+        this.onFilesChanged(newFiles, this.parts.indexOf(part));
 
         // Update the preview src to the new URL
-        this.previewImageSrc = part.files[fileIndex].previewUrl;
-
-        // Update the stored parts for the selected machine
-        if (this.selectedMachine) {
-          this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-        }
+        this.previewImageSrc = updatedFile.previewUrl;
         break;
       }
     }
@@ -851,5 +503,25 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     }
 
     return new Blob([uInt8Array], { type: contentType });
+  }
+
+  onFilesChanged(files: UploadedFile[], partIndex: number): void {
+    if (partIndex >= 0 && partIndex < this.parts.length) {
+      this.parts[partIndex].files = files;
+
+      // Update the stored parts for the selected machine
+      if (this.selectedMachine) {
+        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+      }
+    }
+  }
+
+  onFilePreviewRequested(file: UploadedFile): void {
+    if (file.previewUrl) {
+      this.previewImageSrc = file.previewUrl;
+      this.previewImageAlt = file.name;
+      this.previewImageFileName = file.name;
+      this.showImagePreview = true;
+    }
   }
 }

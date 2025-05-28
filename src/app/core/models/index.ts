@@ -5,3 +5,4 @@ export * from './cart.model';
 export * from './ui.model';
 export * from './auth.model';
 export * from './machine.model';
+export * from './manual-cart-item.model';

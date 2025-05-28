@@ -1,5 +1,18 @@
 import {MediaItem} from '@models/media.model';
-import {UploadedFile} from '@features/manual-entry/template/manual-entry-template.component';
+import { Subscription } from 'rxjs';
+
+export interface UploadedFile {
+  name: string;
+  size: number;
+  type: string;
+  file: File;
+  status: 'uploading' | 'success' | 'error';
+  progress: number;
+  previewUrl?: string;
+  mediaItem?: MediaItem;
+  uploadSubscription?: Subscription;
+  errorMessage?: string;
+}
 
 export interface ManualCartItem {
   id: string;
