@@ -3,10 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { catchError, finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { InquiryService, InquiryResponse } from '@services/http/inquiry.service';
 import { AuthService } from '@core/auth/auth.service';
+import {LogMessage} from '@core/models';
 
 interface Product {
   partNo: string;
@@ -25,13 +24,6 @@ interface Machine {
   isOpen: boolean;
 }
 
-interface LogMessage {
-  type: string;
-  date: string;
-  time: string;
-  user: string;
-  message: string;
-}
 
 @Component({
     selector: 'app-inquiry-detail',

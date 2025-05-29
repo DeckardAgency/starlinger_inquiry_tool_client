@@ -1,4 +1,7 @@
 // src/app/core/models/ui.model.ts
+import {MediaItem} from '@models/media.model';
+import {Subscription} from 'rxjs';
+
 export interface Breadcrumb {
   label: string;
   link?: string;
@@ -16,4 +19,13 @@ export interface SearchResult {
   type: string;
   badge?: string;
   active?: boolean;
+}
+
+
+export interface LogMessage {
+  type: string;
+  date: string;
+  time: string;
+  user: string;
+  message: string;
 }

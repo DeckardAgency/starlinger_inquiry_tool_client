@@ -1,4 +1,4 @@
-import {MediaItem} from '@models/media.model';
+import { MediaItem } from '@models/media.model';
 import { Subscription } from 'rxjs';
 
 export interface UploadedFile {
@@ -23,7 +23,7 @@ export interface ManualCartItem {
     partNumber: string;
     shortDescription: string;
     additionalNotes: string;
-    mediaItems?: MediaItem[]; // MediaItems are now inside partData
+    mediaItems?: MediaItem[];
   };
   files: UploadedFile[];
 }

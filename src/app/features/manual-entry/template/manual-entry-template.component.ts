@@ -21,12 +21,7 @@ import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
 import { SpreadsheetComponent } from '@shared/components/spreadsheet/spreadsheet.component';
 import { SpreadsheetRow } from '@shared/components/spreadsheet/spreadsheet.interface';
 import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
-
-export interface Part {
-  id: string;
-  files: UploadedFile[];
-  spreadsheetData?: SpreadsheetRow[];
-}
+import { Part } from '@models/part.mode';
 
 @Component({
   selector: 'app-manual-entry-template',

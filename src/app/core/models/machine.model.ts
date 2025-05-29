@@ -1,4 +1,3 @@
-// src/app/core/models/machine.model.ts
 export interface Machine {
   '@id': string;
   '@type': string;
@@ -16,9 +15,10 @@ export interface Machine {
   fiStationNumber: number;
   fiSerialNumber: number;
   imageGallery: any[];
-  // For UI compatibility with previous Product model
-  name?: string; // We'll map articleDescription to this for compatibility
+  name?: string;
 }
+
+
 
 export interface MachineResponse {
   '@context': string;
@@ -27,4 +27,10 @@ export interface MachineResponse {
   totalItems: number;
   member: Machine[];
   view: any;
+}
+
+export interface MachineType {
+  id: string;
+  name: string;
+  checked: boolean;
 }

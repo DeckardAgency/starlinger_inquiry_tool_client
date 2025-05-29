@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { InquiryService } from '@services/http/inquiry.service';
 import { AuthService } from '@core/auth/auth.service';
+import {LogMessage} from '@core/models';
 
 interface Product {
   partNo: string;
@@ -20,14 +21,6 @@ interface Machine {
   name: string;
   products: Product[];
   isOpen: boolean;
-}
-
-interface LogMessage {
-  type: string;
-  date: string;
-  time: string;
-  user: string;
-  message: string;
 }
 
 @Component({

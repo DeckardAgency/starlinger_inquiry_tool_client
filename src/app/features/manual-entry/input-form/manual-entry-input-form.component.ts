@@ -13,32 +13,13 @@ import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service
 import { ManualCartItem } from '@models/manual-cart-item.model';
 import { MediaService } from '@services/http/media.service';
 import { MediaItem } from '@models/media.model';
-import { Breadcrumb } from '@core/models';
+import { Breadcrumb, MachineType, UploadedFile } from '@core/models';
 import { Machine } from '@core/models/machine.model';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { MachineArticleItemShimmerComponent } from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
 import { environment } from '@env/environment';
 import { AuthService } from '@core/auth/auth.service';
 import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
-
-export interface MachineType {
-  id: string;
-  name: string;
-  checked: boolean;
-}
-
-export interface UploadedFile {
-  name: string;
-  size: number;
-  type: string;
-  file: File;
-  status: 'uploading' | 'success' | 'error';
-  progress: number;
-  previewUrl?: string;
-  mediaItem?: MediaItem; // Store the API response
-  uploadSubscription?: Subscription; // Store subscription for cancellation
-  errorMessage?: string; // Store specific error message
-}
 
 export interface Part {
   id: string;
