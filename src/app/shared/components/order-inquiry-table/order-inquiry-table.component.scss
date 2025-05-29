@@ -1,0 +1,471 @@
+// order-inquiry-table.component.scss
+
+// Variables
+$basePrimaryForeground: #ffffff;
+$border-color: #E4E4E7;
+$text-primary: #18181B;
+$text-secondary: #71717A;
+$bg-light: #F4F4F5;
+$bg-lightest: #FAFAFA;
+$accent-red: #DC2626;
+$accent-check: #10B981;
+$status-green: #237804;
+$status-green-bg: #237804;
+$status-red: #DC2626;
+$status-red-bg: #DC2626;
+$type-order-bg: #237804;
+$type-manual-bg: #3B0075;
+$border-radius: 6px;
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1024px;
+
+// Mixins
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid $accent-red;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+// Utility classes
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-right {
+  text-align: right;
+}
+
+// Block: Order Inquiry Component
+.order-inquiry {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+
+  // Element: Tabs container
+  &__tabs {
+    display: flex;
+    gap: 0.5rem;
+    border: 1px solid $border-color;
+    border-top-left-radius: $border-radius;
+    border-top-right-radius: $border-radius;
+    background-color: #ffffff;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+
+    @media (max-width: $mobile-breakpoint) {
+      gap: 0.25rem;
+    }
+  }
+
+  // Element: Individual tab
+  &__tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border: none;
+    background: none;
+    color: $text-secondary;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.7;
+    white-space: nowrap;
+    position: relative;
+    min-width: fit-content;
+
+    @media (max-width: $mobile-breakpoint) {
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    &:hover:not(&--active) {
+      color: $text-primary;
+      opacity: 0.9;
+    }
+
+    @include focus-visible;
+
+    // Modifier: Active tab
+    &--active {
+      color: $text-primary;
+      opacity: 1;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: $accent-red;
+      }
+    }
+  }
+
+  // Element: Tab count
+  &__tab-count {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    font-weight: 400;
+  }
+
+  // Element: Content section
+  &__content {
+    min-height: 400px;
+  }
+
+  // Element: Table wrapper
+  &__table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid $border-color;
+    border-top: none;
+    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+  }
+
+  // Element: Table
+  &__table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+    background-color: #ffffff;
+
+    thead {
+      background-color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th {
+      text-align: left;
+      padding: 1rem;
+      font-weight: 400;
+      color: $text-secondary;
+      border-bottom: 1px solid $border-color;
+      white-space: nowrap;
+
+      @media (max-width: $mobile-breakpoint) {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid $border-color;
+      color: $text-primary;
+
+      @media (max-width: $mobile-breakpoint) {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    tr {
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba($bg-light, 0.5);
+      }
+
+      &:last-child td {
+        border-bottom: none;
+      }
+    }
+  }
+
+  // Element: Sort button
+  &__sort-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+
+    &:not(:disabled):hover .order-inquiry__sort-icon {
+      opacity: 1;
+    }
+
+    @include focus-visible;
+
+    // Modifier: Active sort
+    &--active {
+      color: $text-primary;
+      font-weight: 500;
+    }
+  }
+
+  // Element: Sort icon
+  &__sort-icon {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+
+    path {
+      transition: opacity 0.2s;
+    }
+
+    // Modifier: Ascending
+    &--asc {
+      path:first-child {
+        opacity: 1;
+      }
+    }
+
+    // Modifier: Descending
+    &--desc {
+      path:last-child {
+        opacity: 1;
+      }
+    }
+  }
+
+  // Element: Type badge
+  &__type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    color: white;
+
+    // Modifier: Order type
+    &--order {
+      background: $type-order-bg;
+    }
+
+    // Modifier: Manual type
+    &--manual {
+      background: $type-manual-bg;
+    }
+  }
+
+  // Element: Customer cell
+  &__customer-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  // Element: Customer image
+  &__customer-image {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  // Element: Customer initials
+  &__customer-initials {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: $bg-light;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  // Element: Customer name
+  &__customer-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Element: Status badge
+  &__status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+
+    // Modifier: Completed status
+    &--completed {
+      background: $status-green-bg;
+      color: $basePrimaryForeground;
+    }
+
+    // Modifier: Cancelled status
+    &--cancelled {
+      background: $status-red-bg;
+      color: $basePrimaryForeground;
+    }
+
+    // Modifier: Processing status
+    &--processing {
+      background: #EDE9FE;
+      color: #7C3AED;
+    }
+
+    // Modifier: Pending status
+    &--pending {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+  }
+
+  // Element: Action menu button
+  &__action-menu {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    color: $text-secondary;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: $bg-light;
+      color: $text-primary;
+    }
+
+    @include focus-visible;
+  }
+
+  // Element: Empty state
+  &__empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    border: 1px solid $border-color;
+    border-top: none;
+    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+    background-color: $bg-lightest;
+    min-height: 400px;
+  }
+
+  // Element: Empty state icon
+  &__empty-icon {
+    margin-bottom: 1rem;
+  }
+
+  // Element: Empty state title
+  &__empty-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  // Element: Empty state message
+  &__empty-message {
+    margin: 0;
+    color: $text-secondary;
+    max-width: 300px;
+  }
+
+  // Element: Pagination
+  &__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid $border-color;
+    border-top: none;
+    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+    background-color: #ffffff;
+  }
+
+  // Element: Pagination button
+  &__pagination-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    background: #ffffff;
+    color: $text-primary;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      background: $bg-light;
+      border-color: darken($border-color, 10%);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @include focus-visible;
+  }
+
+  // Element: Pagination info
+  &__pagination-info {
+    font-size: 0.875rem;
+    color: $text-secondary;
+  }
+}
+
+// Print styles
+@media print {
+  .order-inquiry {
+    &__tabs,
+    &__action-menu,
+    &__pagination {
+      display: none;
+    }
+
+    &__table-wrapper {
+      overflow: visible;
+      border: none;
+    }
+
+    &__table {
+      font-size: 0.75rem;
+    }
+
+    &__type-badge,
+    &__status-badge {
+      border: 1px solid currentColor;
+      background: none !important;
+      color: $text-primary !important;
+    }
+  }
+}

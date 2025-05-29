@@ -25,8 +25,8 @@ export class InquiryTableComponent implements OnInit {
   @Input() inquiries: InquiryHistory[] = [];
   @Input() loading: boolean = false;
 
-  tabs = ['Show all', 'Completed', 'Cancelled', 'Rejected', 'Archived'];
-  activeTab = 'Show all';
+  tabs = ['Latest', 'Completed', 'Cancelled'];
+  activeTab = 'Latest';
   filteredInquiries: InquiryHistory[] = [];
 
   ngOnInit(): void {
@@ -39,7 +39,7 @@ export class InquiryTableComponent implements OnInit {
   }
 
   filterInquiries(): void {
-    if (this.activeTab === 'Show all') {
+    if (this.activeTab === 'Latest') {
       this.filteredInquiries = [...this.inquiries];
     } else {
       // Convert tab name to status (e.g., 'Completed' to 'Completed')

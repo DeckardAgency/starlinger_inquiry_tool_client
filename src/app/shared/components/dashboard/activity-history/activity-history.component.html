@@ -11,5 +11,15 @@
       <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m6 12 4-4-4-4" stroke="#DC2626" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
   </div>
-  <app-inquiry-table [inquiries]="allInquiries" [loading]="loading"></app-inquiry-table>
+  <app-order-inquiry-table
+    [inquiriesData]="inquiries"
+    [ordersData]="orders"
+    [loadingState]="loading"
+    [configuration]="tableConfig"
+    [initialTab]="'Latest'"
+    (tabChange)="onTabChange($event)"
+    (itemAction)="onItemAction($event)"
+    (loadData)="onLoadData($event)"
+    (configChange)="onConfigChange($event)"
+  />
 </section>

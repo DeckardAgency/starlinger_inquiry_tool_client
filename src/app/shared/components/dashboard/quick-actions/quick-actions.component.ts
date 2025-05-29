@@ -2,9 +2,9 @@ import { Component, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import {InquiryModalComponent} from '../../modals/inquiry-modal/inquiry-modal.component';
-import {InquiryModalService} from '@services/inquiry-modal.service';
-import {IconComponent} from '@shared/components/icon/icon.component';
+import { InquiryModalComponent } from '../../modals/inquiry-modal/inquiry-modal.component';
+import { InquiryModalService } from '@services/inquiry-modal.service';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 @Component({
     selector: 'app-quick-actions',
@@ -16,7 +16,6 @@ export class QuickActionsComponent implements OnDestroy {
   isModalOpen = false;
   private subscription: Subscription;
 
-  // Make modalService public so it can be accessed from the template
   public modalService = inject(InquiryModalService);
 
   constructor() {

@@ -1,158 +1,308 @@
-import {Component, OnInit} from '@angular/core';
+// activity-history.component.ts
+
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import {InquiryTableComponent} from '@shared/components/inquiry-table/inquiry-table.component';
-import {InquiryHistory} from '@core/models';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { OrderInquiryTableComponent } from '@shared/components/order-inquiry-table/order-inquiry-table.component';
+import {
+  DATA_SOURCE,
+  DataSource,
+  INQUIRY_TYPE,
+  ORDER_STATUS,
+  OrderStatus,
+  OrderInquiryAction,
+  OrderInquiryItem,
+  OrderInquiryTab,
+  OrderInquiryTableConfig,
+  TabChangeEvent
+} from '@shared/components/order-inquiry-table/order-inquiry-table.types';
+import { OrderService, OrderResponse, OrdersCollection } from '@services/http/order.service';
+import { InquiryService, InquiryResponse, InquiriesCollection } from '@services/http/inquiry.service';
+import { AuthService } from '@core/auth/auth.service';
 
 @Component({
-    selector: 'app-activity-history',
-    imports: [CommonModule, RouterModule, InquiryTableComponent],
-    templateUrl: "activity-history.component.html",
-    styleUrls: ['./activity-history.component.scss']
+  selector: 'app-activity-history',
+  standalone: true,
+  imports: [CommonModule, RouterModule, OrderInquiryTableComponent],
+  templateUrl: './activity-history.component.html',
+  styleUrls: ['./activity-history.component.scss']
 })
 export class ActivityHistoryComponent implements OnInit {
-  loading = true;
+  inquiries: OrderInquiryItem[] = [];
+  orders: OrderInquiryItem[] = [];
+  loading = false;
+  error: string | null = null;
+  currentDataSource: DataSource = DATA_SOURCE.BOTH;
 
-  // Completed inquiries
-  completedInquiries: InquiryHistory[] = [
-    {
-      id: '0001',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'AK',
-        name: 'Anes Kapetanovic'
-      },
-      partsOrdered: 12,
-      status: 'Completed'
-    },
-    {
-      id: '0002',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'AK',
-        name: 'Anes Kapetanovic'
-      },
-      partsOrdered: 192,
-      status: 'Completed'
-    },
-    {
-      id: '0006',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'AK',
-        name: 'Anes Kapetanovic'
-      },
-      partsOrdered: 60,
-      status: 'Completed'
-    },
-    {
-      id: '0007',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'IJ',
-        name: 'Ivan Jozic'
-      },
-      partsOrdered: 72,
-      status: 'Completed'
-    }
-  ];
+  tableConfig: Partial<OrderInquiryTableConfig> = {
+    loadDataOnTabChange: false, // Set to false since we're loading all data at once
+    dataSource: DATA_SOURCE.BOTH,
+    enableSorting: true,
+    enableFiltering: true,
+    pageSize: 10,
+    showPagination: true
+  };
 
-  // Confirmed inquiries
-  confirmedInquiries: InquiryHistory[] = [
-    {
-      id: '0003',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'ME',
-        name: 'Martin Ertl'
-      },
-      partsOrdered: 48,
-      status: 'Confirmed'
-    },
-    {
-      id: '0008',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'JK',
-        name: 'John Kowalski'
-      },
-      partsOrdered: 35,
-      status: 'Confirmed'
-    },
-    {
-      id: '0009',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '13-03-2024',
-      customer: {
-        initials: 'RM',
-        name: 'Robert Miller'
-      },
-      partsOrdered: 89,
-      status: 'Confirmed'
-    }
-  ];
-
-  // Processing inquiries
-  processingInquiries: InquiryHistory[] = [
-    {
-      id: '0004',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '14-03-2024',
-      customer: {
-        initials: 'ME',
-        name: 'Martin Ertl'
-      },
-      partsOrdered: 36,
-      status: 'Processing'
-    },
-    {
-      id: '0010',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '13-03-2024',
-      customer: {
-        initials: 'LB',
-        name: 'Lucy Brown'
-      },
-      partsOrdered: 156,
-      status: 'Processing'
-    },
-    {
-      id: '0011',
-      machine: 'ad*starKON SX+ 120',
-      dateCreated: '13-03-2024',
-      customer: {
-        initials: 'TS',
-        name: 'Tom Smith'
-      },
-      partsOrdered: 42,
-      status: 'Processing'
-    }
-  ];
-
-  // Cancelled inquiries
-  cancelledInquiries: InquiryHistory[] = [];
-
-  // Combine all inquiries for the "All Inquiries" tab
-  allInquiries: InquiryHistory[] = [];
+  constructor(
+    private orderService: OrderService,
+    private inquiryService: InquiryService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    // Simulate data loading with a delay
-    this.loading = true;
-    setTimeout(() => {
-      this.allInquiries = [
-        ...this.completedInquiries,
-        ...this.confirmedInquiries,
-        ...this.processingInquiries,
-        ...this.cancelledInquiries
-      ].sort((a, b) => b.id.localeCompare(a.id)); // Sort by ID in descending order
+    this.loadInitialData();
+  }
 
-      this.loading = true;
-    }, 2000); // 2 second delay to simulate loading
+  private loadInitialData(): void {
+    this.loading = true;
+    this.error = null;
+
+    // Check if user is authenticated
+    if (!this.authService.isAuthenticated()) {
+      this.error = 'User not authenticated';
+      this.loading = false;
+      return;
+    }
+
+    // Get current user from auth service
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser || !currentUser.email) {
+      this.error = 'User information not available';
+      this.loading = false;
+      return;
+    }
+
+    // Fetch both orders and inquiries in parallel
+    forkJoin({
+      orders: this.orderService.getOrdersByUserEmail(currentUser.email).pipe(
+        catchError(err => {
+          console.error('Error loading orders:', err);
+          return of(this.getEmptyOrdersCollection());
+        })
+      ),
+      inquiries: this.inquiryService.getInquiriesByUserEmail(currentUser.email).pipe(
+        catchError(err => {
+          console.error('Error loading inquiries:', err);
+          return of(this.getEmptyInquiriesCollection());
+        })
+      )
+    })
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe(({ orders, inquiries }) => {
+        // Map orders to OrderInquiryItem format
+        if (orders.member && orders.member.length > 0) {
+          this.orders = orders.member.map(order => this.mapOrderToInquiryItem(order));
+        }
+
+        // Map inquiries to OrderInquiryItem format
+        if (inquiries.member && inquiries.member.length > 0) {
+          this.inquiries = inquiries.member.map(inquiry => this.mapInquiryToInquiryItem(inquiry));
+        }
+      });
+  }
+
+  private mapOrderToInquiryItem(order: OrderResponse): OrderInquiryItem {
+    // Determine the type based on some logic (you might need to adjust this)
+    const type = order.items && order.items.length > 1 ? INQUIRY_TYPE.ORDER : INQUIRY_TYPE.MANUAL;
+
+    // Map API status to component status
+    const status = this.mapApiStatusToComponentStatus(order.status);
+
+    // Get total parts ordered
+    const partsOrdered = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+
+    // Extract customer info from order (you might need to adjust based on actual data structure)
+    const customerName = this.extractCustomerName(order);
+
+    return {
+      id: order.orderNumber,
+      type: type,
+      dateCreated: order.createdAt,
+      internalReferenceNumber: order.id,
+      customer: {
+        id: order.user.split('/').pop() || '',
+        name: customerName,
+        initials: this.getInitials(customerName),
+        image: undefined
+      },
+      partsOrdered: partsOrdered,
+      status: status,
+      source: 'order' as const
+    };
+  }
+
+  private mapInquiryToInquiryItem(inquiry: InquiryResponse): OrderInquiryItem {
+    // Determine the type based on inquiry data
+    const type = inquiry.isDraft ? INQUIRY_TYPE.MANUAL : INQUIRY_TYPE.ORDER;
+
+    // Map inquiry status to component status
+    const status = this.mapApiStatusToComponentStatus(inquiry.status);
+
+    // Count total parts from all machines
+    const partsOrdered = inquiry.machines
+      ? inquiry.machines.reduce((sum, machine) => sum + (machine.products ? machine.products.length : 0), 0)
+      : 0;
+
+    // Extract customer info
+    const customerName = this.extractCustomerNameFromInquiry(inquiry);
+
+    return {
+      id: inquiry.inquiryNumber,
+      type: type,
+      dateCreated: inquiry.createdAt,
+      internalReferenceNumber: inquiry.id,
+      customer: {
+        id: inquiry.user.split('/').pop() || '',
+        name: customerName,
+        initials: this.getInitials(customerName),
+        image: undefined
+      },
+      partsOrdered: partsOrdered,
+      status: status,
+      source: 'inquiry' as const
+    };
+  }
+
+  private mapApiStatusToComponentStatus(apiStatus: string): OrderStatus {
+    // Map API statuses to component statuses
+    const statusMap: Record<string, OrderStatus> = {
+      'draft': ORDER_STATUS.PENDING,
+      'pending': ORDER_STATUS.PROCESSING,
+      'paid': ORDER_STATUS.PROCESSING,
+      'processing': ORDER_STATUS.PROCESSING,
+      'shipped': ORDER_STATUS.COMPLETED,
+      'delivered': ORDER_STATUS.COMPLETED,
+      'canceled': ORDER_STATUS.CANCELLED,
+      'cancelled': ORDER_STATUS.CANCELLED,
+      'completed': ORDER_STATUS.COMPLETED
+    };
+
+    return statusMap[apiStatus.toLowerCase()] || ORDER_STATUS.PENDING;
+  }
+
+  private extractCustomerName(order: OrderResponse): string {
+    // Try to extract customer name from order data
+    // This is a placeholder - adjust based on your actual data structure
+    if (order.shippingAddress) {
+      // Parse shipping address to get name
+      const addressLines = order.shippingAddress.split('\n');
+      if (addressLines.length > 0) {
+        return addressLines[0];
+      }
+    }
+    return 'Unknown Customer';
+  }
+
+  private extractCustomerNameFromInquiry(inquiry: InquiryResponse): string {
+    // Extract name from email if available
+    if (inquiry.contactEmail) {
+      const namePart = inquiry.contactEmail.split('@')[0];
+      return namePart
+        .split(/[._-]/)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+    }
+    return 'Unknown Customer';
+  }
+
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
+  private getEmptyOrdersCollection(): OrdersCollection {
+    return {
+      '@context': '',
+      '@id': '',
+      '@type': '',
+      'totalItems': 0,
+      'member': [],
+      'view': { '@id': '', '@type': '' },
+      'search': { '@type': '', 'template': '', 'variableRepresentation': '', 'mapping': [] }
+    };
+  }
+
+  private getEmptyInquiriesCollection(): InquiriesCollection {
+    return {
+      '@context': '',
+      '@id': '',
+      '@type': '',
+      'totalItems': 0,
+      'member': [],
+      'view': { '@id': '', '@type': '' },
+      'search': { '@type': '', 'template': '', 'variableRepresentation': '', 'mapping': [] }
+    };
+  }
+
+  onTabChange(event: TabChangeEvent): void {
+    console.log('Tab changed:', event);
+    // Since we load all data at once, we don't need to reload on tab change
+  }
+
+  onItemAction(action: OrderInquiryAction): void {
+    console.log('Action triggered:', action);
+
+    switch (action.type) {
+      case 'view':
+        this.viewItem(action.item);
+        break;
+      case 'edit':
+        this.editItem(action.item);
+        break;
+      case 'delete':
+        this.deleteItem(action.item);
+        break;
+      case 'export':
+        this.exportItem(action.item);
+        break;
+    }
+  }
+
+  onLoadData(tab: OrderInquiryTab): void {
+    console.log('Loading data for tab:', tab);
+    // Since we load all data at once, we can skip this
+  }
+
+  onConfigChange(config: OrderInquiryTableConfig): void {
+    console.log('Configuration changed:', config);
+    // Save configuration preferences
+    localStorage.setItem('orderInquiryTableConfig', JSON.stringify(config));
+  }
+
+  private viewItem(item: OrderInquiryItem): void {
+    console.log('View item:', item);
+    // Navigate to detail view based on source
+    if (item.source === 'order') {
+      // Navigate to order detail
+      // this.router.navigate(['/orders', item.internalReferenceNumber]);
+    } else {
+      // Navigate to inquiry detail
+      // this.router.navigate(['/inquiries', item.internalReferenceNumber]);
+    }
+  }
+
+  private editItem(item: OrderInquiryItem): void {
+    console.log('Edit item:', item);
+    // Open edit dialog based on source
+  }
+
+  private deleteItem(item: OrderInquiryItem): void {
+    console.log('Delete item:', item);
+    // Show confirmation dialog
+  }
+
+  private exportItem(item: OrderInquiryItem): void {
+    console.log('Export item:', item);
+    // Export to CSV/PDF
   }
 }
