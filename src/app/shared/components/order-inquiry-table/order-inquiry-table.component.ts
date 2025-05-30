@@ -190,6 +190,8 @@ export class OrderInquiryTableComponent implements OnInit {
     const items = this.sortedItems();
     const config = this.config();
 
+    console.log(items);
+
     if (!config.showPagination || !config.pageSize) {
       return items;
     }

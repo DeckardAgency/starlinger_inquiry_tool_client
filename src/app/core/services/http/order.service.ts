@@ -90,7 +90,7 @@ export class OrderService {
     }));
 
     const orderData: OrderRequest = {
-      status: 'pending',
+      status: 'submitted',
       shippingAddress,
       billingAddress,
       items,

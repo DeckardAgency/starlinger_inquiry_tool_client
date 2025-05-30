@@ -98,18 +98,20 @@ export class ActivityHistoryComponent implements OnInit {
         // Map orders to OrderInquiryItem format
         if (orders.member && orders.member.length > 0) {
           this.orders = orders.member.map(order => this.mapOrderToInquiryItem(order));
+          console.log('orders', this.orders);
         }
 
         // Map inquiries to OrderInquiryItem format
         if (inquiries.member && inquiries.member.length > 0) {
           this.inquiries = inquiries.member.map(inquiry => this.mapInquiryToInquiryItem(inquiry));
+          console.log('inquiries', this.inquiries);
         }
       });
   }
 
   private mapOrderToInquiryItem(order: OrderResponse): OrderInquiryItem {
     // Determine the type based on some logic (you might need to adjust this)
-    const type = order.items && order.items.length > 1 ? INQUIRY_TYPE.ORDER : INQUIRY_TYPE.MANUAL;
+    const type = order.items && order.items.length > 1 ? INQUIRY_TYPE.ORDER : INQUIRY_TYPE.ORDER;
 
     // Map API status to component status
     const status = this.mapApiStatusToComponentStatus(order.status);
@@ -178,7 +180,6 @@ export class ActivityHistoryComponent implements OnInit {
       'processing': ORDER_STATUS.PROCESSING,
       'shipped': ORDER_STATUS.COMPLETED,
       'delivered': ORDER_STATUS.COMPLETED,
-      'canceled': ORDER_STATUS.CANCELLED,
       'cancelled': ORDER_STATUS.CANCELLED,
       'completed': ORDER_STATUS.COMPLETED
     };
