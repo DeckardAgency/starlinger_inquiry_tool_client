@@ -117,7 +117,7 @@ export class OrderService {
     }));
 
     const orderData: OrderRequest = {
-      status: 'draft', // Set status as draft
+      status: 'draft',
       shippingAddress,
       billingAddress,
       items,
@@ -171,7 +171,7 @@ export class OrderService {
       .set('Content-Type', 'application/ld+json')
       .set('Accept', 'application/ld+json');
 
-    // Create the query parameters with user.email filter
+    // Create the query parameters with the user.email filter
     const params = new HttpParams().set('user.email', email);
 
     // Use the headers and params for GET requests

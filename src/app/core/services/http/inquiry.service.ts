@@ -151,7 +151,7 @@ export class InquiryService {
       .set('Content-Type', 'application/ld+json')
       .set('Accept', 'application/ld+json');
 
-    // Create the query parameters with user.email filter
+    // Create the query parameters with the user.email filter
     const params = new HttpParams().set('user.email', email);
 
     // Use the headers and params for GET requests
