@@ -40,65 +40,6 @@
     </div>
   }
 
-  @if (!(viewMode === 'grid' && selectedProduct)) {
-    <div class="shop__filters">
-      <div class="shop__search">
-        <span class="material-icons">
-          <app-icon name="magnifier" size="16px" color="#71717A"></app-icon>
-        </span>
-        <input
-          type="text"
-          [formControl]="searchControl"
-          placeholder="Filter by part number"
-          class="shop__search-input"
-        >
-      </div>
-
-      <div class="shop__machine-filter">
-        <button class="shop__filter-btn" (click)="toggleFilter()">
-        <span class="material-icons">
-          <app-icon name="filter" size="16px" color="#232323 "></app-icon>
-        </span>
-          Filter by machine
-          <app-icon name="arrowDown" size="16px" color="#232323 "></app-icon>
-        </button>
-
-        @if (isFilterOpen) {
-          <div class="shop__filter-dropdown">
-            @for (machine of machines; track machine.id) {
-              <label class="shop__filter-option">
-                <input
-                  type="checkbox"
-                  [checked]="machine.checked"
-                  (change)="toggleMachine(machine)"
-                >
-                <span class="shop__filter-checkbox"></span>
-                <span class="shop__filter-label">{{ machine.name }}</span>
-              </label>
-            }
-          </div>
-        }
-
-      </div>
-    </div>
-  }
-
-  @if (activeFilters.length > 0) {
-    <div class="shop__active-filters">
-      <span>Active filters:</span>
-      @for (filter of activeFilters; track filter) {
-        <div class="shop__filter-tag">
-          {{ filter }}
-          <button class="shop__filter-remove" (click)="removeFilter(filter)">
-            <span class="material-icons">
-              <app-icon name="close" size="16px" color="#71717A  "></app-icon>
-            </span>
-          </button>
-        </div>
-      }
-    </div>
-  }
-
   <!-- Grid View with Full Page Details -->
   @if (viewMode === 'grid' && selectedProduct) {
     <div class="shop__details shop__details--full">
@@ -259,6 +200,64 @@
            [class.shop__products-section--details]="selectedProduct"
            [class.shop__products-section--hidden]="viewMode === 'grid' && selectedProduct">
 
+        @if (!(viewMode === 'grid' && selectedProduct)) {
+          <div class="shop__filters">
+            <div class="shop__search">
+        <span class="material-icons">
+          <app-icon name="magnifier" size="16px" color="#71717A"></app-icon>
+        </span>
+              <input
+                type="text"
+                [formControl]="searchControl"
+                placeholder="Filter by part number"
+                class="shop__search-input"
+              >
+            </div>
+
+            <div class="shop__machine-filter">
+              <button class="shop__filter-btn" (click)="toggleFilter()">
+        <span class="material-icons">
+          <app-icon name="filter" size="16px" color="#232323 "></app-icon>
+        </span>
+                Filter by machine
+                <app-icon name="arrowDown" size="16px" color="#232323 "></app-icon>
+              </button>
+
+              @if (isFilterOpen) {
+                <div class="shop__filter-dropdown">
+                  @for (machine of machines; track machine.id) {
+                    <label class="shop__filter-option">
+                      <input
+                        type="checkbox"
+                        [checked]="machine.checked"
+                        (change)="toggleMachine(machine)"
+                      >
+                      <span class="shop__filter-checkbox"></span>
+                      <span class="shop__filter-label">{{ machine.name }}</span>
+                    </label>
+                  }
+                </div>
+              }
+
+            </div>
+          </div>
+        }
+
+        @if (activeFilters.length > 0) {
+          <div class="shop__active-filters">
+            <span>Active filters:</span>
+            @for (filter of activeFilters; track filter) {
+              <div class="shop__filter-tag">
+                {{ filter }}
+                <button class="shop__filter-remove" (click)="removeFilter(filter)">
+            <span class="material-icons">
+              <app-icon name="close" size="16px" color="#71717A  "></app-icon>
+            </span>
+                </button>
+              </div>
+            }
+          </div>
+        }
 
         @if (loading) {
           <div class="shop__products shop__products--list">

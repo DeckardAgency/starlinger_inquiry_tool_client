@@ -180,7 +180,7 @@ export class ActivityHistoryComponent implements OnInit {
       'processing': ORDER_STATUS.PROCESSING,
       'shipped': ORDER_STATUS.COMPLETED,
       'delivered': ORDER_STATUS.COMPLETED,
-      'cancelled': ORDER_STATUS.CANCELLED,
+      'canceled': ORDER_STATUS.CANCELED,
       'completed': ORDER_STATUS.COMPLETED
     };
 

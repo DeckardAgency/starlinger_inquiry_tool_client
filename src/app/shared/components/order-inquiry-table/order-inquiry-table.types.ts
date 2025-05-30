@@ -3,7 +3,7 @@
 // Status types
 export const ORDER_STATUS = {
   COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled',
+  CANCELED: 'Canceled',
   PROCESSING: 'Processing',
   PENDING: 'Pending'
 } as const;
@@ -14,7 +14,7 @@ export type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
 export const ORDER_INQUIRY_TABS = {
   LATEST: 'Latest',
   COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled'
+  CANCELED: 'Canceled'
 } as const;
 
 export type OrderInquiryTab = typeof ORDER_INQUIRY_TABS[keyof typeof ORDER_INQUIRY_TABS];

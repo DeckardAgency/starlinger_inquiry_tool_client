@@ -106,8 +106,8 @@ export class OrderInquiryTableComponent implements OnInit {
     switch (tab) {
       case ORDER_INQUIRY_TABS.COMPLETED:
         return items.filter(item => item.status === ORDER_STATUS.COMPLETED);
-      case ORDER_INQUIRY_TABS.CANCELLED:
-        return items.filter(item => item.status === ORDER_STATUS.CANCELLED);
+      case ORDER_INQUIRY_TABS.CANCELED:
+        return items.filter(item => item.status === ORDER_STATUS.CANCELED);
       case ORDER_INQUIRY_TABS.LATEST:
       default:
         return items;
@@ -221,7 +221,7 @@ export class OrderInquiryTableComponent implements OnInit {
     return {
       total: items.length,
       completed: items.filter(item => item.status === ORDER_STATUS.COMPLETED).length,
-      cancelled: items.filter(item => item.status === ORDER_STATUS.CANCELLED).length
+      canceled: items.filter(item => item.status === ORDER_STATUS.CANCELED).length
     };
   });
 

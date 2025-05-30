@@ -108,7 +108,10 @@ export class ProductCardComponent implements OnInit, OnChanges, AfterViewInit {
     this.quantity = Math.max(1, value);
   }
 
-  formatPrice(price: number): string {
+  formatPrice(price: number | undefined): string {
+    if (price === undefined || price === null) {
+      return '0.00';
+    }
     return price.toLocaleString('de-DE', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2

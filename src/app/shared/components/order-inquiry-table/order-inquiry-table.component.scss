@@ -319,8 +319,8 @@ $tablet-breakpoint: 1024px;
       color: $basePrimaryForeground;
     }
 
-    // Modifier: Cancelled status
-    &--cancelled {
+    // Modifier: Canceled status
+    &--canceled {
       background: $status-red-bg;
       color: $basePrimaryForeground;
     }
