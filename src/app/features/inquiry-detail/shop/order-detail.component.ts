@@ -3,18 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { Order } from '@models/order.model';
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { OrderService } from '@services/http/order.service';
 import { delay } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import {PriceFilterAdvancedPipe} from '@shared/pipes/price-filter-advanced.pipe';
 import {DateFilterPipe} from '@shared/pipes/date-filter.pipe';
-
-interface StatusOption {
-  value: string;
-  label: string;
-  class?: string;
-}
 
 @Component({
     selector: 'app-inquiry-detail',
@@ -33,19 +26,6 @@ export class OrderDetailComponent implements OnInit {
   order: Order | null = null;
   isLoading = true;
   error: string | null = null;
-  statusForm: FormGroup;
-
-  // Track the saved status separately from the form value
-  savedStatus: string = '';
-
-  // Status options for the select component
-  statusOptions: StatusOption[] = [
-    { value: 'submitted', label: 'Submitted', class: 'submitted' },
-    { value: 'confirmed', label: 'Confirmed', class: 'confirmed' },
-    { value: 'dispatched', label: 'Dispatched', class: 'dispatched' },
-    { value: 'completed', label: 'Completed', class: 'completed' },
-    { value: 'canceled', label: 'Canceled', class: 'canceled' }
-  ];
 
   // Order totals calculated from items
   grandTotal = 0;
@@ -56,23 +36,12 @@ export class OrderDetailComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private orderService: OrderService,
-    private fb: FormBuilder,
   ) {
-    // Initialize the form with a default status
-    this.statusForm = this.fb.group({
-      status: ['draft'] // Default status
-    });
+
   }
 
   ngOnInit(): void {
     this.loadOrderData();
-
-    // Subscribe to status changes
-    this.statusForm.get('status')?.valueChanges.subscribe(value => {
-      console.log('Status changed to:', value);
-      // Here you would typically call an API to update the order status
-      // this.updateOrderStatus(value);
-    });
   }
 
   /**
@@ -114,14 +83,6 @@ export class OrderDetailComponent implements OnInit {
               ];
             }
 
-            // Set the current status in the form and track the saved status
-            if (order.status) {
-              this.savedStatus = order.status;
-              this.statusForm.patchValue({
-                status: order.status
-              });
-            }
-
             // Calculate totals from order items
             this.calculateTotals();
 
@@ -138,7 +99,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   /**
-   * Navigate back to orders list
+   * Navigate back to the order list
    */
   goBack(): void {
     this.router.navigate(['/my-inquiries/active']);

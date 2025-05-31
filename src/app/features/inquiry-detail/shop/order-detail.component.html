@@ -61,13 +61,14 @@
         <span>Internal reference number: {{ order?.id }}</span>
       </div>
       <div>
-        <span>Date created: {{ order?.createdAt }}</span>
+        <span>Date created: {{ order?.createdAt | dateFilter:'dd.MM.yyyy @ HH:mm' }}</span>
         <span>Parts ordered: 12</span>
       </div>
     </div>
   </header>
 
   <div class="order-detail__content">
+
     <!-- Display loading state -->
     <div class="order-detail__loading" *ngIf="isLoading">
       <div class="order-detail__spinner"></div>
