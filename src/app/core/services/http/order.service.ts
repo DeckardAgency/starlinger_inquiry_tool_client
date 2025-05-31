@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { CartItem } from '@models/cart.model';
+import {Order} from '@models/order.model';
 
 export interface OrderRequest {
   status: string;
@@ -134,16 +135,10 @@ export class OrderService {
   }
 
   /**
-   * Get order details by ID
+   * Get a single order by ID
    */
-  getOrderById(orderId: string): Observable<OrderResponse> {
-    // Define headers explicitly for this request
-    const headers = new HttpHeaders()
-      .set('Content-Type', 'application/ld+json')
-      .set('Accept', 'application/ld+json');
-
-    // Use the headers for GET requests
-    return this.http.get<OrderResponse>(`${this.apiUrl}/${orderId}`, { headers });
+  getOrder(id: string): Observable<Order> {
+    return this.http.get<Order>(`${this.apiUrl}/${id}`);
   }
 
   /**
@@ -194,5 +189,20 @@ export class OrderService {
 
     // Use the headers and params for GET requests
     return this.http.get<OrdersCollection>(this.apiUrl, { headers, params });
+  }
+
+  /**
+   * Export order to PDF
+   */
+  exportOrderPdf(orderId: string): Observable<Blob> {
+    return this.http.get(
+      `${this.apiUrl}/${orderId}/export/pdf`,
+      {
+        headers: new HttpHeaders({
+          'Accept': 'application/pdf'
+        }),
+        responseType: 'blob'
+      }
+    );
   }
 }

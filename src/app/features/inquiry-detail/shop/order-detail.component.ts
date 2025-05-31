@@ -2,40 +2,27 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
-import { InquiryService } from '@services/http/inquiry.service';
-import { AuthService } from '@core/auth/auth.service';
-import {LogMessage} from '@core/models';
+import { Order } from '@models/order.model';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { OrderService } from '@services/http/order.service';
+import { delay } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import {PriceFilterAdvancedPipe} from '@shared/pipes/price-filter-advanced.pipe';
+import {DateFilterPipe} from '@shared/pipes/date-filter.pipe';
 
-interface Product {
-  partNo: string;
-  name: string;
-  weight: string;
-  quantity: number;
-  unitPrice: number;
-  discount: string;
-  price: number;
-}
-
-interface Machine {
-  id: string;
-  name: string;
-  products: Product[];
-  isOpen: boolean;
+interface StatusOption {
+  value: string;
+  label: string;
+  class?: string;
 }
 
 @Component({
     selector: 'app-inquiry-detail',
-    imports: [CommonModule, BreadcrumbsComponent, RouterModule],
+  imports: [CommonModule, BreadcrumbsComponent, RouterModule, PriceFilterAdvancedPipe, DateFilterPipe],
     templateUrl: './order-detail.component.html',
     styleUrls: ['./order-detail.component.scss']
 })
 export class OrderDetailComponent implements OnInit {
-  inquiryId: string = '#0001';
-  internalReference: string = '000123-ABC';
-  dateCreated: string = '14-03-2024';
-  partsOrdered: number = 12;
-  totalPrice: number = 9764.19;
-  amountToPay: number = 7811.352;
 
   breadcrumbs = [
     { label: 'My inquiries', link: '/my-inquiries' },
@@ -43,150 +30,240 @@ export class OrderDetailComponent implements OnInit {
     { label: '...' },
   ];
 
-  status: string = 'Payment pending';
-  type: string = 'Shop';
-  fulfillmentStatus: string = 'Unfulfilled';
+  order: Order | null = null;
+  isLoading = true;
+  error: string | null = null;
+  statusForm: FormGroup;
 
-  machines: Machine[] = [
-    {
-      id: '1',
-      name: '200XE Winding Machine',
-      isOpen: true,
-      products: [
-        {
-          partNo: 'AIVV-01152',
-          name: 'Power panel T30 4,3" WQVGA color touch',
-          weight: '0,4 kg',
-          quantity: 2,
-          unitPrice: 556.17,
-          discount: '10 %',
-          price: 1112.34
-        },
-        {
-          partNo: 'ZME-01171D',
-          name: 'Modul FU-Stacofil 200XE',
-          weight: '1,4 kg',
-          quantity: 3,
-          unitPrice: 442.46,
-          discount: '20 %',
-          price: 1327.38
-        },
-        {
-          partNo: 'AEPI-01072',
-          name: 'ABTASTKOPF f. induktives Winkelmesssystem',
-          weight: '0,263 kg',
-          quantity: 2,
-          unitPrice: 868.10,
-          discount: '–',
-          price: 1736.36
-        }
-      ]
-    },
-    {
-      id: '2',
-      name: 'Alpha 6.0 Machine',
-      isOpen: true,
-      products: [
-        {
-          partNo: 'AIHR-01039',
-          name: 'Heating element',
-          weight: '1,5 kg',
-          quantity: 3,
-          unitPrice: 1855.01,
-          discount: '10 %',
-          price: 5565.03
-        },
-        {
-          partNo: 'VYC-00245F',
-          name: 'SL 6 Shuttle Wheel (6,5") for Reed 10"',
-          weight: '0,09 kg',
-          quantity: 2,
-          unitPrice: 11.54,
-          discount: '–',
-          price: 23.08
-        }
-      ]
-    }
+  // Track the saved status separately from the form value
+  savedStatus: string = '';
+
+  // Status options for the select component
+  statusOptions: StatusOption[] = [
+    { value: 'submitted', label: 'Submitted', class: 'submitted' },
+    { value: 'confirmed', label: 'Confirmed', class: 'confirmed' },
+    { value: 'dispatched', label: 'Dispatched', class: 'dispatched' },
+    { value: 'completed', label: 'Completed', class: 'completed' },
+    { value: 'canceled', label: 'Canceled', class: 'canceled' }
   ];
 
-  logMessages: LogMessage[] = [
-    {
-      type: 'Order',
-      date: '19-03-2024',
-      time: '16:30',
-      user: 'Support',
-      message: 'Order completed'
-    },
-    {
-      type: 'Order',
-      date: '18-03-2024',
-      time: '09:15',
-      user: 'Support',
-      message: 'Preparing order'
-    },
-    {
-      type: 'Payment',
-      date: '17-03-2024',
-      time: '14:45',
-      user: 'Anes Kapetanovic',
-      message: 'Payment completed'
-    },
-    {
-      type: 'Email',
-      date: '16-03-2024',
-      time: '10:00',
-      user: 'Support',
-      message: 'Missing shipping info'
-    },
-    {
-      type: 'Order',
-      date: '15-03-2024',
-      time: '19:30',
-      user: 'Support',
-      message: 'All products are availible'
-    },
-    {
-      type: 'Order',
-      date: '14-03-2024',
-      time: '18:00',
-      user: 'Anes Kapetanovic',
-      message: 'Order submitted'
-    }
-  ];
+  // Order totals calculated from items
+  grandTotal = 0;
+  priceWithoutTax = 0;
+  priceTax = 0;
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
-    private inquiryService: InquiryService,
-    private authService: AuthService
-  ) {}
-
-  ngOnInit(): void {
-    // In a real implementation, we would fetch the data from the API
-    // this.route.paramMap.pipe(
-    //   switchMap(params => {
-    //     const id = params.get('id');
-    //     if (!id) {
-    //       return of(null);
-    //     }
-    //     return this.inquiryService.getInquiryById(id);
-    //   })
-    // ).subscribe(data => {
-    //   if (data) {
-    //     // Process the data
-    //   }
-    // });
+    private route: ActivatedRoute,
+    private orderService: OrderService,
+    private fb: FormBuilder,
+  ) {
+    // Initialize the form with a default status
+    this.statusForm = this.fb.group({
+      status: ['draft'] // Default status
+    });
   }
 
+  ngOnInit(): void {
+    this.loadOrderData();
+
+    // Subscribe to status changes
+    this.statusForm.get('status')?.valueChanges.subscribe(value => {
+      console.log('Status changed to:', value);
+      // Here you would typically call an API to update the order status
+      // this.updateOrderStatus(value);
+    });
+  }
+
+  /**
+   * Load order data from the API
+   */
+  loadOrderData(): void {
+    const orderId = this.route.snapshot.paramMap.get('id');
+
+    if (!orderId) {
+      this.isLoading = false;
+      this.error = 'Order ID is required';
+      return;
+    }
+
+    // Update breadcrumbs with order ID
+    this.breadcrumbs = [
+      { label: 'Orders', link: '/orders/list' },
+      { label: `Order #${orderId.substring(0, 8)}` },
+    ];
+
+    this.orderService.getOrder(orderId)
+      .pipe(
+        // Add a small delay to show the loading state in development
+        delay(300),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe({
+        next: (order) => {
+          if (order) {
+            this.order = order;
+
+            // Update breadcrumbs with order number if available
+            if (order.orderNumber) {
+              this.breadcrumbs = [
+                { label: 'Orders', link: '/orders/list' },
+                { label: order.orderNumber },
+              ];
+            }
+
+            // Set the current status in the form and track the saved status
+            if (order.status) {
+              this.savedStatus = order.status;
+              this.statusForm.patchValue({
+                status: order.status
+              });
+            }
+
+            // Calculate totals from order items
+            this.calculateTotals();
+
+            console.log('Order data loaded:', order);
+          } else {
+            this.error = 'Order not found';
+          }
+        },
+        error: (err) => {
+          console.error('Error loading order:', err);
+          this.error = 'Failed to load order data';
+        }
+      });
+  }
+
+  /**
+   * Navigate back to orders list
+   */
   goBack(): void {
     this.router.navigate(['/my-inquiries/active']);
   }
 
-  toggleMachine(machine: Machine): void {
-    machine.isOpen = !machine.isOpen;
+  /**
+   * Calculate order totals from items
+   */
+  calculateTotals(): void {
+    if (!this.order || !this.order.items) {
+      return;
+    }
+
+    // Calculate grand total from order totalAmount or sum of items
+    this.grandTotal = this.order.totalAmount || 0;
+
+    // If we don't have the totalAmount, calculate from items
+    if (!this.grandTotal && this.order.items.length > 0) {
+      this.grandTotal = this.order.items.reduce((sum, item) => sum + item.subtotal, 0);
+    }
+
+    // Calculate price without a tax (assuming 20% VAT for demo)
+    const taxRate = 0.20;
+    this.priceWithoutTax = this.grandTotal / (1 + taxRate);
+    this.priceTax = this.grandTotal - this.priceWithoutTax;
   }
 
-  getLogTypeBadgeClass(type: string): string {
-    return `order-detail__log-type--${type.toLowerCase()}`;
+  /**
+   * Export the order to PDF
+   */
+  exportOrder(): void {
+    if (!this.order) {
+      // this.notificationService.error('No order loaded to export');
+      return;
+    }
+
+    // Show loading state
+    const exportButton = document.querySelector('.order-detail__action-btn') as HTMLButtonElement;
+    const originalButtonContent = exportButton?.innerHTML;
+
+    if (exportButton) {
+      exportButton.disabled = true;
+      exportButton.innerHTML = `
+            <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 1V4M8 12V15M3.05 3.05L5.17 5.17M10.83 10.83L12.95 12.95M1 8H4M12 8H15M3.05 12.95L5.17 10.83M10.83 5.17L12.95 3.05" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Exporting...
+        `;
+    }
+
+    this.orderService.exportOrderPdf(this.order.id).subscribe({
+      next: (blob) => {
+        // Create a download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+
+        // Set filename with order number and current date
+        const date = new Date();
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        a.download = `order_${this.order!.orderNumber}_${dateStr}.pdf`;
+
+        // Trigger download
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        // Show success notification
+        // this.notificationService.success('Order exported successfully!');
+      },
+      error: (error) => {
+        console.error('Export error:', error);
+
+        // Show a specific error message based on an error type
+        if (error.status === 403) {
+          // this.notificationService.error('You do not have permission to export this order.');
+        } else if (error.status === 404) {
+          // this.notificationService.error('Order not found.');
+        } else if (error.status === 0) {
+          // this.notificationService.error('Network error. Please check your connection.');
+        } else {
+          // this.notificationService.error('Failed to export order. Please try again.');
+        }
+      },
+      complete: () => {
+        // Reset button state
+        if (exportButton && originalButtonContent) {
+          exportButton.disabled = false;
+          exportButton.innerHTML = originalButtonContent;
+        }
+      }
+    });
   }
+
+  /**
+   * Print the order
+   */
+  printOrder(): void {
+    window.print();
+  }
+
+  /**
+   * Get the CSS class for log status badges
+   */
+  getLogStatusClass(status: string): string {
+    const normalizedStatus = status.toLowerCase().replace(/ /g, '_');
+
+    switch (normalizedStatus) {
+      case 'submitted':
+        return 'logs-section__status--submitted';
+      case 'confirmed':
+        return 'logs-section__status--confirmed';
+      case 'dispatched':
+        return 'logs-section__status--dispatched';
+      case 'completed':
+        return 'logs-section__status--completed';
+      case 'canceled':
+        return 'logs-section__status--canceled';
+      default:
+        return 'logs-section__status--default';
+    }
+  }
+
 }

@@ -24,7 +24,7 @@ $color-amber: #d97706;
   &__header {
     padding: 1rem;
     display: flex;
-    align-items: center;
+    flex-direction: column;
   }
 
   &__back-btn {
@@ -54,14 +54,14 @@ $color-amber: #d97706;
   &__title {
     font-size: 18px;
     font-weight: 600;
-    margin: 0;
+    margin: 0 1rem 0 0;
     display: flex;
     align-items: center;
   }
 
   &__badges {
     display: flex;
-    gap: 8px;
+    gap: 0.625rem;
   }
 
   &__badge {
@@ -113,6 +113,21 @@ $color-amber: #d97706;
     &:hover {
       background-color: $color-gray-50;
     }
+  }
+
+  &__header-top {
+    margin-bottom: 1rem;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__header-bottom {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
   }
 
   &__body {
@@ -353,6 +368,297 @@ $color-amber: #d97706;
     }
   }
 
+
+  //
+  &__details {
+    display: flex;
+    flex-direction: column;
+    //gap: 24px;
+  }
+
+  &__info-row {
+    padding: 1rem;
+    display: flex;
+    gap: 24px;
+  }
+
+  &__info-card {
+    flex: 1;
+    padding: 16px;
+    background-color: #fff;
+    border-radius: 0.375rem;
+    //box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    //border: 1px solid #E4E4E7;
+  }
+
+  &__section-title {
+    font-size: 1.125rem;
+    line-height: 100%;
+    font-weight: 500;
+    margin: 0 0 1rem 0;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    //border-top: 1px solid #F4F4F5;
+
+    &:last-child {
+      //padding-top: 1rem;
+      //padding-bottom: 0.5rem;
+      border-bottom: none;
+    }
+
+    &:not(:last-child) {
+      //padding: 1rem 0;
+    }
+  }
+
+  &__field--status {
+    //background-color: red;
+  }
+
+  &__field-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid #F4F4F5;
+  }
+
+  &__field-label {
+    min-width: 160px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #232323;
+  }
+
+  &__field-value {
+    font-size: 0.875rem;
+    color: #232323;
+    font-weight: 500;
+    max-width: 60%;
+    text-align: right;
+  }
+
+  &__field-select {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+  }
+
+  &__toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background-color: #DC2626;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &-slider {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      background-color: white;
+      border-radius: 50%;
+      transition: right 0.3s;
+    }
+  }
+
+  &__tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    background-color: #F4F4F5;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #71717A;
+
+    svg {
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+    }
+  }
+
+  &__products-section {
+    padding: 1rem;
+    border-top: 1px solid #E4E4E7;
+    //margin-bottom: 24px;
+  }
+
+  &__products-table {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #E4E4E7;
+  }
+
+  &__empty-state {
+    padding: 48px;
+    text-align: center;
+    color: #71717A;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #E4E4E7;
+  }
+
+  &__custom-price {
+    color: #F59E0B;
+    font-weight: 500;
+  }
+
+  &__machine-section {
+    margin-bottom: 16px;
+  }
+
+  &__machine-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: #F4F4F5;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 8px;
+
+    &:hover {
+      background-color: #E4E4E7;
+    }
+  }
+
+  &__machine-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #232323;
+    font-size: 0.875rem;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.3s ease;
+    }
+  }
+
+  &__machine-action {
+    font-size: 0.875rem;
+    color: #71717A;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__table-container {
+    margin-bottom: 16px;
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background-color: #ffffff;
+    }
+    tbody {
+      background-color: transparent;
+    }
+  }
+
+  &__table-header {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #232323;
+    border-bottom: 1px solid #E4E4E7;
+  }
+
+  &__table-row {
+    background-color: transparent !important;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #E4E4E7;
+    }
+
+    &:hover {
+      background-color: #F9FAFB;
+    }
+  }
+
+  &__table-cell {
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: #232323;
+    background-color: transparent;
+  }
+
+  &__total-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 1rem;
+    background-color: #237804;
+    color: #ffffff;
+    border-radius: 6px;
+  }
+
+  &__total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-top: 1px solid #E4E4E7;
+  }
+
+  &__total-label {
+    font-size: 0.875rem;
+  }
+
+  &__total-value {
+    font-size: 0.875rem;
+  }
+
+  &__amount-paid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: #15803D;
+    border-radius: 4px;
+    margin-top: 12px;
+  }
+
+  &__amount-paid-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+  }
+
+  &__amount-paid-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+  }
+
+
+
   // Responsive styles
   @media (max-width: 992px) {
     &__header {
@@ -396,5 +702,113 @@ $color-amber: #d97706;
       justify-content: flex-start;
       flex-wrap: wrap;
     }
+  }
+}
+
+
+// logs-section
+.logs-section {
+  padding: 1rem;
+  border-top: 1px solid #E4E4E7;
+  //margin-top: 1rem;
+  //margin-bottom: 1rem;
+
+  &__title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: #232323;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  &__container {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    border: 1px solid #E4E4E7;
+    background-color: #fff;
+  }
+
+  &__item {
+    display: grid;
+    grid-template-columns: 120px 160px 100px 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #E4E4E7;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    // Responsive behavior
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    color: white;
+    white-space: nowrap;
+    width: fit-content;
+
+    &--canceled {
+      background-color: #DC3545;
+    }
+
+    &--completed {
+      background-color: #28A745;
+    }
+
+    &--dispatched {
+      background-color: #28A745;
+    }
+
+    &--confirmed {
+      background-color: #FFA500;
+    }
+
+    &--submitted {
+      background-color: #3B0075;
+    }
+
+    &--default {
+      background-color: #6C757D;
+    }
+  }
+
+  &__date {
+    font-size: 0.875rem;
+    color: #232323;
+    font-weight: 500;
+  }
+
+  &__user {
+    font-size: 0.875rem;
+    color: #71717A;
+  }
+
+  &__comment {
+    font-size: 0.875rem;
+    color: #232323;
+    line-height: 1.4;
   }
 }

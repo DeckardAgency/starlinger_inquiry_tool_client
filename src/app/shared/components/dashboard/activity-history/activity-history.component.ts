@@ -128,7 +128,7 @@ export class ActivityHistoryComponent implements OnInit {
       dateCreated: order.createdAt,
       internalReferenceNumber: order.id,
       customer: {
-        id: order.user.split('/').pop() || '',
+        id: "",
         name: customerName,
         initials: this.getInitials(customerName),
         image: undefined
