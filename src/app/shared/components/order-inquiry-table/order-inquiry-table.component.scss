@@ -312,29 +312,30 @@ $tablet-breakpoint: 1024px;
     font-size: 0.875rem;
     font-weight: 500;
     white-space: nowrap;
+    color: #ffffff;
 
-    // Modifier: Completed status
-    &--completed {
-      background: $status-green-bg;
-      color: $basePrimaryForeground;
-    }
-
-    // Modifier: Canceled status
     &--canceled {
-      background: $status-red-bg;
-      color: $basePrimaryForeground;
+      background-color: #DC3545;
     }
 
-    // Modifier: Processing status
-    &--processing {
-      background: #EDE9FE;
-      color: #7C3AED;
+    &--completed {
+      background-color: #28A745;
     }
 
-    // Modifier: Pending status
-    &--pending {
-      background: #FEF3C7;
-      color: #D97706;
+    &--dispatched {
+      background-color: #28A745;
+    }
+
+    &--confirmed {
+      background-color: #FFA500;
+    }
+
+    &--submitted {
+      background-color: #3B0075;
+    }
+
+    &--default {
+      background-color: #6C757D;
     }
   }
 

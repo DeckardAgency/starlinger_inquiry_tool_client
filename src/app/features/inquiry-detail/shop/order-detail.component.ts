@@ -8,11 +8,12 @@ import { delay } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { PriceFilterAdvancedPipe } from '@shared/pipes/price-filter-advanced.pipe';
 import { DateFilterPipe } from '@shared/pipes/date-filter.pipe';
+import { OrderDetailShimmerComponent } from '@features/inquiry-detail/shop/order-detail-shimmer-component';
 
 @Component({
   selector: 'app-inquiry-detail',
   standalone: true,
-  imports: [CommonModule, BreadcrumbsComponent, RouterModule, PriceFilterAdvancedPipe, DateFilterPipe],
+  imports: [CommonModule, BreadcrumbsComponent, RouterModule, PriceFilterAdvancedPipe, DateFilterPipe, OrderDetailShimmerComponent],
   templateUrl: './order-detail.component.html',
   styleUrls: ['./order-detail.component.scss']
 })
@@ -244,7 +245,7 @@ export class OrderDetailComponent implements OnInit {
       case 'completed':
         return 'order-detail__badge--completed';
       case 'canceled':
-        return 'order-detail__badge--cancelled';
+        return 'order-detail__badge--canceled';
       default:
         return 'order-detail__badge--default';
     }

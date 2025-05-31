@@ -97,11 +97,6 @@ export class ActiveInquiriesComponent implements OnInit {
     status: string;
     internalReference: string
   } {
-    // Format date from ISO string to DD-MM-YYYY
-    const createDate = new Date(order.createdAt);
-    const formattedDate = `${createDate.getDate().toString().padStart(2, '0')}-${
-      (createDate.getMonth() + 1).toString().padStart(2, '0')}-${
-      createDate.getFullYear()}`;
 
     // Get total items count
     const totalItems = order.items ? order.items.length : 0;
@@ -121,7 +116,7 @@ export class ActiveInquiriesComponent implements OnInit {
     return {
       id: order.id,
       machine: machineName,
-      dateCreated: formattedDate,
+      dateCreated: order.createdAt,
       partsOrdered: totalItems,
       status: status,
       internalReference: order.id

@@ -2,10 +2,11 @@
 
 // Status types
 export const ORDER_STATUS = {
-  COMPLETED: 'Completed',
   CANCELED: 'Canceled',
-  PROCESSING: 'Processing',
-  PENDING: 'Pending'
+  COMPLETED: 'Completed',
+  DISPATCHED: 'Dispatched',
+  CONFIRMED: 'Confirmed',
+  SUBMITTED: 'Submitted',
 } as const;
 
 export type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];

@@ -26,7 +26,7 @@
         </div>
         <div class="inquiry-card__detail-info">
           <span class="inquiry-card__label">Date created</span>
-          <span class="inquiry-card__value">{{ inquiry.dateCreated }}</span>
+          <span class="inquiry-card__value">{{ inquiry.dateCreated | dateFilter:'dd.MM.yyyy @ HH:mm' }}</span>
         </div>
       </div>
 

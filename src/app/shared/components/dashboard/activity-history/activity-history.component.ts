@@ -174,17 +174,14 @@ export class ActivityHistoryComponent implements OnInit {
   private mapApiStatusToComponentStatus(apiStatus: string): OrderStatus {
     // Map API statuses to component statuses
     const statusMap: Record<string, OrderStatus> = {
-      'draft': ORDER_STATUS.PENDING,
-      'pending': ORDER_STATUS.PROCESSING,
-      'paid': ORDER_STATUS.PROCESSING,
-      'processing': ORDER_STATUS.PROCESSING,
-      'shipped': ORDER_STATUS.COMPLETED,
-      'delivered': ORDER_STATUS.COMPLETED,
       'canceled': ORDER_STATUS.CANCELED,
-      'completed': ORDER_STATUS.COMPLETED
+      'completed': ORDER_STATUS.COMPLETED,
+      'dispatched': ORDER_STATUS.DISPATCHED,
+      'confirmed': ORDER_STATUS.CONFIRMED,
+      'submitted': ORDER_STATUS.SUBMITTED,
     };
 
-    return statusMap[apiStatus.toLowerCase()] || ORDER_STATUS.PENDING;
+    return statusMap[apiStatus.toLowerCase()] || ORDER_STATUS.SUBMITTED;
   }
 
   private extractCustomerName(order: OrderResponse): string {

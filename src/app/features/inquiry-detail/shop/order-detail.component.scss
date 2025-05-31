@@ -1,4 +1,3 @@
-// Variables
 $color-primary: #4f46e5;
 $color-gray-50: #f9fafb;
 $color-gray-100: #f3f4f6;
@@ -145,7 +144,7 @@ $color-amber: #FFA500;
       color: $color-white;
     }
 
-    &--cancelled {
+    &--canceled {
       background-color: $color-red;
       color: $color-white;
     }
@@ -444,7 +443,7 @@ $color-amber: #FFA500;
     font-size: 0.75rem;
     font-weight: 500;
     text-transform: capitalize;
-    color: white;
+    color: #ffffff;
     white-space: nowrap;
     width: fit-content;
 
@@ -507,5 +506,156 @@ $color-amber: #FFA500;
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+
+
+
+
+// Shimmer effect styles
+.shimmer {
+  background: linear-gradient(
+      90deg,
+      #f0f0f0 0%,
+      #f8f8f8 20%,
+      #f0f0f0 40%,
+      #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Shimmer loading state
+.order-detail__shimmer {
+  .shimmer--button {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+  }
+
+  .shimmer--title {
+    width: 280px;
+    height: 24px;
+    margin-right: 1rem;
+  }
+
+  .shimmer--badge {
+    width: 80px;
+    height: 28px;
+    border-radius: 12px;
+  }
+
+  .shimmer--action-btn {
+    width: 80px;
+    height: 36px;
+  }
+
+  .shimmer--info-item {
+    width: 200px;
+    height: 20px;
+  }
+
+  .shimmer--section-title {
+    width: 180px;
+    height: 24px;
+    margin-bottom: 1rem;
+  }
+
+  .shimmer--table-header {
+    width: 80%;
+    height: 14px;
+  }
+
+  .shimmer--table-cell {
+    width: 60%;
+    height: 16px;
+
+    &-long {
+      width: 90%;
+    }
+  }
+
+  .shimmer--total-label {
+    width: 100px;
+    height: 16px;
+  }
+
+  .shimmer--total-value {
+    width: 80px;
+    height: 16px;
+  }
+
+  .shimmer--log-status {
+    width: 90px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  .shimmer--log-date {
+    width: 140px;
+    height: 16px;
+  }
+
+  .shimmer--log-user {
+    width: 60px;
+    height: 16px;
+  }
+
+  .shimmer--log-comment {
+    width: 100%;
+    max-width: 400px;
+    height: 16px;
+  }
+
+  // Override background colors for shimmer elements in colored sections
+  .order-detail__header-bottom {
+    background-color: #F9FAFB;
+  }
+
+  .order-detail__total-section {
+    background-color: #237804;
+
+    .shimmer {
+      background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.2) 0%,
+          rgba(255, 255, 255, 0.3) 20%,
+          rgba(255, 255, 255, 0.2) 40%,
+          rgba(255, 255, 255, 0.2) 100%
+      );
+    }
+  }
+}
+
+// Responsive shimmer adjustments
+@media (max-width: 768px) {
+  .order-detail__shimmer {
+    .shimmer--title {
+      width: 200px;
+    }
+
+    .shimmer--info-item {
+      width: 150px;
+    }
+
+    .order-logs__item {
+      grid-template-columns: 1fr;
+      gap: 8px;
+
+      .shimmer--log-comment {
+        max-width: 100%;
+      }
+    }
   }
 }

@@ -34,11 +34,12 @@ import {
   DataSource
 } from './order-inquiry-table.types';
 import {InquiryShimmerComponent} from '@shared/components/inquiry-table/inquiry-shimmer.component';
+import {DateFilterPipe} from '@shared/pipes/date-filter.pipe';
 
 @Component({
   selector: 'app-order-inquiry-table',
   standalone: true,
-  imports: [CommonModule, FormsModule, InquiryShimmerComponent],
+  imports: [CommonModule, FormsModule, InquiryShimmerComponent, DateFilterPipe],
   templateUrl: './order-inquiry-table.component.html',
   styleUrls: ['./order-inquiry-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -338,11 +339,4 @@ export class OrderInquiryTableComponent implements OnInit {
     return current.direction;
   }
 
-  formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  }
 }

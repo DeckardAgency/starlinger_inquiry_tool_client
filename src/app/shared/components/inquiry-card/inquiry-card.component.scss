@@ -149,35 +149,30 @@
     font-size: 12px;
     font-weight: 600;
     text-transform: capitalize;
+    color: #ffffff;
 
-    &--pending {
-      background-color: #079ca1;
-      color: #ffffff;
-    }
-
-    &--submitted {
-      background-color: #a16207;
-      color: #ffffff;
-    }
-
-    &--processing {
-      background-color: #2563eb;
-      color: #ffffff;
-    }
-
-    &--shipped {
-      background-color: #059669;
-      color: #ffffff;
+    &--canceled {
+      background-color: #DC3545;
     }
 
     &--completed {
-      background-color: #10b981;
-      color: #ffffff;
+      background-color: #28A745;
     }
 
-    &--cancelled {
-      background-color: #ef4444;
-      color: #ffffff;
+    &--dispatched {
+      background-color: #28A745;
+    }
+
+    &--confirmed {
+      background-color: #FFA500;
+    }
+
+    &--submitted {
+      background-color: #3B0075;
+    }
+
+    &--default {
+      background-color: #6C757D;
     }
   }
 

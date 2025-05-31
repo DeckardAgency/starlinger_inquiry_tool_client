@@ -183,7 +183,7 @@
                   </span>
                 </td>
                 <td>
-                  <time [dateTime]="item.dateCreated">{{ formatDate(item.dateCreated) }}</time>
+                  <time [dateTime]="item.dateCreated">{{ item.dateCreated | dateFilter:'dd.MM.yyyy @ HH:mm' }}</time>
                 </td>
                 <td>{{ item.internalReferenceNumber }}</td>
                 <td>
