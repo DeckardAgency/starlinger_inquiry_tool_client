@@ -6,14 +6,15 @@ import { Order } from '@models/order.model';
 import { OrderService } from '@services/http/order.service';
 import { delay } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import {PriceFilterAdvancedPipe} from '@shared/pipes/price-filter-advanced.pipe';
-import {DateFilterPipe} from '@shared/pipes/date-filter.pipe';
+import { PriceFilterAdvancedPipe } from '@shared/pipes/price-filter-advanced.pipe';
+import { DateFilterPipe } from '@shared/pipes/date-filter.pipe';
 
 @Component({
-    selector: 'app-inquiry-detail',
+  selector: 'app-inquiry-detail',
+  standalone: true,
   imports: [CommonModule, BreadcrumbsComponent, RouterModule, PriceFilterAdvancedPipe, DateFilterPipe],
-    templateUrl: './order-detail.component.html',
-    styleUrls: ['./order-detail.component.scss']
+  templateUrl: './order-detail.component.html',
+  styleUrls: ['./order-detail.component.scss']
 })
 export class OrderDetailComponent implements OnInit {
 
@@ -36,9 +37,7 @@ export class OrderDetailComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private orderService: OrderService,
-  ) {
-
-  }
+  ) {}
 
   ngOnInit(): void {
     this.loadOrderData();
@@ -137,17 +136,17 @@ export class OrderDetailComponent implements OnInit {
     }
 
     // Show loading state
-    const exportButton = document.querySelector('.order-detail__action-btn') as HTMLButtonElement;
+    const exportButton = document.querySelector('.order-detail__action-btn--export') as HTMLButtonElement;
     const originalButtonContent = exportButton?.innerHTML;
 
     if (exportButton) {
       exportButton.disabled = true;
       exportButton.innerHTML = `
-            <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 1V4M8 12V15M3.05 3.05L5.17 5.17M10.83 10.83L12.95 12.95M1 8H4M12 8H15M3.05 12.95L5.17 10.83M10.83 5.17L12.95 3.05" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Exporting...
-        `;
+        <svg class="spinner" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1V4M8 12V15M3.05 3.05L5.17 5.17M10.83 10.83L12.95 12.95M1 8H4M12 8H15M3.05 12.95L5.17 10.83M10.83 5.17L12.95 3.05" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Exporting...
+      `;
     }
 
     this.orderService.exportOrderPdf(this.order.id).subscribe({
@@ -171,7 +170,7 @@ export class OrderDetailComponent implements OnInit {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
 
-        // Show success notification
+        // Show a success notification
         // this.notificationService.success('Order exported successfully!');
       },
       error: (error) => {
@@ -213,18 +212,41 @@ export class OrderDetailComponent implements OnInit {
 
     switch (normalizedStatus) {
       case 'submitted':
-        return 'logs-section__status--submitted';
+        return 'order-logs__status--submitted';
       case 'confirmed':
-        return 'logs-section__status--confirmed';
+        return 'order-logs__status--confirmed';
       case 'dispatched':
-        return 'logs-section__status--dispatched';
+        return 'order-logs__status--dispatched';
       case 'completed':
-        return 'logs-section__status--completed';
+        return 'order-logs__status--completed';
       case 'canceled':
-        return 'logs-section__status--canceled';
+        return 'order-logs__status--canceled';
       default:
-        return 'logs-section__status--default';
+        return 'order-logs__status--default';
     }
   }
 
+  /**
+   * Get the CSS class for order status badge
+   */
+  getOrderStatusClass(status: string | undefined): string {
+    if (!status) return 'order-detail__badge--default';
+
+    const normalizedStatus = status.toLowerCase().replace(/ /g, '-');
+
+    switch (normalizedStatus) {
+      case 'submitted':
+        return 'order-detail__badge--submitted';
+      case 'confirmed':
+        return 'order-detail__badge--confirmed';
+      case 'dispatched':
+        return 'order-detail__badge--dispatched';
+      case 'completed':
+        return 'order-detail__badge--completed';
+      case 'canceled':
+        return 'order-detail__badge--cancelled';
+      default:
+        return 'order-detail__badge--default';
+    }
+  }
 }
