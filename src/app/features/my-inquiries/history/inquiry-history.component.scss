@@ -1,0 +1,69 @@
+.inquiries-history {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    margin-top: 1.5rem;
+    margin-bottom: 1.125rem;
+  }
+
+  &__title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #18181B;
+
+    svg {
+      color: #71717A;
+    }
+  }
+
+  &__body {
+    padding: 0 16px;
+  }
+
+  &__tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid #E4E4E7;
+
+    @media (max-width: 480px) {
+      overflow: auto;
+    }
+  }
+
+  &__tab {
+    padding: 1rem 2rem;
+    border: none;
+    background: none;
+    color: #71717A;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.5;
+
+    &:hover {
+      color: #18181B;
+    }
+
+    &--active {
+      color: #18181B;
+      position: relative;
+      opacity: 1;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #DC2626;
+      }
+    }
+  }
+}

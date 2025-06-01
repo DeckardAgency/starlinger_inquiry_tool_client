@@ -1,0 +1,28 @@
+.draft-inquiries {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    margin-top: 1.5rem;
+    margin-bottom: 1.125rem;
+  }
+
+  &__title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #18181B;
+
+    svg {
+      color: #71717A;
+    }
+  }
+
+  &__body {
+    padding: 0 16px;
+  }
+}

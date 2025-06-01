@@ -1,0 +1,13 @@
+<div class="inquiries-history">
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+  <div class="inquiries-history__header">
+    <h2 class="inquiries-history__title">
+      <app-icon name="fileWarning" size="20px" color="#232323"></app-icon>
+      Activity / History
+    </h2>
+  </div>
+  <div class="inquiries-history__body">
+    <app-inquiry-table [inquiries]="allInquiries" [loading]="loading"></app-inquiry-table>
+  </div>
+</div>

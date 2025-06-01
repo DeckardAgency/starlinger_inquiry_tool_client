@@ -1,0 +1,137 @@
+<div class="inquiry-detail">
+
+  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
+
+  <!-- Header section -->
+  <header class="inquiry-detail__header">
+    <button class="inquiry-detail__back-btn" (click)="goBack()">
+      <app-icon name="arrowLeft" size="20px" color="#52525B"></app-icon>
+    </button>
+
+    <div class="inquiry-detail__title-container">
+      <h1 class="inquiry-detail__title">Inquiry ID: {{ inquiryId }}</h1>
+
+      <div class="inquiry-detail__badges">
+        <span class="inquiry-detail__badge inquiry-detail__badge--shop">{{ type }}</span>
+        <span class="inquiry-detail__badge inquiry-detail__badge--pending">{{ status }}</span>
+        <span class="inquiry-detail__badge inquiry-detail__badge--unfulfilled">{{ fulfillmentStatus }}</span>
+      </div>
+    </div>
+
+    <div class="inquiry-detail__actions">
+      <button class="inquiry-detail__action-btn">
+        <app-icon name="edit" size="18px" color="#52525B"></app-icon>
+        Edit
+      </button>
+
+      <button class="inquiry-detail__action-btn">
+        <app-icon name="download" size="18px" color="#52525B"></app-icon>
+        Export
+      </button>
+
+      <button class="inquiry-detail__action-btn">
+        <app-icon name="printer" size="18px" color="#52525B"></app-icon>
+        Print
+      </button>
+    </div>
+  </header>
+
+  <!-- Meta info section -->
+  <div class="inquiry-detail__meta">
+    <div class="inquiry-detail__reference">
+      <span class="inquiry-detail__meta-label">Internal reference number:</span>
+      <span class="inquiry-detail__meta-value">{{ internalReference }}</span>
+    </div>
+    <div class="inquiry-detail__date">
+      <span class="inquiry-detail__meta-label">Date created:</span>
+      <span class="inquiry-detail__meta-value">{{ dateCreated }}</span>
+    </div>
+    <div class="inquiry-detail__parts">
+      <span class="inquiry-detail__meta-label">Parts ordered:</span>
+      <span class="inquiry-detail__meta-value">{{ partsOrdered }}</span>
+    </div>
+  </div>
+
+  <!-- Products section -->
+  <section class="inquiry-detail__section">
+    <div class="inquiry-detail__section-header">
+      <app-icon name="shoppingCart" size="20px" color="#52525B"></app-icon>
+      <h2 class="inquiry-detail__section-title">Products ordered</h2>
+    </div>
+
+    <!-- Machines with products -->
+    <div class="inquiry-detail__machines">
+      <!-- Loop through machines -->
+      <div class="inquiry-detail__machine" *ngFor="let machine of machines">
+        <div class="inquiry-detail__machine-header" (click)="toggleMachine(machine)">
+          <div class="inquiry-detail__machine-icon">
+            <app-icon name="box" size="20px" color="#52525B"></app-icon>
+          </div>
+          <span class="inquiry-detail__machine-name">{{ machine.name }}</span>
+          <button class="inquiry-detail__machine-toggle" [class.inquiry-detail__machine-toggle--open]="machine.isOpen">
+            <app-icon name="chevronDown" size="20px" color="#52525B"></app-icon>
+          </button>
+        </div>
+
+        <!-- Products table (shown when machine is open) -->
+        <div class="inquiry-detail__machine-content" *ngIf="machine.isOpen">
+          <table class="inquiry-detail__products-table">
+            <thead>
+            <tr>
+              <th>Part no.</th>
+              <th>Product name</th>
+              <th>Weight</th>
+              <th>Quantity</th>
+              <th>Unit price</th>
+              <th>Discount</th>
+              <th>Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let product of machine.products">
+              <td>{{ product.partNo }}</td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.weight }}</td>
+              <td>{{ product.quantity }}</td>
+              <td>€ {{ product.unitPrice | number:'1.2-2' }}</td>
+              <td>{{ product.discount }}</td>
+              <td>€ {{ product.price | number:'1.2-2' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="inquiry-detail__totals">
+      <div class="inquiry-detail__total-row">
+        <span class="inquiry-detail__total-label">Total price</span>
+        <span class="inquiry-detail__total-value">€ {{ totalPrice | number:'1.2-2' }}</span>
+      </div>
+      <div class="inquiry-detail__total-row inquiry-detail__total-row--highlighted">
+        <span class="inquiry-detail__total-label">Amount to pay</span>
+        <span class="inquiry-detail__total-value">€ {{ amountToPay | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Log messages section -->
+  <section class="inquiry-detail__section">
+    <div class="inquiry-detail__section-header">
+      <app-icon name="messageSquare" size="20px" color="#52525B"></app-icon>
+      <h2 class="inquiry-detail__section-title">Log messages</h2>
+    </div>
+
+    <div class="inquiry-detail__log">
+      <div class="inquiry-detail__log-entry" *ngFor="let log of logMessages">
+        <div class="inquiry-detail__log-badge-container">
+          <span class="inquiry-detail__log-type" [ngClass]="getLogTypeBadgeClass(log.type)">{{ log.type }}</span>
+        </div>
+        <div class="inquiry-detail__log-date">{{ log.date }} {{ log.time }}</div>
+        <div class="inquiry-detail__log-user">{{ log.user }}</div>
+        <div class="inquiry-detail__log-message" [ngClass]="{'inquiry-detail__log-message--highlight': log.message.includes('completed')}">{{ log.message }}</div>
+      </div>
+    </div>
+  </section>
+</div>

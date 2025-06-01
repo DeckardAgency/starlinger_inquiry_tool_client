@@ -1,0 +1,102 @@
+<!-- draft-order-table.component.html -->
+<div class="order-table-container">
+  <div class="table-wrapper">
+    <table class="order-table">
+      <thead>
+      <tr>
+        <th (click)="sortByDate()" class="sortable">
+          Date Created
+          <span class="sort-icon" [ngClass]="getSortIconClass()"></span>
+        </th>
+        <th>Type</th>
+        <th>Internal reference number</th>
+        <th>Customer</th>
+        <th>Status</th>
+        <th></th> <!-- Column for more options -->
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngIf="!loading; else shimmerTemplate">
+        <tr *ngFor="let item of items; trackBy: trackByFn" (click)="stopPropagation($event)">
+          <td>{{ item.dateCreated }}</td>
+          <td>
+            <span class="badge" [ngClass]="getTypeClass(item.type)">{{ item.type }}</span>
+          </td>
+          <td>{{ item.referenceNumber || '–' }}</td>
+          <td class="customer-cell">
+            <div class="customer-container">
+              <div class="avatar" *ngIf="!item.customer.avatar">
+                {{ item.customer.initials }}
+              </div>
+              <img *ngIf="item.customer.avatar" [src]="item.customer.avatar" class="avatar-img" alt="Customer avatar">
+              <span class="customer-name">{{ item.customer.name }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge status" [ngClass]="getStatusClass()">{{ item.status }}</span>
+          </td>
+          <td class="actions-cell">
+            <div class="menu-container">
+              <button class="more-options-btn" (click)="openMoreOptions($event, item)" aria-label="More options">
+                <span class="dots">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="16" viewBox="0 0 17 16" fill="none">
+                    <path d="M8.50016 8.66666C8.86835 8.66666 9.16683 8.36818 9.16683 7.99999C9.16683 7.6318 8.86835 7.33332 8.50016 7.33332C8.13197 7.33332 7.8335 7.6318 7.8335 7.99999C7.8335 8.36818 8.13197 8.66666 8.50016 8.66666Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8.50016 3.99999C8.86835 3.99999 9.16683 3.70151 9.16683 3.33332C9.16683 2.96513 8.86835 2.66666 8.50016 2.66666C8.13197 2.66666 7.8335 2.96513 7.8335 3.33332C7.8335 3.70151 8.13197 3.99999 8.50016 3.99999Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8.50016 13.3333C8.86835 13.3333 9.16683 13.0348 9.16683 12.6667C9.16683 12.2985 8.86835 12 8.50016 12C8.13197 12 7.8335 12.2985 7.8335 12.6667C7.8335 13.0348 8.13197 13.3333 8.50016 13.3333Z" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </button>
+              <div class="dropdown-menu" *ngIf="item.showMenu">
+                <div class="menu-item" (click)="handleAction($event, item, 'edit')" role="button" tabindex="0">
+                  <span class="menu-icon edit-icon"></span>
+                  <span class="menu-text">Edit</span>
+                </div>
+                <div class="menu-item" (click)="handleAction($event, item, 'delete')" role="button" tabindex="0">
+                  <span class="menu-icon delete-icon"></span>
+                  <span class="menu-text">Delete</span>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty state if no items -->
+        <tr *ngIf="items.length === 0">
+          <td colspan="6" class="empty-state">
+            <div class="empty-message">
+              <span>No draft orders or inquiries found</span>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+
+      <!-- Shimmer loading template -->
+      <ng-template #shimmerTemplate>
+        <tr *ngFor="let i of shimmerRows">
+          <td>
+            <div class="shimmer-block date-shimmer"></div>
+          </td>
+          <td>
+            <div class="shimmer-block badge-shimmer"></div>
+          </td>
+          <td>
+            <div class="shimmer-block reference-shimmer"></div>
+          </td>
+          <td>
+            <div class="customer-container">
+              <div class="shimmer-block avatar-shimmer"></div>
+              <div class="shimmer-block name-shimmer"></div>
+            </div>
+          </td>
+          <td>
+            <div class="shimmer-block status-shimmer"></div>
+          </td>
+          <td class="actions-cell">
+            <div class="shimmer-block action-shimmer"></div>
+          </td>
+        </tr>
+      </ng-template>
+      </tbody>
+    </table>
+  </div>
+</div>
