@@ -14,19 +14,19 @@
         (click)="selectTab(tab)"
       >
         {{ tab }}
-        <span class="order-inquiry__tab-count" aria-label="Count">
-          @switch (tab) {
-            @case ('Completed') {
-              ({{ itemCounts().completed }})
-            }
-            @case ('Canceled') {
-              ({{ itemCounts().canceled }})
-            }
-            @default {
-              ({{ itemCounts().total }})
-            }
-          }
-        </span>
+<!--        <span class="order-inquiry__tab-count" aria-label="Count">-->
+<!--          @switch (tab) {-->
+<!--            @case ('Completed') {-->
+<!--              ({{ itemCounts().completed }})-->
+<!--            }-->
+<!--            @case ('Canceled') {-->
+<!--              ({{ itemCounts().canceled }})-->
+<!--            }-->
+<!--            @default {-->
+<!--              ({{ itemCounts().total }})-->
+<!--            }-->
+<!--          }-->
+<!--        </span>-->
       </button>
     }
   </div>
@@ -170,7 +170,7 @@
                 }
               </button>
             </th>
-            <th scope="col" class="sr-only">Actions</th>
+            <th scope="col" class=""></th>
           </tr>
           </thead>
           <tbody>

@@ -4,16 +4,29 @@ import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcru
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { OrderResponse, OrderService } from '@services/http/order.service';
+import { OrderService } from '@services/http/order.service';
 import { AuthService } from '@core/auth/auth.service';
-import { Inquiry } from '@core/models/inquiry.model';
-import { DraftOrderTableItem } from '@shared/components/draft-order-table/draft-order-table.component';
+import { Order } from '@models/order.model';
+
+interface DraftInquiry {
+  id: string;
+  dateCreated: string;
+  type: 'Order' | 'Inquiry';
+  internalReference: string;
+  customer: {
+    initials: string;
+    name: string;
+    avatar?: string;
+  };
+  status: string;
+}
 
 @Component({
-    selector: 'app-draft-inquiries',
-    imports: [CommonModule, BreadcrumbsComponent, IconComponent],
-    templateUrl: './draft-inquiries.component.html',
-    styleUrls: ['./draft-inquiries.component.scss']
+  selector: 'app-draft-inquiries',
+  standalone: true,
+  imports: [CommonModule, BreadcrumbsComponent, IconComponent],
+  templateUrl: './draft-inquiries.component.html',
+  styleUrls: ['./draft-inquiries.component.scss']
 })
 export class DraftInquiriesComponent implements OnInit {
   breadcrumbs = [
@@ -21,138 +34,11 @@ export class DraftInquiriesComponent implements OnInit {
     { label: 'Drafts' }
   ];
 
-  draftInquiries: Inquiry[] = [];
+  draftInquiries: DraftInquiry[] = [];
   isLoading = false;
   error: string | null = null;
-
-  draftOrderItems: DraftOrderTableItem[] = [
-    {
-      dateCreated: '28-04-2025',
-      type: 'Order',
-      referenceNumber: '000123-ABC',
-      customer: {
-        initials: 'AK',
-        name: 'Anes Kapetanovic'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '27-04-2025',
-      type: 'Order',
-      referenceNumber: '000124-XYZ',
-      customer: {
-        initials: 'MK',
-        name: 'Mira Kulic'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '26-04-2025',
-      type: 'Inquiry',
-      referenceNumber: '004231-UGR',
-      customer: {
-        initials: 'ME',
-        name: 'Martin Ertl'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '25-04-2025',
-      type: 'Inquiry',
-      referenceNumber: '001456-ZXY',
-      customer: {
-        initials: 'IJ',
-        name: 'Ivan Jozic'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '24-04-2025',
-      type: 'Order',
-      referenceNumber: '000125-DEF',
-      customer: {
-        initials: 'SK',
-        name: 'Sara Kovač',
-        avatar: 'assets/avatar1.jpg'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '23-04-2025',
-      type: 'Order',
-      referenceNumber: '000126-GHI',
-      customer: {
-        initials: 'TM',
-        name: 'Tomislav Marić'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '22-04-2025',
-      type: 'Inquiry',
-      referenceNumber: '003234-LJK',
-      customer: {
-        initials: 'ZP',
-        name: 'Zoran Petrović',
-        avatar: 'assets/avatar2.jpg'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '21-04-2025',
-      type: 'Order',
-      referenceNumber: '007890-QWE',
-      customer: {
-        initials: 'LB',
-        name: 'Lucia Babić'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '20-04-2025',
-      type: 'Order',
-      referenceNumber: '008901-RTY',
-      customer: {
-        initials: 'DH',
-        name: 'Damir Horvat'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '19-04-2025',
-      type: 'Inquiry',
-      referenceNumber: '005678-MNB',
-      customer: {
-        initials: 'JP',
-        name: 'Jana Pavlović',
-        avatar: 'assets/avatar3.jpg'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '18-04-2025',
-      type: 'Order',
-      referenceNumber: '009012-VCX',
-      customer: {
-        initials: 'NR',
-        name: 'Nikola Radić'
-      },
-      status: 'Draft'
-    },
-    {
-      dateCreated: '17-04-2025',
-      type: 'Inquiry',
-      referenceNumber: '006789-POI',
-      customer: {
-        initials: 'MM',
-        name: 'Marko Matić'
-      },
-      status: 'Draft'
-    }
-  ];
-
-  // API status values that exist in the system
-  readonly API_STATUSES = ['draft', 'pending', 'paid', 'processing', 'shipped', 'delivered', 'canceled'];
+  sortField: string = 'dateCreated';
+  sortDirection: 'asc' | 'desc' = 'desc';
 
   constructor(
     private orderService: OrderService,
@@ -183,7 +69,7 @@ export class DraftInquiriesComponent implements OnInit {
       return;
     }
 
-    // Use the current user's email to fetch draft orders
+    // Use the getDraftOrdersByUserEmail method which already filters by isDraft=true
     this.orderService.getDraftOrdersByUserEmail(currentUser.email)
       .pipe(
         catchError(err => {
@@ -205,49 +91,110 @@ export class DraftInquiriesComponent implements OnInit {
       )
       .subscribe(ordersCollection => {
         if (ordersCollection.member && ordersCollection.member.length > 0) {
-          this.draftInquiries = ordersCollection.member.map(order => this.mapOrderToInquiry(order));
+          this.draftInquiries = ordersCollection.member.map(order => this.mapOrderToDraftInquiry(order));
+          this.sortInquiries();
         } else {
           this.draftInquiries = [];
         }
       });
   }
 
-  private mapOrderToInquiry(order: OrderResponse): {
-    id: string;
-    machine: string;
-    dateCreated: string;
-    partsOrdered: number;
-    status: string;
-    internalReference: string
-  } {
-    // Format date from ISO string to DD-MM-YYYY
-    const createDate = new Date(order.createdAt);
-    const formattedDate = `${createDate.getDate().toString().padStart(2, '0')}-${
-      (createDate.getMonth() + 1).toString().padStart(2, '0')}-${
-      createDate.getFullYear()}`;
+  private mapOrderToDraftInquiry(order: any): DraftInquiry {
+    // Get user initials from the order user data
+    const userName = order.user?.name || order.user?.email || 'Unknown User';
+    const initials = this.getInitials(userName);
 
-    // Get total items count
-    const totalItems = order.items ? order.items.length : 0;
-
-    // Use product name as machine name if available, otherwise use order number
-    const machineName = order.items && order.items.length > 0 && order.items[0].product
-      ? order.items[0].product.name
-      : `Order ${order.orderNumber}`;
-
-    // Apply basic validation to ensure the status is one of the known API statuses
-    // This is just a safety check - if an unknown status comes in, we still use it
-    const status = this.API_STATUSES.includes(order.status)
-      ? order.status
-      : order.status; // Still use the original if not in our list, for flexibility
-
-    // Use the status directly from the API response
     return {
-      id: order.orderNumber,
-      machine: machineName,
-      dateCreated: formattedDate,
-      partsOrdered: totalItems,
-      status: status,
-      internalReference: order.id
+      id: order.id,
+      dateCreated: order.createdAt,
+      type: 'Order', // Based on the table image, all entries are 'Order' type
+      internalReference: order.orderNumber || '-',
+      customer: {
+        initials: initials,
+        name: userName,
+        avatar: order.user?.avatar // Optional avatar URL if available
+      },
+      status: order.status || 'draft'
     };
+  }
+
+  private getInitials(name: string): string {
+    if (!name) return 'UN';
+
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  sortBy(field: string): void {
+    if (this.sortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = field;
+      this.sortDirection = 'asc';
+    }
+    this.sortInquiries();
+  }
+
+  private sortInquiries(): void {
+    this.draftInquiries.sort((a, b) => {
+      let aValue: any = a[this.sortField as keyof DraftInquiry];
+      let bValue: any = b[this.sortField as keyof DraftInquiry];
+
+      // Handle nested customer property
+      if (this.sortField === 'customer') {
+        aValue = a.customer.name;
+        bValue = b.customer.name;
+      }
+
+      // Handle date comparison
+      if (this.sortField === 'dateCreated') {
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+      }
+
+      // Handle string comparison
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (aValue < bValue) {
+        return this.sortDirection === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return this.sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  onEdit(inquiry: DraftInquiry): void {
+    // Navigate to edit page or open edit modal
+    console.log('Edit inquiry:', inquiry);
+    // this.router.navigate(['/inquiries/edit', inquiry.id]);
+  }
+
+  onDelete(inquiry: DraftInquiry): void {
+    // Implement delete functionality with confirmation
+    if (confirm(`Are you sure you want to delete this draft inquiry?`)) {
+      console.log('Delete inquiry:', inquiry);
+      // Call delete service method here
+    }
+  }
+
+  onMoreOptions(inquiry: DraftInquiry): void {
+    // Open context menu or dropdown with more options
+    console.log('More options for inquiry:', inquiry);
   }
 }

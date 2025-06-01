@@ -135,7 +135,7 @@ export class ActiveInquiriesComponent implements OnInit {
 
     // Use the status directly from the API response
     return {
-      id: order.orderNumber,
+      id: order.id,
       machine: machineName,
       dateCreated: formattedDate,
       partsOrdered: totalItems,

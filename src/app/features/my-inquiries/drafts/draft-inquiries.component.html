@@ -7,7 +7,99 @@
       Drafts
     </h2>
   </div>
+
   <div class="draft-inquiries__body">
-<!--    <app-draft-order-table [items]="draftInquiries"></app-draft-order-table>-->
+    @if (isLoading) {
+      <div class="draft-inquiries__loading">
+        <div class="draft-inquiries__loading-spinner"></div>
+        <p>Loading draft inquiries...</p>
+      </div>
+    } @else if (error) {
+      <div class="draft-inquiries__error">
+        <app-icon name="alertTriangle" size="24px" color="#DC2626"></app-icon>
+        <p>{{ error }}</p>
+        <button (click)="loadDraftOrders()" class="draft-inquiries__retry-btn">
+          <app-icon name="refresh" size="16px" color="#ffffff"></app-icon>
+          Try Again
+        </button>
+      </div>
+    } @else if (draftInquiries.length === 0) {
+      <div class="draft-inquiries__empty">
+        <app-icon name="inbox" size="32px" color="#71717A"></app-icon>
+        <p>You don't have any draft inquiries at the moment.</p>
+      </div>
+    } @else {
+      <div class="draft-inquiries__table-container">
+        <table class="draft-inquiries__table">
+          <thead>
+          <tr>
+            <th (click)="sortBy('dateCreated')" class="sortable">
+              <span>Date Created</span>
+              <app-icon
+                [name]="sortField === 'dateCreated' ? (sortDirection === 'asc' ? 'chevronUp' : 'chevronDown') : 'chevronUpDown'"
+                size="14px"
+                color="#71717A">
+              </app-icon>
+            </th>
+            <th>Type</th>
+            <th>Internal reference number</th>
+            <th (click)="sortBy('customer')" class="sortable">
+              <span>Customer</span>
+              <app-icon
+                [name]="sortField === 'customer' ? (sortDirection === 'asc' ? 'chevronUp' : 'chevronDown') : 'chevronUpDown'"
+                size="14px"
+                color="#71717A">
+              </app-icon>
+            </th>
+            <th>Status</th>
+            <th class="actions-column"></th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (inquiry of draftInquiries; track inquiry.id) {
+              <tr>
+                <td class="date-cell">{{ formatDate(inquiry.dateCreated) }}</td>
+                <td>
+                  <span class="type-badge type-badge--{{ inquiry.type.toLowerCase() }}">
+                    {{ inquiry.type }}
+                  </span>
+                </td>
+                <td class="reference-cell">{{ inquiry.internalReference }}</td>
+                <td class="customer-cell">
+                  <div class="customer-info">
+                    @if (inquiry.customer.avatar) {
+                      <img [src]="inquiry.customer.avatar" [alt]="inquiry.customer.name" class="customer-avatar">
+                    } @else {
+                      <div class="customer-initials">{{ inquiry.customer.initials }}</div>
+                    }
+                    <span class="customer-name">{{ inquiry.customer.name }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge status-badge--{{ inquiry.status.toLowerCase() }}">
+                    {{ inquiry.status | titlecase }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  <div class="actions">
+                    <button class="action-button" (click)="onEdit(inquiry)" title="Edit">
+                      <app-icon name="pencil" size="16px" color="#18181B"></app-icon>
+                      <span>Edit</span>
+                    </button>
+                    <button class="action-button" (click)="onDelete(inquiry)" title="Delete">
+                      <app-icon name="trash" size="16px" color="#18181B"></app-icon>
+                      <span>Delete</span>
+                    </button>
+                    <button class="action-button action-button--more" (click)="onMoreOptions(inquiry)" title="More options">
+                      <app-icon name="moreVertical" size="16px" color="#18181B"></app-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   </div>
 </div>
