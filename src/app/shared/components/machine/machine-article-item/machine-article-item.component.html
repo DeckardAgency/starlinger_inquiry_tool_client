@@ -9,7 +9,7 @@
 >
   <div class="article-item__image">
     <img
-      [src]="'https://via.assets.so/img.jpg?w=90&h=90'"
+      [src]="environment.apiBaseUrl + machine.featuredImage?.filePath"
       [alt]="machine.articleDescription"
       onerror="this.src='https://via.assets.so/img.jpg?w=90&h=90'"
       loading="lazy"

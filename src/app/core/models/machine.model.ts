@@ -1,3 +1,5 @@
+import {MediaItem} from '@models/media.model';
+
 export interface Machine {
   '@id': string;
   '@type': string;
@@ -14,6 +16,7 @@ export interface Machine {
   mcNumber: string;
   fiStationNumber: number;
   fiSerialNumber: number;
+  featuredImage: MediaItem | null;
   imageGallery: any[];
   name?: string;
 }
