@@ -6,6 +6,7 @@ import {CartService} from '@services/cart/cart.service';
 import {QuickCartService} from '@services/cart/quick-cart.service';
 import {ManualCartService} from '@services/cart/manual-cart.service';
 import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
+import {MobileMenuService} from '@services/mobile-menu.service';
 
 @Component({
     selector: 'app-top-bar',
@@ -21,7 +22,8 @@ export class TopBarComponent implements OnInit {
     public quickCartService: QuickCartService,
     public manualCartService: ManualCartService,
     public manualQuickCartService: ManualQuickCartService,
-    private router: Router
+    private router: Router,
+    private mobileMenuService: MobileMenuService
   ) {}
 
   ngOnInit(): void {
@@ -72,5 +74,9 @@ export class TopBarComponent implements OnInit {
     } else {
       return this.quickCartService.getTotalItems();
     }
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuService.toggle();
   }
 }

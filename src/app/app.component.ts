@@ -18,20 +18,22 @@ import {ManualQuickCartService} from '@services/cart/manual-quick-cart.service';
 import {LoginModalService} from '@services/login-modal.service';
 import {LoginModalComponent} from '@shared/components/modals/login-modal/login-modal.component';
 import {AuthService} from '@core/auth/auth.service';
+import {MobileMenuComponent} from './layout/mobile-menu/mobile-menu.component';
 
 @Component({
     selector: 'app-root',
-    imports: [
-        RouterOutlet,
-        SidebarComponent,
-        TopBarComponent,
-        QuickCartComponent,
-        ManualQuickCartComponent,
-        CartNotificationComponent,
-        ManualNotificationComponent,
-        AsyncPipe,
-        LoginModalComponent
-    ],
+  imports: [
+    RouterOutlet,
+    SidebarComponent,
+    TopBarComponent,
+    QuickCartComponent,
+    ManualQuickCartComponent,
+    CartNotificationComponent,
+    ManualNotificationComponent,
+    AsyncPipe,
+    LoginModalComponent,
+    MobileMenuComponent
+  ],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
