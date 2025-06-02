@@ -341,6 +341,11 @@ $tablet-breakpoint: 1024px;
     }
   }
 
+  // Element: Action wrapper
+  &__action-wrapper {
+    position: relative;
+  }
+
   // Element: Action menu button
   &__action-menu {
     padding: 0.5rem;
@@ -360,6 +365,59 @@ $tablet-breakpoint: 1024px;
     }
 
     @include focus-visible;
+  }
+
+  // Element: Dropdown menu
+  &__dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.25rem;
+    min-width: 160px;
+    background: #ffffff;
+    border: 1px solid $border-color;
+    border-radius: $border-radius;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 50;
+    animation: dropdownSlide 0.2s ease-out;
+  }
+
+  // Element: Dropdown item
+  &__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    color: $text-primary;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $bg-light;
+    }
+
+    &:first-child {
+      border-top-left-radius: calc(#{$border-radius} - 1px);
+      border-top-right-radius: calc(#{$border-radius} - 1px);
+    }
+
+    &:last-child {
+      border-bottom-left-radius: calc(#{$border-radius} - 1px);
+      border-bottom-right-radius: calc(#{$border-radius} - 1px);
+    }
+
+    @include focus-visible;
+  }
+
+  // Element: Dropdown icon
+  &__dropdown-icon {
+    flex-shrink: 0;
+    color: $text-secondary;
   }
 
   // Element: Empty state
@@ -470,5 +528,17 @@ $tablet-breakpoint: 1024px;
       background: none !important;
       color: $text-primary !important;
     }
+  }
+}
+
+// Animations
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

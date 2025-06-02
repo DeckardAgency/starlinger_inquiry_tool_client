@@ -1,5 +1,3 @@
-// activity-history.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -98,13 +96,11 @@ export class ActivityHistoryComponent implements OnInit {
         // Map orders to OrderInquiryItem format
         if (orders.member && orders.member.length > 0) {
           this.orders = orders.member.map(order => this.mapOrderToInquiryItem(order));
-          console.log('orders', this.orders);
         }
 
         // Map inquiries to OrderInquiryItem format
         if (inquiries.member && inquiries.member.length > 0) {
           this.inquiries = inquiries.member.map(inquiry => this.mapInquiryToInquiryItem(inquiry));
-          console.log('inquiries', this.inquiries);
         }
       });
   }
@@ -243,13 +239,10 @@ export class ActivityHistoryComponent implements OnInit {
   }
 
   onTabChange(event: TabChangeEvent): void {
-    console.log('Tab changed:', event);
     // Since we load all data at once, we don't need to reload on tab change
   }
 
   onItemAction(action: OrderInquiryAction): void {
-    console.log('Action triggered:', action);
-
     switch (action.type) {
       case 'view':
         this.viewItem(action.item);
@@ -267,18 +260,15 @@ export class ActivityHistoryComponent implements OnInit {
   }
 
   onLoadData(tab: OrderInquiryTab): void {
-    console.log('Loading data for tab:', tab);
     // Since we load all data at once, we can skip this
   }
 
   onConfigChange(config: OrderInquiryTableConfig): void {
-    console.log('Configuration changed:', config);
     // Save configuration preferences
     localStorage.setItem('orderInquiryTableConfig', JSON.stringify(config));
   }
 
   private viewItem(item: OrderInquiryItem): void {
-    console.log('View item:', item);
     // Navigate to detail view based on source
     if (item.source === 'order') {
       // Navigate to order detail
@@ -290,17 +280,14 @@ export class ActivityHistoryComponent implements OnInit {
   }
 
   private editItem(item: OrderInquiryItem): void {
-    console.log('Edit item:', item);
     // Open edit dialog based on source
   }
 
   private deleteItem(item: OrderInquiryItem): void {
-    console.log('Delete item:', item);
     // Show confirmation dialog
   }
 
   private exportItem(item: OrderInquiryItem): void {
-    console.log('Export item:', item);
     // Export to CSV/PDF
   }
 }

@@ -1,4 +1,4 @@
-import {MediaItem} from '@models/media.model';
+import { MediaItem } from '@models/media.model';
 
 export interface Machine {
   '@id': string;
@@ -19,6 +19,7 @@ export interface Machine {
   featuredImage: MediaItem | null;
   imageGallery: any[];
   name?: string;
+  documents: MediaItem[] | string[];
 }
 
 

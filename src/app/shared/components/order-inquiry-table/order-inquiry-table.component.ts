@@ -1,5 +1,3 @@
-// order-inquiry-table.component.ts
-
 import {
   Component,
   Input,
@@ -11,10 +9,13 @@ import {
   ChangeDetectionStrategy,
   OnInit,
   DestroyRef,
-  inject
+  inject,
+  HostListener,
+  ElementRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, Subject } from 'rxjs';
 
@@ -46,6 +47,8 @@ import {DateFilterPipe} from '@shared/pipes/date-filter.pipe';
 })
 export class OrderInquiryTableComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
+  private elementRef = inject(ElementRef);
 
   // Input signals
   readonly inquiries = signal<OrderInquiryItem[]>([]);
@@ -68,6 +71,9 @@ export class OrderInquiryTableComponent implements OnInit {
   readonly searchTerm = signal<string>('');
   readonly showLoadOnTabChangeToggle = signal<boolean>(false);
 
+  // Dropdown state
+  readonly activeDropdownId = signal<string | null>(null);
+
   // Search debounce subject
   private searchSubject = new Subject<string>();
 
@@ -81,6 +87,22 @@ export class OrderInquiryTableComponent implements OnInit {
   readonly tabs = Object.values(ORDER_INQUIRY_TABS);
   readonly statusOptions = Object.values(ORDER_STATUS);
   readonly typeOptions = Object.values(INQUIRY_TYPE);
+
+  // Host listener for click outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const clickedInside = this.elementRef.nativeElement.contains(target);
+
+    // If clicked outside the component or on a different action button, close dropdown
+    if (!clickedInside || !target.closest('.order-inquiry__dropdown')) {
+      // Check if the click is on an action button
+      const actionButton = target.closest('.order-inquiry__action-menu');
+      if (!actionButton || actionButton.getAttribute('data-item-id') !== this.activeDropdownId()) {
+        this.activeDropdownId.set(null);
+      }
+    }
+  }
 
   // Computed signals
   readonly allItems = computed(() => {
@@ -190,8 +212,6 @@ export class OrderInquiryTableComponent implements OnInit {
   readonly paginatedItems = computed(() => {
     const items = this.sortedItems();
     const config = this.config();
-
-    console.log(items);
 
     if (!config.showPagination || !config.pageSize) {
       return items;
@@ -311,8 +331,33 @@ export class OrderInquiryTableComponent implements OnInit {
     this.configChange.emit(this.config());
   }
 
+  toggleDropdown(itemId: string, event: Event): void {
+    event.stopPropagation();
+
+    if (this.activeDropdownId() === itemId) {
+      this.activeDropdownId.set(null);
+    } else {
+      this.activeDropdownId.set(itemId);
+    }
+  }
+
   handleAction(action: 'view' | 'edit' | 'delete' | 'export', item: OrderInquiryItem): void {
+    // Close dropdown
+    this.activeDropdownId.set(null);
+
+    // Handle view action with navigation
+    if (action === 'view') {
+      const type = item.type.toLowerCase();
+      const url = `/my-inquiries/active/${type}/${item.internalReferenceNumber}/view`;
+      this.router.navigate([url]);
+    }
+
+    // Emit action for other cases
     this.itemAction.emit({ type: action, item });
+  }
+
+  isDropdownOpen(itemId: string): boolean {
+    return this.activeDropdownId() === itemId;
   }
 
   // Track by functions
@@ -338,5 +383,4 @@ export class OrderInquiryTableComponent implements OnInit {
     if (!current || current.column !== column) return 'both';
     return current.direction;
   }
-
 }

@@ -14,6 +14,8 @@ import { DraftInquiriesComponent } from '@features/my-inquiries/drafts/draft-inq
 import { InquiryHistoryComponent } from '@features/my-inquiries/history/inquiry-history.component';
 import { OrderDetailComponent } from '@features/inquiry-detail/shop/order-detail.component';
 import { InquiryDetailComponent } from '@features/inquiry-detail/manual-entry/inquiry-detail.component';
+import {MyMachinesComponent} from '@features/my-machines/my-machines.component';
+import {AllMachinesComponent} from '@features/all-machines/all-machines.component';
 
 export const routes: Routes = [
   {
@@ -102,5 +104,15 @@ export const routes: Routes = [
     component: OrderDetailComponent,
     canActivate: [AuthGuard],
     title: 'Inquiry Tool | Order Details'
-  }
+  },
+  {
+    path: 'my-machines',
+    component: MyMachinesComponent,
+    title: 'Inquiry Tool | My Machines'
+  },
+  {
+    path: 'all-machines',
+    component: AllMachinesComponent,
+    title: 'Inquiry Tool | All Machines'
+  },
 ];
