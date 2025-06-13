@@ -20,6 +20,7 @@ export interface Machine {
   imageGallery: any[];
   name?: string;
   documents: MediaItem[] | string[];
+  products: any[]
 }
 
 

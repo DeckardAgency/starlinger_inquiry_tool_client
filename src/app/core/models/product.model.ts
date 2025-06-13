@@ -1,4 +1,5 @@
 import { MediaItem } from './media.model';
+import {Machine} from '@models/machine.model';
 
 export interface ProductResponse {
   '@context': string;
@@ -32,4 +33,5 @@ export interface Product {
   imageGallery: MediaItem[];
   createdAt?: string;
   updatedAt?: string;
+  machines: Machine[];
 }
