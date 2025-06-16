@@ -1,10 +1,10 @@
-import { Component, OnInit, HostListener, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, startWith, catchError } from 'rxjs/operators';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
-import { Subscription } from 'rxjs';
+import { Subscription, of, EMPTY } from 'rxjs';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { MachineArticleItemComponent } from '@shared/components/machine/machine-article-item/machine-article-item.component';
 import { AdvancedImagePreviewModalComponent } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
@@ -34,22 +34,22 @@ export interface Part {
 }
 
 @Component({
-    selector: 'app-manual-entry-input-form',
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        RouterModule,
-        BreadcrumbsComponent,
-        MachineArticleItemComponent,
-        AdvancedImagePreviewModalComponent,
-        IconComponent,
-        MachineArticleItemShimmerComponent
-    ],
-    templateUrl: './manual-entry-input-form.component.html',
-    styleUrls: ['./manual-entry-input-form.component.scss']
+  selector: 'app-manual-entry-input-form',
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    BreadcrumbsComponent,
+    MachineArticleItemComponent,
+    AdvancedImagePreviewModalComponent,
+    IconComponent,
+    MachineArticleItemShimmerComponent
+  ],
+  templateUrl: './manual-entry-input-form.component.html',
+  styleUrls: ['./manual-entry-input-form.component.scss']
 })
-export class ManualEntryInputFormComponent implements OnInit {
+export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
   // Machine data properties
   machines: Machine[] = [];
   filteredMachines: Machine[] = [];
@@ -58,6 +58,11 @@ export class ManualEntryInputFormComponent implements OnInit {
   error: string | null = null;
   totalItems = 0;
   dragCounter = 0;
+
+  // Search state
+  searchLoading = false;
+  searchError: string | null = null;
+  private searchSubscription?: Subscription;
 
   // Image preview modal properties
   showImagePreview = false;
@@ -120,17 +125,197 @@ export class ManualEntryInputFormComponent implements OnInit {
     private manualQuickCartService: ManualQuickCartService,
     private authService: AuthService,
     private inquiryService: InquiryService,
-    private mediaService: MediaService // Add MediaService injection
+    private mediaService: MediaService
   ) {
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(value => this.filterMachines());
+    // Set up search functionality with server-side search
+    this.setupSearch();
   }
 
   ngOnInit(): void {
     this.loadMachines();
     this.addPart(); // Add first part by default
+  }
+
+  ngOnDestroy(): void {
+    // Clean up search subscription
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+
+    // Cancel all ongoing uploads and clean up resources
+    this.machinePartsMap.forEach(parts => {
+      parts.forEach(part => {
+        part.files.forEach(file => {
+          // Cancel any ongoing uploads
+          if (file.uploadSubscription && !file.uploadSubscription.closed) {
+            file.uploadSubscription.unsubscribe();
+          }
+          // Clean up object URLs
+          if (file.previewUrl) {
+            URL.revokeObjectURL(file.previewUrl);
+          }
+        });
+      });
+    });
+
+    // Also clean up current parts
+    this.parts.forEach(part => {
+      part.files.forEach(file => {
+        if (file.uploadSubscription && !file.uploadSubscription.closed) {
+          file.uploadSubscription.unsubscribe();
+        }
+        if (file.previewUrl) {
+          URL.revokeObjectURL(file.previewUrl);
+        }
+      });
+    });
+  }
+
+  /**
+   * Set up reactive search functionality
+   */
+  private setupSearch(): void {
+    this.searchSubscription = this.searchControl.valueChanges.pipe(
+      startWith(''), // Start with empty search
+      debounceTime(300), // Wait 300ms after user stops typing
+      distinctUntilChanged(), // Only emit if value actually changed
+      switchMap(searchTerm => {
+        // Set loading state
+        this.searchLoading = true;
+        this.searchError = null;
+
+        // If search term is empty or only whitespace, load all machines
+        if (!searchTerm?.trim()) {
+          return this.machineService.getMachines().pipe(
+            catchError(error => {
+              console.error('Error loading machines:', error);
+              this.searchError = 'Failed to load machines. Please try again.';
+              return of({ member: [], totalItems: 0, '@context': '', '@id': '', '@type': '', view: null });
+            })
+          );
+        }
+
+        // Perform server-side search
+        return this.machineService.searchMachines(searchTerm.trim()).pipe(
+          catchError(error => {
+            console.error('Error searching machines:', error);
+            this.searchError = `Failed to search for "${searchTerm}". Please try again.`;
+            return of({ member: [], totalItems: 0, '@context': '', '@id': '', '@type': '', view: null });
+          })
+        );
+      })
+    ).subscribe({
+      next: (response) => {
+        this.machines = response.member;
+        this.totalItems = response.totalItems;
+        this.searchLoading = false;
+
+        // Apply local filters (machine types) if any are active
+        this.applyLocalFilters();
+      },
+      error: (error) => {
+        console.error('Search subscription error:', error);
+        this.searchError = 'Search failed. Please try again.';
+        this.searchLoading = false;
+      }
+    });
+  }
+
+  /**
+   * Apply local filters (machine types) to the search results
+   */
+  private applyLocalFilters(): void {
+    let filtered = this.machines;
+
+    // Apply machine type filters
+    if (this.activeFilters.length > 0) {
+      filtered = filtered.filter(machine =>
+        this.activeFilters.some(filter =>
+          machine.articleDescription.toLowerCase().includes(filter.toLowerCase())
+        )
+      );
+    }
+
+    this.filteredMachines = filtered;
+  }
+
+  /**
+   * Load initial machines without search
+   */
+  private loadMachines(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.machineService.getMachines().subscribe({
+      next: (response) => {
+        this.machines = response.member;
+        this.totalItems = response.totalItems;
+        this.filteredMachines = this.machines;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load machines. Please try again later.';
+        this.loading = false;
+        console.error('Error loading machines:', err);
+      }
+    });
+  }
+
+  /**
+   * Clear search input
+   */
+  clearSearch(): void {
+    this.searchControl.setValue('');
+  }
+
+  /**
+   * Handle search input focus for better UX
+   */
+  onSearchFocus(): void {
+    // You can add focus-specific behavior here if needed
+  }
+
+  /**
+   * Handle search input blur for better UX
+   */
+  onSearchBlur(): void {
+    // You can add blur-specific behavior here if needed
+  }
+
+  // Machine type filter methods
+  removeFilter(filter: string): void {
+    // Remove from activeFilters
+    this.activeFilters = this.activeFilters.filter(f => f !== filter);
+
+    // Update machine type checked state
+    const machineType = this.machineTypes.find(m => m.name === filter);
+    if (machineType) {
+      machineType.checked = false;
+    }
+
+    // Reapply local filters
+    this.applyLocalFilters();
+  }
+
+  toggleFilter(): void {
+    this.isFilterOpen = !this.isFilterOpen;
+  }
+
+  toggleMachineType(machineType: MachineType): void {
+    machineType.checked = !machineType.checked;
+
+    if (machineType.checked) {
+      // Add to activeFilters if not already present
+      if (!this.activeFilters.includes(machineType.name)) {
+        this.activeFilters.push(machineType.name);
+      }
+    } else {
+      // Remove from activeFilters
+      this.activeFilters = this.activeFilters.filter(filter => filter !== machineType.name);
+    }
+
+    // Reapply local filters
+    this.applyLocalFilters();
   }
 
   // Part repeater methods
@@ -180,24 +365,6 @@ export class ManualEntryInputFormComponent implements OnInit {
     return 'part_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
   }
 
-  private loadMachines(): void {
-    this.loading = true;
-    this.machineService.getMachines().subscribe({
-      next: (response) => {
-        // Use machines instead of products
-        this.machines = response.member;
-        this.totalItems = response.totalItems;
-        this.filteredMachines = this.machines;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load machines. Please try again later.';
-        this.loading = false;
-        console.error('Error loading machines:', err);
-      }
-    });
-  }
-
   selectMachine(machine: Machine): void {
     // Save the current parts state if a machine is already selected
     if (this.selectedMachine) {
@@ -235,63 +402,6 @@ export class ManualEntryInputFormComponent implements OnInit {
       { label: 'Dashboard', link: '/dashboard' },
       { label: 'Manual Entry', link: '/manual-entry' }
     ];
-  }
-
-  removeFilter(filter: string): void {
-    // Remove from activeFilters
-    this.activeFilters = this.activeFilters.filter(f => f !== filter);
-
-    // Update machine type checked state
-    const machineType = this.machineTypes.find(m => m.name === filter);
-    if (machineType) {
-      machineType.checked = false;
-    }
-
-    this.filterMachines();
-  }
-
-  toggleFilter(): void {
-    this.isFilterOpen = !this.isFilterOpen;
-  }
-
-  toggleMachineType(machineType: MachineType): void {
-    machineType.checked = !machineType.checked;
-
-    if (machineType.checked) {
-      // Add to activeFilters if not already present
-      if (!this.activeFilters.includes(machineType.name)) {
-        this.activeFilters.push(machineType.name);
-      }
-    } else {
-      // Remove from activeFilters
-      this.activeFilters = this.activeFilters.filter(filter => filter !== machineType.name);
-    }
-
-    this.filterMachines();
-  }
-
-  private filterMachines(): void {
-    let filtered = this.machines;
-
-    const searchTerm = this.searchControl.value?.toLowerCase();
-    if (searchTerm) {
-      filtered = filtered.filter(machine =>
-        machine.articleDescription.toLowerCase().includes(searchTerm) ||
-        machine.articleNumber.toLowerCase().includes(searchTerm) ||
-        machine.ibSerialNumber.toString().includes(searchTerm) ||
-        machine.ibStationNumber.toString().includes(searchTerm)
-      );
-    }
-
-    // Use activeFilters for machine type filtering
-    if (this.activeFilters.length > 0) {
-      // Simple filtering by machine description containing filter text
-      filtered = filtered.filter(machine =>
-        this.activeFilters.some(filter => machine.articleDescription.includes(filter))
-      );
-    }
-
-    this.filteredMachines = filtered;
   }
 
   // Methods to check part form validity
@@ -686,36 +796,6 @@ export class ManualEntryInputFormComponent implements OnInit {
       count += parts.length;
     });
     return count;
-  }
-
-  ngOnDestroy(): void {
-    // Cancel all ongoing uploads and clean up resources
-    this.machinePartsMap.forEach(parts => {
-      parts.forEach(part => {
-        part.files.forEach(file => {
-          // Cancel any ongoing uploads
-          if (file.uploadSubscription && !file.uploadSubscription.closed) {
-            file.uploadSubscription.unsubscribe();
-          }
-          // Clean up object URLs
-          if (file.previewUrl) {
-            URL.revokeObjectURL(file.previewUrl);
-          }
-        });
-      });
-    });
-
-    // Also clean up current parts
-    this.parts.forEach(part => {
-      part.files.forEach(file => {
-        if (file.uploadSubscription && !file.uploadSubscription.closed) {
-          file.uploadSubscription.unsubscribe();
-        }
-        if (file.previewUrl) {
-          URL.revokeObjectURL(file.previewUrl);
-        }
-      });
-    });
   }
 
   @HostListener('document:click', ['$event'])

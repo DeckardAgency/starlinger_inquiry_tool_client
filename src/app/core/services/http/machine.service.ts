@@ -1,9 +1,15 @@
 // src/app/services/http/machine.service.ts
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '@env/environment';
 import { MachineResponse, Machine } from '@core/models/machine.model';
+
+export interface MachineSearchParams {
+  articleDescription?: string;
+  itemsPerPage?: number;
+  page?: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -23,12 +29,22 @@ export class MachineService {
   }
 
   /**
-   * Get all machines (without client filter)
-   * @param itemsPerPage Number of items to return per page
+   * Get all machines with optional search and pagination
+   * @param searchParamsOrItemsPerPage Search parameters object OR number of items per page (for backward compatibility)
    * @returns Observable with MachineResponse
    */
-  getMachines(itemsPerPage: number = 300): Observable<MachineResponse> {
-    return this.http.get<any>(`${this.apiUrl}?itemsPerPage=${itemsPerPage}`).pipe(
+  getMachines(searchParamsOrItemsPerPage: MachineSearchParams | number = {}): Observable<MachineResponse> {
+    // Handle backward compatibility - if a number is passed, convert to searchParams
+    let searchParams: MachineSearchParams;
+    if (typeof searchParamsOrItemsPerPage === 'number') {
+      searchParams = { itemsPerPage: searchParamsOrItemsPerPage };
+    } else {
+      searchParams = searchParamsOrItemsPerPage;
+    }
+
+    const params = this.buildHttpParams(searchParams);
+
+    return this.http.get<any>(`${this.apiUrl}`, { params }).pipe(
       map(response => this.normalizeHydraResponse(response)),
       map(response => {
         // Add name property for UI compatibility
@@ -42,14 +58,38 @@ export class MachineService {
   }
 
   /**
-   * Get machines for a specific client by ID
-   * @param clientId The client ID
+   * Search machines by article description
+   * @param term Search term for article description
    * @param itemsPerPage Number of items to return per page
    * @returns Observable with MachineResponse
    */
-  getMachinesByClientId(clientId: string, itemsPerPage: number = 300): Observable<MachineResponse> {
+  searchMachines(term: string, itemsPerPage: number = 300): Observable<MachineResponse> {
+    return this.getMachines({
+      articleDescription: term,
+      itemsPerPage
+    });
+  }
+
+  /**
+   * Get machines for a specific client by ID with optional search
+   * @param clientId The client ID
+   * @param searchParamsOrItemsPerPage Search parameters object OR number of items per page (for backward compatibility)
+   * @returns Observable with MachineResponse
+   */
+  getMachinesByClientId(clientId: string, searchParamsOrItemsPerPage: MachineSearchParams | number = {}): Observable<MachineResponse> {
+    // Handle backward compatibility - if a number is passed, convert to searchParams
+    let searchParams: MachineSearchParams;
+    if (typeof searchParamsOrItemsPerPage === 'number') {
+      searchParams = { itemsPerPage: searchParamsOrItemsPerPage };
+    } else {
+      searchParams = searchParamsOrItemsPerPage;
+    }
+
+    const params = this.buildHttpParams(searchParams);
+
     return this.http.get<any>(
-      `${this.clientApiUrl}/${clientId}/machines?itemsPerPage=${itemsPerPage}`
+      `${this.clientApiUrl}/${clientId}/machines`,
+      { params }
     ).pipe(
       map(response => this.normalizeHydraResponse(response)),
       map(response => {
@@ -61,6 +101,20 @@ export class MachineService {
         return response;
       })
     );
+  }
+
+  /**
+   * Search machines for a specific client
+   * @param clientId The client ID
+   * @param term Search term for article description
+   * @param itemsPerPage Number of items to return per page
+   * @returns Observable with MachineResponse
+   */
+  searchClientMachines(clientId: string, term: string, itemsPerPage: number = 300): Observable<MachineResponse> {
+    return this.getMachinesByClientId(clientId, {
+      articleDescription: term,
+      itemsPerPage
+    });
   }
 
   /**
@@ -90,6 +144,31 @@ export class MachineService {
         name: machine.articleDescription
       }))
     );
+  }
+
+  /**
+   * Build HttpParams from search parameters
+   * @param searchParams Search parameters object
+   * @returns HttpParams object
+   */
+  private buildHttpParams(searchParams: MachineSearchParams): HttpParams {
+    let params = new HttpParams();
+
+    // Add articleDescription search parameter
+    if (searchParams.articleDescription?.trim()) {
+      params = params.set('articleDescription', searchParams.articleDescription.trim());
+    }
+
+    // Add pagination parameters
+    if (searchParams.itemsPerPage) {
+      params = params.set('itemsPerPage', searchParams.itemsPerPage.toString());
+    }
+
+    if (searchParams.page) {
+      params = params.set('page', searchParams.page.toString());
+    }
+
+    return params;
   }
 
   /**

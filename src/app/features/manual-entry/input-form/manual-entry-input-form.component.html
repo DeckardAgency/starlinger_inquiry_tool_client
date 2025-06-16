@@ -5,8 +5,6 @@
     <div class="manual-entry__header-left">
       <h1 class="manual-entry__title">
         Manual inquiry
-<!--        <span class="manual-entry__title&#45;&#45;total-items" *ngIf="!loading">{{ totalItems }}</span>-->
-<!--        <span class="manual-entry__title&#45;&#45;total-items shimmer-effect" *ngIf="loading"></span>-->
       </h1>
     </div>
 
@@ -53,40 +51,57 @@
 
       <div class="manual-entry__filters">
         <div class="manual-entry__filters-title">
-      <span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <g clip-path="url(#clip0_333_67880)">
-            <path d="M3.66683 5.66683L6.00016 8.00016L3.66683 10.3335L1.3335 8.00016L3.66683 5.66683Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8.00016 1.3335L10.3335 3.66683L8.00016 6.00016L5.66683 3.66683L8.00016 1.3335Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12.3335 5.66683L14.6668 8.00016L12.3335 10.3335L10.0002 8.00016L12.3335 5.66683Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8.00016 10.0002L10.3335 12.3335L8.00016 14.6668L5.66683 12.3335L8.00016 10.0002Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </g>
-          <defs>
-            <clipPath id="clip0_333_67880">
-              <rect width="16" height="16" fill="white"/>
-            </clipPath>
-          </defs>
-        </svg>
-      </span>
           <span>
-        Part 1:
-      </span>
-          <span>
-        Select machine
-      </span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <g clip-path="url(#clip0_333_67880)">
+                <path d="M3.66683 5.66683L6.00016 8.00016L3.66683 10.3335L1.3335 8.00016L3.66683 5.66683Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8.00016 1.3335L10.3335 3.66683L8.00016 6.00016L5.66683 3.66683L8.00016 1.3335Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12.3335 5.66683L14.6668 8.00016L12.3335 10.3335L10.0002 8.00016L12.3335 5.66683Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8.00016 10.0002L10.3335 12.3335L8.00016 14.6668L5.66683 12.3335L8.00016 10.0002Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <defs>
+                <clipPath id="clip0_333_67880">
+                  <rect width="16" height="16" fill="white"/>
+                </clipPath>
+              </defs>
+            </svg>
+          </span>
+          <span>Part 1:</span>
+          <span>Select machine</span>
         </div>
+
         <div class="manual-entry__search">
-        <span class="material-icons">
-          <app-icon name="searchInput" size="16px" color="#71717A"></app-icon>
-        </span>
+          <span class="material-icons">
+            @if (searchLoading) {
+              <div class="search-loading-spinner"></div>
+            } @else {
+              <app-icon name="searchInput" size="16px" color="#71717A"></app-icon>
+            }
+          </span>
           <input
             type="text"
             [formControl]="searchControl"
             placeholder="Filter by machine name"
             class="manual-entry__search-input"
+            (focus)="onSearchFocus()"
+            (blur)="onSearchBlur()"
+            [class.search-loading]="searchLoading"
           >
+          @if (searchControl.value && searchControl.value.length > 0) {
+<!--            <button class="manual-entry__search-clear" (click)="clearSearch()" type="button">-->
+<!--              <app-icon name="close" size="14px" color="#71717A"></app-icon>-->
+<!--            </button>-->
+          }
         </div>
       </div>
+
+      <!-- Search Error Message -->
+      @if (searchError) {
+        <div class="manual-entry__search-error">
+          <app-icon name="alert" size="16px" color="#DC2626"></app-icon>
+          {{ searchError }}
+        </div>
+      }
 
       @if (loading) {
         <div class="manual-entry__machines manual-entry__machines--list">
@@ -100,13 +115,28 @@
 
       @if (!loading && !error) {
         <div class="manual-entry__machines manual-entry__machines--list">
-          @for (machine of filteredMachines; track machine.id) {
-            <app-machine-article-item
-              [machine]="machine"
-              viewMode="list"
-              [isSelected]="selectedMachine?.id === machine.id"
-              (machineSelected)="selectMachine($event)"
-            ></app-machine-article-item>
+          @if (filteredMachines.length === 0 && !searchLoading) {
+            <div class="manual-entry__no-results">
+              @if (searchControl.value && searchControl.value.trim().length > 0) {
+<!--                <app-icon name="searchEmpty" size="48px" color="#71717A"></app-icon>-->
+<!--                <h3>No machines found</h3>-->
+<!--                <p>No machines match your search for "{{ searchControl.value }}". Try adjusting your search terms.</p>-->
+<!--                <button class="btn btn-secondary" (click)="clearSearch()">Clear search</button>-->
+              } @else {
+<!--                <app-icon name="machineEmpty" size="48px" color="#71717A"></app-icon>-->
+<!--                <h3>No machines available</h3>-->
+<!--                <p>There are no machines available at the moment.</p>-->
+              }
+            </div>
+          } @else {
+            @for (machine of filteredMachines; track machine.id) {
+              <app-machine-article-item
+                [machine]="machine"
+                viewMode="list"
+                [isSelected]="selectedMachine?.id === machine.id"
+                (machineSelected)="selectMachine($event)"
+              ></app-machine-article-item>
+            }
           }
         </div>
       }
@@ -123,15 +153,10 @@
           <!-- Single Part Form -->
           <div class="manual-entry__form">
             <form [formGroup]="partForm">
-              <!--              <div class="part-repeater__header">-->
-              <!--                <h3 class="part-repeater__title">Parts ({{ parts.length }})</h3>-->
-              <!--              </div>-->
-
               @for (part of parts; track part.id; let i = $index) {
                 <div class="part-repeater__item">
                   <!-- Part Header -->
                   <div class="part-repeater__item-header">
-                    <!--                    <h4 class="part-repeater__item-title">Part {{ i + 1 }}</h4>-->
                     @if (parts.length > 1) {
                       <button type="button" class="part-repeater__remove-btn" (click)="removePart(i)">
                         <app-icon name="trashPart" size="16px"></app-icon>
@@ -247,11 +272,6 @@
                                 @if (file.status === 'error') {
                                   <div class="file-error-message">Failed to upload!</div>
                                 }
-
-                                <!-- Preview Hint for Images -->
-                                <!--                                @if (isImageFile(file.name) && file.status === 'success') {-->
-                                <!--                                  <div class="preview-hint">Click to preview</div>-->
-                                <!--                                }-->
                               </div>
 
                               <!-- File Actions -->
