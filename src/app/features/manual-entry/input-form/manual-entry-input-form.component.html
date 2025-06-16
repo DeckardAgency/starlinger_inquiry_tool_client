@@ -3,9 +3,10 @@
 
   <div class="manual-entry__header">
     <div class="manual-entry__header-left">
-      <h1 class="manual-entry__title">Available machines
-        <span class="manual-entry__title--total-items" *ngIf="!loading">{{ totalItems }}</span>
-        <span class="manual-entry__title--total-items shimmer-effect" *ngIf="loading"></span>
+      <h1 class="manual-entry__title">
+        Manual inquiry
+<!--        <span class="manual-entry__title&#45;&#45;total-items" *ngIf="!loading">{{ totalItems }}</span>-->
+<!--        <span class="manual-entry__title&#45;&#45;total-items shimmer-effect" *ngIf="loading"></span>-->
       </h1>
     </div>
 
@@ -29,21 +30,6 @@
     </div>
   </div>
 
-  <div class="manual-entry__filters">
-    <div class="manual-entry__filters-title">Select machine</div>
-    <div class="manual-entry__search">
-        <span class="material-icons">
-          <app-icon name="searchInput" size="16px" color="#71717A"></app-icon>
-        </span>
-      <input
-        type="text"
-        [formControl]="searchControl"
-        placeholder="Filter by machine name"
-        class="manual-entry__search-input"
-      >
-    </div>
-  </div>
-
   @if (activeFilters.length > 0) {
     <div class="manual-entry__active-filters">
       <span>Active filters:</span>
@@ -64,6 +50,43 @@
   <div class="manual-entry__container">
     <div class="manual-entry__machines-section"
          [class.manual-entry__machines-section--details]="selectedMachine">
+
+      <div class="manual-entry__filters">
+        <div class="manual-entry__filters-title">
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <g clip-path="url(#clip0_333_67880)">
+            <path d="M3.66683 5.66683L6.00016 8.00016L3.66683 10.3335L1.3335 8.00016L3.66683 5.66683Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8.00016 1.3335L10.3335 3.66683L8.00016 6.00016L5.66683 3.66683L8.00016 1.3335Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12.3335 5.66683L14.6668 8.00016L12.3335 10.3335L10.0002 8.00016L12.3335 5.66683Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8.00016 10.0002L10.3335 12.3335L8.00016 14.6668L5.66683 12.3335L8.00016 10.0002Z" stroke="#232323" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <defs>
+            <clipPath id="clip0_333_67880">
+              <rect width="16" height="16" fill="white"/>
+            </clipPath>
+          </defs>
+        </svg>
+      </span>
+          <span>
+        Part 1:
+      </span>
+          <span>
+        Select machine
+      </span>
+        </div>
+        <div class="manual-entry__search">
+        <span class="material-icons">
+          <app-icon name="searchInput" size="16px" color="#71717A"></app-icon>
+        </span>
+          <input
+            type="text"
+            [formControl]="searchControl"
+            placeholder="Filter by machine name"
+            class="manual-entry__search-input"
+          >
+        </div>
+      </div>
 
       @if (loading) {
         <div class="manual-entry__machines manual-entry__machines--list">
@@ -303,8 +326,10 @@
                 <div class="part-repeater__add-section">
                   <p class="part-repeater__add-text">Do you want to add more parts to the inquiry?</p>
                   <button type="button" class="part-repeater__add-btn" (click)="addPart()">
-                    <app-icon name="addPart" size="16px"></app-icon>
                     Add Part
+                    <span>
+                      <app-icon name="addPart" size="16px"></app-icon>
+                    </span>
                   </button>
                 </div>
               }
