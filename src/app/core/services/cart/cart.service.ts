@@ -12,7 +12,7 @@ export class CartService {
   private readonly isBrowser: boolean;
 
   // Quick cart panel state
-  private readonly openStateSubject = new BehaviorSubject<boolean>(true); // Open state
+  private readonly openStateSubject = new BehaviorSubject<boolean>(false); // Open state
   public readonly isOpen$ = this.openStateSubject.asObservable();
 
   // Notification state
