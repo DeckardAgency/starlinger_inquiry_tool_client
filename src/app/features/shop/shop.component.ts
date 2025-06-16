@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -11,26 +11,26 @@ import { ProductService } from '@services/http/product.service';
 import { CartService } from '@services/cart/cart.service';
 import { AuthService } from '@core/auth/auth.service';
 import { Breadcrumb, Product } from '@core/models';
-import { Machine } from '@models/machine-type.model';
+import { MachineType } from '@models/machine.model';
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { ArticleItemShimmerComponent } from '@shared/components/product/article-item/article-item-shimmer.component';
 import { ProductCardShimmerComponent } from '@shared/components/product/product-card/product-card-shimmer.component';
 
 @Component({
-    selector: 'app-shop',
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        RouterModule,
-        BreadcrumbsComponent,
-        ProductCardComponent,
-        ArticleItemComponent,
-        IconComponent,
-        ArticleItemShimmerComponent,
-        ProductCardShimmerComponent,
-    ],
-    templateUrl: 'shop.component.html',
-    styleUrls: ['shop.component.scss']
+  selector: 'app-shop',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    BreadcrumbsComponent,
+    ProductCardComponent,
+    ArticleItemComponent,
+    IconComponent,
+    ArticleItemShimmerComponent,
+    ProductCardShimmerComponent,
+  ],
+  templateUrl: 'shop.component.html',
+  styleUrls: ['shop.component.scss']
 })
 export class ShopComponent implements OnInit {
   environment = environment;
@@ -50,13 +50,7 @@ export class ShopComponent implements OnInit {
   discountedControl = new FormControl(false);
   quantityControl = new FormControl(1);
 
-  machines: Machine[] = [
-    { id: '1', name: '200XE Winding Machine', checked: false },
-    { id: '2', name: 'starEX Machine', checked: false },
-    { id: '3', name: 'ad*starKON Machine', checked: false },
-    { id: '4', name: 'Alpha 6.0 Machine', checked: false },
-    { id: '5', name: 'starEX 1600 ES Machine', checked: false }
-  ];
+  machines: MachineType[] = [];
   isFilterOpen = false;
   activeFilters: string[] = [];
   breadcrumbs: Breadcrumb[] = [
@@ -93,31 +87,49 @@ export class ShopComponent implements OnInit {
     this.loadProducts();
   }
 
+  private loadInitialProducts(): void {
+    this.loading = true;
+
+    // Check if a user has a client
+    if (this.authService.hasClient()) {
+      const clientId = this.authService.getCurrentUser()?.client?.id;
+      if (clientId) {
+        console.log('Loading initial client products for client ID:', clientId);
+        this.loadClientProducts(clientId, []); // Load without any machine filters
+      } else {
+        this.error = 'Client ID is missing. Please contact support.';
+        this.loading = false;
+      }
+    } else {
+      // Load all products (no client filter)
+      console.log('Loading initial products (no client).');
+      this.productService.getProducts().subscribe({
+        next: (response) => {
+          console.log('Initial product response received:', response);
+          this.products = response.member;
+          this.totalItems = response.totalItems;
+          this.filteredProducts = this.products;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = 'Failed to load products. Please try again later.';
+          this.loading = false;
+          console.error('Error loading initial products:', err);
+        }
+      });
+    }
+  }
+
   private loadProducts(): void {
     this.loading = true;
-    this.totalItems = 0; // Reset totalItems when starting to load
+    this.totalItems = 0;
 
     // Check if a user has a client
     if (this.authService.hasClient()) {
       const clientId = this.authService.getCurrentUser()?.client?.id;
       if (clientId) {
         console.log('Client found. Loading client products for client ID:', clientId);
-
-        // Load client-specific products
-        this.productService.getProductsByClientId(clientId).subscribe({
-          next: (response) => {
-            console.log('Product response received:', response);
-            this.products = response.member;
-            this.totalItems = response.totalItems;
-            this.filteredProducts = this.products;
-            this.loading = false;
-          },
-          error: (err) => {
-            this.error = 'Failed to load products. Please try again later.';
-            this.loading = false;
-            console.error('Error loading client products:', err);
-          }
-        });
+        this.loadClientProducts(clientId);
       } else {
         this.error = 'Client ID is missing. Please contact support.';
         this.loading = false;
@@ -131,6 +143,7 @@ export class ShopComponent implements OnInit {
           this.products = response.member;
           this.totalItems = response.totalItems;
           this.filteredProducts = this.products;
+          this.extractMachinesFromProducts(this.products);
           this.loading = false;
         },
         error: (err) => {
@@ -140,6 +153,64 @@ export class ShopComponent implements OnInit {
         }
       });
     }
+  }
+
+  private loadClientProducts(clientId: string, machineFilters: string[] = []): void {
+    // Build query parameters for machine filtering
+    const params: any = {};
+    if (machineFilters.length > 0) {
+      // Create multiple machine filter parameters
+      machineFilters.forEach(machineDescription => {
+        if (!params['machines.articleDescription']) {
+          params['machines.articleDescription'] = [];
+        }
+        params['machines.articleDescription'].push(machineDescription);
+      });
+    }
+
+    this.productService.getProductsByClientIdWithFilters(clientId, params).subscribe({
+      next: (response) => {
+        console.log('Product response received:', response);
+        this.products = response.member;
+        this.totalItems = response.totalItems;
+
+        // Apply local search filtering after getting API results
+        this.applyLocalFilters();
+
+        // Only extract machines on initial load (when no filters are applied)
+        if (machineFilters.length === 0) {
+          this.extractMachinesFromProducts(this.products);
+        }
+
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load products. Please try again later.';
+        this.loading = false;
+        console.error('Error loading client products:', err);
+      }
+    });
+  }
+
+  private extractMachinesFromProducts(products: Product[]): void {
+    const machineMap = new Map<string, MachineType>();
+
+    products.forEach(product => {
+      if (product.machines && Array.isArray(product.machines)) {
+        product.machines.forEach(machine => {
+          if (machine.articleDescription && !machineMap.has(machine.articleDescription)) {
+            machineMap.set(machine.articleDescription, {
+              id: machine.id,
+              name: machine.articleDescription,
+              checked: false
+            });
+          }
+        });
+      }
+    });
+
+    this.machines = Array.from(machineMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    console.log('Extracted machines:', this.machines);
   }
 
   /**
@@ -231,7 +302,12 @@ export class ShopComponent implements OnInit {
       machine.checked = false;
     }
 
-    this.filterProducts();
+    // If no active filters remain, reload initial products
+    if (this.activeFilters.length === 0) {
+      this.loadInitialProducts();
+    } else {
+      this.filterProducts();
+    }
   }
 
   incrementQuantity(): void {
@@ -248,7 +324,7 @@ export class ShopComponent implements OnInit {
     this.isFilterOpen = !this.isFilterOpen;
   }
 
-  toggleMachine(machine: Machine): void {
+  toggleMachine(machine: MachineType): void {
     machine.checked = !machine.checked;
 
     if (machine.checked) {
@@ -277,6 +353,17 @@ export class ShopComponent implements OnInit {
   }
 
   private filterProducts(): void {
+    // If we have machine filters and this is a client, use API filtering
+    if (this.activeFilters.length > 0 && this.authService.hasClient()) {
+      this.loading = true;
+      const clientId = this.authService.getCurrentUser()?.client?.id;
+      if (clientId) {
+        this.loadClientProducts(clientId, this.activeFilters);
+      }
+      return;
+    }
+
+    // Local filtering for search and discount
     let filtered = this.products;
 
     const searchTerm = this.searchControl.value?.toLowerCase();
@@ -287,47 +374,23 @@ export class ShopComponent implements OnInit {
       );
     }
 
-    // Use activeFilters for machine filtering
-    if (this.activeFilters.length > 0) {
-      // Check if "200XE Winding Machine" is selected
-      if (this.activeFilters.includes('200XE Winding Machine')) {
-        // Create demo products array
-        const demoProducts = [
-          {
-            id: '1',
-            name: 'Power Control 200XE',
-            partNo: 'PC-200XE-001',
-            clientPrice: 599.99,
-            effectivePrice: 599.99,
-            shortDescription: 'Power control unit for 200XE Winding Machine',
-            technicalDescription: '24V DC, 500W, IP65'
-          },
-          {
-            id: '2',
-            name: 'Sensor Module 200XE',
-            partNo: 'SM-200XE-002',
-            clientPrice: 299.99,
-            effectivePrice: 299.99,
-            shortDescription: 'High-precision sensor module for 200XE',
-            technicalDescription: 'Accuracy ±0.01mm, Response time 1ms'
-          },
-          {
-            id: '3',
-            name: 'Control Panel 200XE',
-            partNo: 'CP-200XE-003',
-            clientPrice: 449.99,
-            effectivePrice: 449.99,
-            shortDescription: 'Touch control panel for 200XE series',
-            technicalDescription: '7" TFT, IP54, Multi-touch'
-          }
-        ] as Product[];
+    if (this.discountedControl.value) {
+      // Filter products with discounts
+      filtered = filtered.filter(product => this.hasDiscount(product));
+    }
 
-        filtered = demoProducts;
-      } else {
-        filtered = filtered.filter(product =>
-          this.activeFilters.some(filter => product.name.includes(filter))
-        );
-      }
+    this.filteredProducts = filtered;
+  }
+
+  private applyLocalFilters(): void {
+    let filtered = this.products;
+
+    const searchTerm = this.searchControl.value?.toLowerCase();
+    if (searchTerm) {
+      filtered = filtered.filter(product =>
+        product.partNo.toLowerCase().includes(searchTerm) ||
+        product.name.toLowerCase().includes(searchTerm)
+      );
     }
 
     if (this.discountedControl.value) {
@@ -337,8 +400,6 @@ export class ShopComponent implements OnInit {
 
     this.filteredProducts = filtered;
   }
-
-  @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const filterElement = document.querySelector('.shop__machine-filter');
     if (!filterElement?.contains(event.target as Node)) {

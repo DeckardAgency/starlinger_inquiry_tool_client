@@ -38,7 +38,7 @@ import { CommonModule } from '@angular/common';
     }
 
     .product-card__image.shimmer-effect {
-      height: 600px;
+      height: 464px;
       width: 100%;
       margin-bottom: 24px;
       border-radius: 8px;

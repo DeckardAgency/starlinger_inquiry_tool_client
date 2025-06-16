@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '@env/environment';
@@ -42,6 +42,54 @@ export class ProductService {
     return this.http.get<any>(
       `${this.clientApiUrl}/${clientId}/products?itemsPerPage=${itemsPerPage}`
     ).pipe(
+      map(response => this.normalizeHydraResponse(response))
+    );
+  }
+
+  /**
+   * Get products for a specific client by ID with filters
+   * @param clientId The client ID
+   * @param filters Object containing filter parameters
+   * @param itemsPerPage Number of items to return per page
+   * @returns Observable with ProductResponse
+   */
+  getProductsByClientIdWithFilters(
+    clientId: string,
+    filters: any = {},
+    itemsPerPage: number = 300
+  ): Observable<ProductResponse> {
+    let params = new HttpParams();
+    params = params.set('itemsPerPage', itemsPerPage.toString());
+
+    // Handle machine filters
+    if (filters['machines.articleDescription']) {
+      const machineFilters = Array.isArray(filters['machines.articleDescription'])
+        ? filters['machines.articleDescription']
+        : [filters['machines.articleDescription']];
+
+      machineFilters.forEach((machineDescription: string) => {
+        params = params.append('machines.articleDescription', machineDescription);
+      });
+    }
+
+    // Add other filters if needed
+    Object.keys(filters).forEach(key => {
+      if (key !== 'machines.articleDescription' && filters[key]) {
+        if (Array.isArray(filters[key])) {
+          filters[key].forEach((value: any) => {
+            params = params.append(key, value.toString());
+          });
+        } else {
+          params = params.set(key, filters[key].toString());
+        }
+      }
+    });
+
+    const url = `${this.clientApiUrl}/${clientId}/products`;
+    console.log('API Request URL:', url);
+    console.log('API Request Params:', params.toString());
+
+    return this.http.get<any>(url, { params }).pipe(
       map(response => this.normalizeHydraResponse(response))
     );
   }

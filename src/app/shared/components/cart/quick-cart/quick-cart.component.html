@@ -59,8 +59,13 @@
               </button>
             </div>
             <div class="cart-item__price-wrapper">
-              <div class="cart-item__price">€ {{ formatPrice(calculateItemPrice(item.product.clientPrice, item.quantity)) }}</div>
-<!--              {{ formatPrice(product.discountPercentage ? product.effectivePrice : product.clientPrice) }}-->
+              @if (item.product.clientPrice > 0) {
+                <div class="cart-item__price">
+                  <span *ngIf="item.product.discountPercentage" class="cart-item__price-original">€ {{ formatPrice(item.product.clientPrice * item.quantity) }}</span>
+                  <span *ngIf="item.product.discountPercentage" class="cart-item__price-discount">-{{ item.product.discountPercentage }}%</span>
+                  <span class="cart-item__price-final">€ {{ formatPrice(item.product.discountPercentage ? ((item.product.effectivePrice || item.product.clientPrice) * item.quantity) : (item.product.clientPrice * item.quantity)) }}</span>
+                </div>
+              }
             </div>
           </div>
         </div>

@@ -23,8 +23,6 @@ export interface Machine {
   products: any[]
 }
 
-
-
 export interface MachineResponse {
   '@context': string;
   '@id': string;
