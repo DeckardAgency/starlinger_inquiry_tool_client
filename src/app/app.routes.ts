@@ -16,6 +16,7 @@ import { OrderDetailComponent } from '@features/inquiry-detail/shop/order-detail
 import { InquiryDetailComponent } from '@features/inquiry-detail/manual-entry/inquiry-detail.component';
 import {MyMachinesComponent} from '@features/my-machines/my-machines.component';
 import {AllMachinesComponent} from '@features/all-machines/all-machines.component';
+import {MyInquiriesComponent} from '@features/my-inquiries/my-inquiries.component';
 
 export const routes: Routes = [
   {
@@ -74,6 +75,12 @@ export const routes: Routes = [
     path: 'order-confirmation',
     component: OrderConfirmationComponent,
     title: 'Inquiry Tool | Order Confirmation'
+  },
+  {
+    path: 'my-inquiries',
+    component: MyInquiriesComponent,
+    canActivate: [AuthGuard],
+    title: 'Inquiry Tool | My Inquiries'
   },
   {
     path: 'my-inquiries/active',
