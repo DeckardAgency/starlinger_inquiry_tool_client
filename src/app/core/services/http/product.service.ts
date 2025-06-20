@@ -61,14 +61,14 @@ export class ProductService {
     let params = new HttpParams();
     params = params.set('itemsPerPage', itemsPerPage.toString());
 
-    // Handle machine filters
+    // Handle machine filters with array notation
     if (filters['machines.articleDescription']) {
       const machineFilters = Array.isArray(filters['machines.articleDescription'])
         ? filters['machines.articleDescription']
         : [filters['machines.articleDescription']];
 
       machineFilters.forEach((machineDescription: string) => {
-        params = params.append('machines.articleDescription', machineDescription);
+        params = params.append('machines.articleDescription[]', machineDescription);
       });
     }
 
@@ -77,7 +77,8 @@ export class ProductService {
       if (key !== 'machines.articleDescription' && filters[key]) {
         if (Array.isArray(filters[key])) {
           filters[key].forEach((value: any) => {
-            params = params.append(key, value.toString());
+            // Use array notation for other array filters too
+            params = params.append(`${key}[]`, value.toString());
           });
         } else {
           params = params.set(key, filters[key].toString());

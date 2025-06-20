@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -85,6 +85,14 @@ export class ShopComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const filterElement = document.querySelector('.shop__machine-filter');
+    if (!filterElement?.contains(event.target as Node)) {
+      this.isFilterOpen = false;
+    }
   }
 
   private loadInitialProducts(): void {
@@ -337,7 +345,16 @@ export class ShopComponent implements OnInit {
       this.activeFilters = this.activeFilters.filter(filter => filter !== machine.name);
     }
 
-    this.filterProducts();
+    // Check if all machines are unchecked
+    const hasAnyCheckedMachine = this.machines.some(m => m.checked);
+
+    if (!hasAnyCheckedMachine && this.activeFilters.length === 0) {
+      // All checkboxes are unchecked, reset to initial state
+      this.loadInitialProducts();
+    } else {
+      // Apply filters normally
+      this.filterProducts();
+    }
   }
 
   addSelectedProductToCart(): void {
@@ -399,11 +416,5 @@ export class ShopComponent implements OnInit {
     }
 
     this.filteredProducts = filtered;
-  }
-  onDocumentClick(event: MouseEvent): void {
-    const filterElement = document.querySelector('.shop__machine-filter');
-    if (!filterElement?.contains(event.target as Node)) {
-      this.isFilterOpen = false;
-    }
   }
 }
