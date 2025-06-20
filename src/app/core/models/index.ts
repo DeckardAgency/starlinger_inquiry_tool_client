@@ -6,3 +6,4 @@ export * from './ui.model';
 export * from './auth.model';
 export * from './machine.model';
 export * from './manual-cart-item.model';
+export * from './client-machine-installed-base.model';
