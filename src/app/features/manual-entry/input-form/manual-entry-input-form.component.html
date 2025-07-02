@@ -233,7 +233,7 @@
                             Add file(s)
                           </button>
                           <p class="drag-text">or Drag & Drop them here!</p>
-                          <p class="file-types">We accept: JPG, PNG, WEBP, PDF, DOC. Max file size: 5 MB. 1</p>
+                          <p class="file-types">We accept: JPG, PNG, WEBP, PDF, DOC. Max file size: 5 MB.</p>
                         </div>
                       }
 
@@ -324,19 +324,15 @@
 
                   <!-- Additional Notes Field -->
                   <div class="form-group">
-                    <label [for]="'additionalNotes' + i">Additional notes *</label>
+                    <label [for]="'additionalNotes' + i">Additional notes</label>
                     <textarea
                       [id]="'additionalNotes' + i"
                       [(ngModel)]="part.data.additionalNotes"
                       [ngModelOptions]="{standalone: true}"
                       class="form-control"
                       rows="5"
-                      (input)="checkPartValidity()"
                       placeholder="If you have more information that you want to share with us, please type here."
                     ></textarea>
-                    @if (!part.data.additionalNotes && part.touched) {
-                      <div class="error-message">Additional notes are required</div>
-                    }
                   </div>
                 </div>
               }

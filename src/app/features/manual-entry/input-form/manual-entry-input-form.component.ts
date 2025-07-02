@@ -93,7 +93,7 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
     partName: new FormControl('', Validators.required),
     partNumber: new FormControl(''),
     shortDescription: new FormControl('', Validators.required),
-    additionalNotes: new FormControl('', Validators.required)
+    additionalNotes: new FormControl('')
   });
 
   // Parts repeater array
@@ -421,15 +421,13 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
 
     // Check if required fields are filled
     return !!currentPart.data.partName &&
-      !!currentPart.data.shortDescription &&
-      !!currentPart.data.additionalNotes;
+      !!currentPart.data.shortDescription;
   }
 
   isFormValid(): boolean {
     return this.parts.every(part =>
       !!part.data.partName &&
-      !!part.data.shortDescription &&
-      !!part.data.additionalNotes
+      !!part.data.shortDescription
     );
   }
 

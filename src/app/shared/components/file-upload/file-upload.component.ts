@@ -21,11 +21,8 @@ export class FileUploadComponent {
     'image/png',
     'image/webp',
     'application/pdf',
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'video/mp4'
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
   ];
 
   @Output() filesChanged = new EventEmitter<UploadedFile[]>();
