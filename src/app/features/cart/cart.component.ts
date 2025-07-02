@@ -75,18 +75,27 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Calculate all cart totals
+   * Get the price to use for calculations (effectivePrice if available, otherwise clientPrice)
+   */
+  getEffectivePrice(product: any): number {
+    return product.effectivePrice !== null && product.effectivePrice !== undefined
+      ? product.effectivePrice
+      : product.clientPrice;
+  }
+
+  /**
+   * Calculate all cart totals using effective prices
    */
   calculateTotals(): void {
-    // Calculate original subtotal
+    // Calculate original subtotal using effective prices
     this.cartSubtotal = this.cartItems.reduce(
-      (total, item) => total + (item.product.clientPrice * item.quantity),
+      (total, item) => total + (this.getEffectivePrice(item.product) * item.quantity),
       0
     );
 
     // Calculate total with discount applied
     const discountedTotal = this.cartItems.reduce(
-      (total, item) => total + (this.getDiscountedPrice(item.product.clientPrice) * item.quantity),
+      (total, item) => total + (this.getDiscountedPrice(this.getEffectivePrice(item.product)) * item.quantity),
       0
     );
 
@@ -105,10 +114,10 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Calculate the total for a specific item
+   * Calculate the total for a specific item using effective price
    */
   getItemTotal(item: CartItem): number {
-    return this.getDiscountedPrice(item.product.clientPrice) * item.quantity;
+    return this.getDiscountedPrice(this.getEffectivePrice(item.product)) * item.quantity;
   }
 
   /**
