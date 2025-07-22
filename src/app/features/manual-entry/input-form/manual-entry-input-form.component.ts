@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChildren, QueryList, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -122,7 +122,8 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
     private manualQuickCartService: ManualQuickCartService,
     private authService: AuthService,
     private inquiryService: InquiryService,
-    private mediaService: MediaService
+    private mediaService: MediaService,
+    private cdr: ChangeDetectorRef
   ) {
     // Set up search functionality with server-side search
     this.setupSearch();
@@ -506,7 +507,7 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
           type: file.type,
           file: file,
           status: 'uploading',
-          progress: 0
+          progress: 0 // Start at 0
         };
 
         // If it's an image, create a preview URL
@@ -515,7 +516,14 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
         }
 
         this.parts[partIndex].files.push(uploadedFile);
-        this.uploadFile(partIndex, uploadedFile);
+
+        // Force change detection to ensure UI updates immediately
+        this.cdr.detectChanges();
+
+        // Start upload with a small delay to ensure UI has rendered
+        setTimeout(() => {
+          this.uploadFile(partIndex, uploadedFile);
+        }, 10);
 
         // Update the stored parts for the selected machine
         if (this.selectedMachine) {
@@ -531,12 +539,22 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
 
   // Replace simulateUpload with actual upload using MediaService
   private uploadFile(partIndex: number, file: UploadedFile): void {
+    // Set initial progress to show the progress bar immediately
+    file.progress = 1; // Start at 1% to ensure the progress bar is visible
+    this.cdr.detectChanges(); // Force UI update
+
     const uploadSubscription = this.mediaService.uploadFile(file.file).subscribe({
       next: (event: HttpEvent<MediaItem>) => {
         switch (event.type) {
+          case HttpEventType.Sent:
+            // File upload has been sent to server
+            file.progress = 1;
+            break;
+
           case HttpEventType.UploadProgress:
             if (event.total) {
-              file.progress = Math.round((event.loaded / event.total) * 100);
+              // Calculate progress, ensuring it's at least 1% for visibility
+              file.progress = Math.max(1, Math.round((event.loaded / event.total) * 100));
             }
             break;
 
@@ -554,6 +572,9 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
         if (this.selectedMachine) {
           this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
         }
+
+        // Trigger change detection for smooth progress updates
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Upload failed:', error);
@@ -575,6 +596,8 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
         if (this.selectedMachine) {
           this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
         }
+
+        this.cdr.detectChanges();
       },
       complete: () => {
         // Clean up the subscription

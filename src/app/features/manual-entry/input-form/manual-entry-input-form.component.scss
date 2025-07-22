@@ -201,6 +201,7 @@
       z-index: 4;
       margin-bottom: 10px;
       height: 64px;
+      transition: all 0.2s ease;
 
       &:last-child {
 
@@ -219,8 +220,11 @@
       }
 
       &.file-uploading {
-        //background-color: #f0fdf4;
-        border-radius: 4px;
+        // Ensure the progress bar container is visible immediately
+        .upload-progress {
+          opacity: 1;
+          transition: opacity 0.2s ease-in;
+        }
       }
     }
 
@@ -260,6 +264,29 @@
           background: linear-gradient(0deg, var(--alpha-default-10, rgba(255, 255, 255, 0.90)) 0%, var(--alpha-default-10, rgba(255, 255, 255, 0.90)) 100%), var(--base-success, #237804);
           transition: width 0.3s ease;
           border-radius: 6px;
+
+          // Add a minimum width so it's visible even at 1%
+          min-width: 2%;
+
+          // Add a subtle animation for better UX
+          position: relative;
+          overflow: hidden;
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+          }
         }
       }
     }
@@ -940,5 +967,103 @@
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+// Add loading spinner for search
+.search-loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #805AD5;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.manual-entry__search-input.search-loading {
+  padding-right: 40px;
+}
+
+.manual-entry__search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #71717A;
+
+  &:hover {
+    color: #52525B;
+  }
+}
+
+.manual-entry__search-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #FEF2F2;
+  color: #DC2626;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.manual-entry__no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+
+  h3 {
+    margin: 16px 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  p {
+    margin: 0 0 24px;
+    color: #64748b;
+    font-size: 14px;
+    max-width: 400px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &.btn-secondary {
+      background-color: white;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+
+      &:hover {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+      }
+    }
   }
 }
