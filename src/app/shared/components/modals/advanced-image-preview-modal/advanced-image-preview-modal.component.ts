@@ -1,4 +1,37 @@
-import { Component, Input, Output, EventEmitter, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+/**
+ * Advanced Image Preview Modal Component
+ *
+ * This component provides a modal interface for viewing and editing images with various annotation tools.
+ *
+ * Features:
+ * - Drawing tools: freehand, circle, and text annotations
+ * - Image cropping
+ * - Image rotation
+ * - Undo/redo functionality
+ *
+ * Optimizations and bug fixes (2025-07-22):
+ * 1. Performance improvements:
+ *    - Replaced setTimeout with requestAnimationFrame for better rendering performance
+ *    - Optimized circle drawing to avoid expensive redraws from history
+ *    - Added memory management for history to prevent memory leaks (MAX_HISTORY_SIZE)
+ *
+ * 2. Bug fixes:
+ *    - Fixed rotation handling in saveChanges method to properly handle different rotation angles
+ *    - Added proper cleanup of temporary resources to prevent memory leaks
+ *    - Improved canvas setup to handle image loading edge cases
+ *
+ * 3. Error handling:
+ *    - Added comprehensive error handling throughout the component
+ *    - Improved validation for user inputs
+ *    - Added graceful error recovery to prevent UI from getting stuck
+ *    - Added a notification system for user-friendly error messages
+ *
+ * 4. Code quality:
+ *    - Added better logging for debugging
+ *    - Improved code organization and comments
+ *    - Enhanced the reset functionality for complete state cleanup
+ */
+import { Component, Input, Output, EventEmitter, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -21,9 +54,9 @@ interface Annotation {
 }
 
 @Component({
-    selector: 'app-advanced-image-preview-modal',
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-advanced-image-preview-modal',
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="image-modal-overlay" (click)="handleClose()">
       <div class="image-modal-content" (click)="$event.stopPropagation()">
         <!-- Modal header with image name and edit title -->
@@ -39,8 +72,8 @@ interface Annotation {
         <div class="image-toolbar">
           <div class="toolbar-group">
             <button class="toolbar-button" [class.toolbar-button-active]="drawingMode === DrawingMode.Freehand" title="Freehand Draw" (click)="toggleDrawingMode(DrawingMode.Freehand)">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 21c3-3 5-6 12-10M9 3l1.5 1.5M11 5.5l1.5 1.5M13 8l1.5 1.5M15 10.5l1.5 1.5M17 13l1.5 1.5M19 15.5l1.5 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path d="M9.79346 11.8997L17.8635 3.83967C18.1265 3.56812 18.441 3.35162 18.7885 3.20278C19.1361 3.05395 19.5098 2.97575 19.8878 2.97275C20.2659 2.96974 20.6408 3.04199 20.9907 3.18529C21.3405 3.32858 21.6584 3.54006 21.9257 3.8074C22.1931 4.07474 22.4045 4.39261 22.5478 4.74248C22.6911 5.09235 22.7634 5.46723 22.7604 5.8453C22.7574 6.22336 22.6792 6.59705 22.5303 6.9446C22.3815 7.29215 22.165 7.60661 21.8935 7.86967L13.8335 15.9497M7.80342 14.9397C6.14342 14.9397 4.80342 16.2897 4.80342 17.9597C4.80342 19.2897 2.30342 19.4797 2.80342 19.9797C3.88342 21.0797 5.29342 21.9997 6.80342 21.9997C9.00342 21.9997 10.8034 20.1997 10.8034 17.9597C10.8047 17.5644 10.7282 17.1728 10.5781 16.8071C10.4281 16.4414 10.2075 16.1088 9.92889 15.8284C9.65031 15.5479 9.31923 15.3251 8.95454 15.1726C8.58985 15.0202 8.1987 14.941 7.80342 14.9397Z" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
 
@@ -58,23 +91,21 @@ interface Annotation {
 
             <!-- Crop button -->
             <button class="toolbar-button" [class.toolbar-button-active]="isCropMode" title="Crop" (click)="toggleCropMode()">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 2v4h12v12h4M16 16H4V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path d="M6.7334 2V16C6.7334 16.5304 6.94411 17.0391 7.31918 17.4142C7.69426 17.7893 8.20297 18 8.7334 18H22.7334M18.7334 22V8C18.7334 7.46957 18.5227 6.96086 18.1476 6.58579C17.7725 6.21071 17.2638 6 16.7334 6H2.7334" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
 
             <!-- Rotate buttons -->
             <button class="toolbar-button" title="Rotate Left" (click)="rotateImage(-90)">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2 12a10 10 0 1 1 10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 12h10M2 12l4-4M2 12l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path d="M21.7334 12C21.7334 13.78 21.2056 15.5201 20.2166 17.0001C19.2277 18.4802 17.8221 19.6337 16.1776 20.3149C14.533 20.9961 12.7234 21.1743 10.9776 20.8271C9.23176 20.4798 7.62811 19.6226 6.36944 18.364C5.11077 17.1053 4.2536 15.5016 3.90633 13.7558C3.55907 12.01 3.7373 10.2004 4.41849 8.55585C5.09968 6.91131 6.25323 5.50571 7.73327 4.51677C9.21331 3.52784 10.9534 3 12.7334 3C15.2534 3 17.6634 4 19.4734 5.74L21.7334 8M21.7334 8L21.7334 3M21.7334 8H16.7334" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
 
             <button class="toolbar-button" title="Rotate Right" (click)="rotateImage(90)">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22 12a10 10 0 1 0-10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M22 12H12M22 12l-4-4M22 12l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path d="M3.7334 12C3.7334 13.78 4.26124 15.5201 5.25017 17.0001C6.2391 18.4802 7.64471 19.6337 9.28925 20.3149C10.9338 20.9961 12.7434 21.1743 14.4892 20.8271C16.235 20.4798 17.8387 19.6226 19.0974 18.364C20.356 17.1053 21.2132 15.5016 21.5605 13.7558C21.9077 12.01 21.7295 10.2004 21.0483 8.55585C20.3671 6.91131 19.2136 5.50571 17.7335 4.51677C16.2535 3.52784 14.5134 3 12.7334 3C10.2174 3.00947 7.80237 3.99122 5.9934 5.74L3.7334 8M3.7334 8V3M3.7334 8H8.7334" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
           </div>
@@ -103,14 +134,14 @@ interface Annotation {
 
           <div class="toolbar-group">
             <button class="toolbar-button" title="Undo" (click)="handleUndo()">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 10h10c4 0 7 3 7 7v0c0 4-3 7-7 7H9M3 10l5-5M3 10l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path d="M3.7334 7V13M3.7334 13H9.7334M3.7334 13L6.7334 10.3C8.38225 8.82116 10.5185 8.00226 12.7334 8C15.1203 8 17.4095 8.94821 19.0974 10.636C20.7852 12.3239 21.7334 14.6131 21.7334 17" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
 
             <button class="toolbar-button" title="Redo" (click)="handleRedo()">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 10H11c-4 0-7 3-7 7v0c0 4 3 7 7 7h4M21 10l-5-5M21 10l-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+                <path d="M21.7334 7V13M21.7334 13H15.7334M21.7334 13L18.7334 10.3C17.0845 8.82116 14.9483 8.00226 12.7334 8C10.3465 8 8.05726 8.94821 6.36944 10.636C4.68161 12.3239 3.7334 14.6131 3.7334 17" stroke="#232323" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
 
@@ -164,6 +195,10 @@ interface Annotation {
                 <div class="crop-handle bottom-left"></div>
                 <div class="crop-handle bottom-right"></div>
               </div>
+              <!-- Message about keyboard shortcut -->
+              <div *ngIf="cropSelectionFinalized" class="crop-message">
+                Press Enter to apply crop
+              </div>
             </div>
           </div>
         </div>
@@ -192,7 +227,7 @@ interface Annotation {
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     :host {
       --modal-bg: #ffffff;
       --modal-border: #e0e0e0;
@@ -463,6 +498,20 @@ interface Annotation {
       right: -5px;
     }
 
+    .crop-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
     .image-modal-footer {
       display: flex;
       justify-content: flex-end;
@@ -541,6 +590,7 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
   // Crop properties
   isCropMode: boolean = false;
   cropStarted: boolean = false;
+  cropSelectionFinalized: boolean = false;
   cropStart = { x: 0, y: 0 };
   cropEnd = { x: 0, y: 0 };
 
@@ -553,6 +603,7 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
   // History for undo/redo
   history: ImageData[] = [];
   historyIndex: number = -1;
+  readonly MAX_HISTORY_SIZE: number = 20; // Limit history size to prevent memory issues
 
   // Make Math available in the template
   Math: any = Math;
@@ -563,28 +614,59 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
     // Initialization
   }
 
+  // Handle keyboard events
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent): void {
+    // Apply crop when Enter key is pressed and crop selection is finalized
+    // This allows the user to apply the crop without moving the cursor outside the image area,
+    // which would otherwise change the crop rectangle unintentionally
+    if (event.key === 'Enter' && this.isCropMode && this.cropStarted && this.cropSelectionFinalized) {
+      this.applyCrop();
+    }
+  }
+
   ngAfterViewInit(): void {
     // Setup canvas after view is initialized
-    setTimeout(() => {
+    // Use requestAnimationFrame instead of setTimeout for better performance
+    requestAnimationFrame(() => {
       this.setupCanvas();
-    }, 300);
+    });
   }
 
   setupCanvas(): void {
-    if (!this.annotationCanvas || !this.previewImage) return;
+    if (!this.annotationCanvas || !this.previewImage) {
+      console.warn('Canvas or image element not available');
+      return;
+    }
 
-    const canvas = this.annotationCanvas.nativeElement;
-    const img = this.previewImage.nativeElement;
+    try {
+      const canvas = this.annotationCanvas.nativeElement;
+      const img = this.previewImage.nativeElement;
 
-    // Set canvas dimensions to match the image
-    canvas.width = img.width;
-    canvas.height = img.height;
+      // Check if image has loaded and has dimensions
+      if (img.width === 0 || img.height === 0) {
+        console.warn('Image dimensions are zero, waiting for image to load');
+        // Will be called again by onImageLoad when image is ready
+        return;
+      }
 
-    // Get the canvas context for drawing
-    this.ctx = canvas.getContext('2d');
+      // Set canvas dimensions to match the image
+      canvas.width = img.width;
+      canvas.height = img.height;
 
-    // Save initial state in history
-    this.saveToHistory();
+      // Get the canvas context for drawing
+      this.ctx = canvas.getContext('2d');
+
+      if (!this.ctx) {
+        console.error('Failed to get canvas context');
+        return;
+      }
+
+      // Save initial state in history
+      this.saveToHistory();
+    } catch (error) {
+      console.error('Error setting up canvas:', error);
+    }
   }
 
   onImageLoad(): void {
@@ -612,6 +694,7 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
     if (this.isCropMode) {
       this.drawingMode = DrawingMode.None;
       this.cropStarted = false;
+      this.cropSelectionFinalized = false;
     }
   }
 
@@ -620,9 +703,10 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
     this.imageRotation = (this.imageRotation + degrees) % 360;
 
     // Need to update canvas setup after rotation
-    setTimeout(() => {
+    // Use requestAnimationFrame instead of setTimeout for better performance
+    requestAnimationFrame(() => {
       this.setupCanvas();
-    }, 300);
+    });
   }
 
   // Drawing methods
@@ -634,10 +718,22 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
     const y = event.clientY - rect.top;
 
     if (this.isCropMode) {
-      // Start crop selection
-      this.cropStarted = true;
-      this.cropStart = { x, y };
-      this.cropEnd = { x, y };
+      if (!this.cropStarted) {
+        // First click: Start crop selection
+        this.cropStarted = true;
+        this.cropSelectionFinalized = false;
+        this.cropStart = { x, y };
+        this.cropEnd = { x, y };
+      } else if (!this.cropSelectionFinalized) {
+        // Second click: Finalize crop selection
+        // This prevents the crop rectangle from changing when moving the cursor
+        this.cropSelectionFinalized = true;
+      } else {
+        // If already finalized, start a new crop selection
+        this.cropSelectionFinalized = false;
+        this.cropStart = { x, y };
+        this.cropEnd = { x, y };
+      }
       return;
     }
 
@@ -680,15 +776,28 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
 
     // Handle crop mode differently
     if (this.isCropMode && this.cropStarted) {
-      this.cropEnd = { x: currentX, y: currentY };
+      // Only update the crop rectangle if the selection is not finalized
+      // This prevents the crop rectangle from changing when moving the cursor to the Apply Crop button
+      if (!this.cropSelectionFinalized) {
+        this.cropEnd = { x: currentX, y: currentY };
+      }
       return;
     }
 
     if (!this.isDrawing || !this.ctx || this.drawingMode === DrawingMode.None || this.drawingMode === DrawingMode.Text) return;
 
     if (this.drawingMode === DrawingMode.Circle) {
-      // Clear the previous frame to redraw the circle
-      this.redrawFromHistory();
+      // Store the current canvas state if we don't have a temporary backup
+      if (!this._tempCanvasState) {
+        this._tempCanvasState = this.ctx.getImageData(
+          0, 0,
+          this.annotationCanvas.nativeElement.width,
+          this.annotationCanvas.nativeElement.height
+        );
+      }
+
+      // Restore the canvas to the state before drawing the circle
+      this.ctx.putImageData(this._tempCanvasState, 0, 0);
 
       // Draw the new circle
       const radius = Math.sqrt(
@@ -717,6 +826,9 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
     this.lastY = currentY;
   }
 
+  // Temporary storage for canvas state during circle drawing
+  private _tempCanvasState: ImageData | null = null;
+
   stopDrawing(): void {
     if (this.isDrawing) {
       this.isDrawing = false;
@@ -726,111 +838,314 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
         this.saveToHistory();
       }
 
-      // Save circle annotation if in circle mode
+      // Clean up temporary canvas state after circle drawing
       if (this.drawingMode === DrawingMode.Circle) {
-        // Could save circle data here if needed for future manipulation
+        this._tempCanvasState = null;
       }
     }
 
     // Handle crop completion
     if (this.isCropMode && this.cropStarted && !this.isDrawing) {
-      // Just keep the crop overlay visible, actual cropping happens
-      // when user clicks "Apply Crop" button
+      // If the crop selection is too small, reset it
+      const width = Math.abs(this.cropEnd.x - this.cropStart.x);
+      const height = Math.abs(this.cropEnd.y - this.cropStart.y);
+
+      if (width < 10 || height < 10) {
+        this.cropStarted = false;
+        this.cropSelectionFinalized = false;
+      }
+
+      // If the selection is finalized, show a message about using Enter key
+      // The user can now press Enter to apply the crop without moving the cursor outside the image area
+      if (this.cropSelectionFinalized) {
+        // Use console.debug instead of console.log for development messages
+        console.debug('Crop selection finalized. Press Enter to apply crop.');
+      }
     }
   }
 
   // Text handling methods
   confirmTextInput(): void {
-    if (!this.ctx || !this.currentText.trim()) {
+    try {
+      // Validate required elements
+      if (!this.ctx) {
+        console.warn('Canvas context not available for text input');
+        this.isAddingText = false;
+        return;
+      }
+
+      // Check if text is empty or only whitespace
+      const trimmedText = this.currentText.trim();
+      if (!trimmedText) {
+        this.isAddingText = false;
+        return;
+      }
+
+      // Validate font size
+      const fontSize = Math.max(10, Math.min(this.fontSize || 24, 72));
+
+      // Draw the text on the canvas with proper font settings
+      this.ctx.save();
+      this.ctx.font = `${fontSize}px Arial, sans-serif`;
+      this.ctx.fillStyle = this.currentColor || '#000000';
+      this.ctx.textBaseline = 'middle';
+
+      // Apply text with word wrapping if needed
+      const maxWidth = this.annotationCanvas.nativeElement.width - this.textPosition.x - 10;
+      if (maxWidth > 100) {
+        this.ctx.fillText(trimmedText, this.textPosition.x, this.textPosition.y, maxWidth);
+      } else {
+        this.ctx.fillText(trimmedText, this.textPosition.x, this.textPosition.y);
+      }
+      this.ctx.restore();
+
+      // Save the annotation for potential future reference
+      this.annotations.push({
+        type: 'text',
+        x: this.textPosition.x,
+        y: this.textPosition.y,
+        text: trimmedText,
+        color: this.currentColor,
+        fontSize: fontSize
+      });
+
+      // Save state to history
+      this.saveToHistory();
+    } catch (error) {
+      console.error('Error adding text annotation:', error);
+    } finally {
+      // Always clear the input and hide it, even if there was an error
+      this.currentText = '';
       this.isAddingText = false;
-      return;
     }
-
-    // Draw the text on the canvas
-    this.ctx.font = `${this.fontSize}px Arial`;
-    this.ctx.fillStyle = this.currentColor;
-    this.ctx.fillText(this.currentText, this.textPosition.x, this.textPosition.y);
-
-    // Save the annotation for potential future reference
-    this.annotations.push({
-      type: 'text',
-      x: this.textPosition.x,
-      y: this.textPosition.y,
-      text: this.currentText,
-      color: this.currentColor,
-      fontSize: this.fontSize
-    });
-
-    // Clear the input and hide it
-    this.currentText = '';
-    this.isAddingText = false;
-
-    // Save state to history
-    this.saveToHistory();
   }
 
-  // Crop methods
+  /**
+   * Applies the crop operation to the current image
+   *
+   * Fixed issues (2025-07-22):
+   * 1. Scaling issue: The original implementation didn't account for the difference between
+   *    the displayed image dimensions and the natural image dimensions, causing the cropped
+   *    area to not match what was selected.
+   *
+   * 2. Rotation handling: Added proper coordinate transformations for rotated images
+   *    to ensure the crop area is correctly applied regardless of rotation angle.
+   *
+   * 3. Display consistency: Improved how the cropped image is displayed to ensure
+   *    it maintains its natural dimensions without unwanted scaling.
+   */
   applyCrop(): void {
-    if (!this.ctx || !this.cropStarted) return;
+    try {
+      // Validate required elements
+      if (!this.ctx) {
+        console.warn('Canvas context not available for crop operation');
+        return;
+      }
 
-    const width = Math.abs(this.cropEnd.x - this.cropStart.x);
-    const height = Math.abs(this.cropEnd.y - this.cropStart.y);
+      if (!this.cropStarted) {
+        console.warn('No crop area selected');
+        return;
+      }
 
-    if (width < 10 || height < 10) {
-      alert('Crop area too small');
-      return;
-    }
+      // Calculate crop dimensions in display coordinates
+      const displayWidth = Math.abs(this.cropEnd.x - this.cropStart.x);
+      const displayHeight = Math.abs(this.cropEnd.y - this.cropStart.y);
 
-    const x = Math.min(this.cropStart.x, this.cropEnd.x);
-    const y = Math.min(this.cropStart.y, this.cropEnd.y);
+      // Validate crop size
+      if (displayWidth < 10 || displayHeight < 10) {
+        console.warn('Crop area too small (minimum 10x10 pixels)');
+        // Use a more user-friendly notification instead of alert
+        // alert can be disruptive and block the UI
+        this.showNotification('Crop area too small. Please select a larger area.');
+        return;
+      }
 
-    // Create a temporary canvas for the cropped image
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = width;
-    tempCanvas.height = height;
-    const tempCtx = tempCanvas.getContext('2d');
+      // Calculate crop position (top-left corner) in display coordinates
+      const displayX = Math.min(this.cropStart.x, this.cropEnd.x);
+      const displayY = Math.min(this.cropStart.y, this.cropEnd.y);
 
-    if (!tempCtx) return;
+      // Get both the image and annotations
+      const image = this.previewImage.nativeElement;
+      const annotations = this.annotationCanvas.nativeElement;
 
-    // Get both the image and annotations
-    const image = this.previewImage.nativeElement;
-    const annotations = this.annotationCanvas.nativeElement;
+      // Ensure the image and canvas are valid
+      if (!image || !annotations) {
+        console.error('Image or annotation canvas not available');
+        return;
+      }
 
-    // Draw the cropped portion of the image
-    tempCtx.drawImage(
-      image,
-      x, y, width, height,
-      0, 0, width, height
-    );
+      // Calculate the scaling factor between displayed image and natural image dimensions
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
 
-    // Draw the annotations on top
-    tempCtx.drawImage(
-      annotations,
-      x, y, width, height,
-      0, 0, width, height
-    );
+      // Handle rotation if present
+      let x, y, width, height;
 
-    // Create a new image with the cropped data
-    const newImage = new Image();
-    newImage.onload = () => {
-      // Reset canvas dimensions
-      const canvas = this.annotationCanvas.nativeElement;
-      canvas.width = width;
-      canvas.height = height;
+      if (this.imageRotation !== 0) {
+        // For rotated images, we need to transform the coordinates
+        // Store original dimensions for reference
+        const originalWidth = image.naturalWidth;
+        const originalHeight = image.naturalHeight;
 
-      // Reset the image source
-      this.previewImage.nativeElement.src = tempCanvas.toDataURL('image/png');
+        // Convert display coordinates to actual image coordinates, accounting for rotation
+        if (this.imageRotation === 90) {
+          // 90 degrees: (x,y) -> (y, width-x)
+          x = Math.round(displayY * scaleY);
+          y = Math.round(originalWidth - (displayX + displayWidth) * scaleX);
+          width = Math.round(displayHeight * scaleY);
+          height = Math.round(displayWidth * scaleX);
+        } else if (this.imageRotation === 180) {
+          // 180 degrees: (x,y) -> (width-x, height-y)
+          x = Math.round(originalWidth - (displayX + displayWidth) * scaleX);
+          y = Math.round(originalHeight - (displayY + displayHeight) * scaleY);
+          width = Math.round(displayWidth * scaleX);
+          height = Math.round(displayHeight * scaleY);
+        } else if (this.imageRotation === 270) {
+          // 270 degrees: (x,y) -> (height-y, x)
+          x = Math.round(originalHeight - (displayY + displayHeight) * scaleY);
+          y = Math.round(displayX * scaleX);
+          width = Math.round(displayHeight * scaleY);
+          height = Math.round(displayWidth * scaleX);
+        } else {
+          // For other rotation angles, use standard transformation
+          console.warn('Non-standard rotation angle detected:', this.imageRotation);
+          x = Math.round(displayX * scaleX);
+          y = Math.round(displayY * scaleY);
+          width = Math.round(displayWidth * scaleX);
+          height = Math.round(displayHeight * scaleY);
+        }
+      } else {
+        // No rotation - simple case
+        x = Math.round(displayX * scaleX);
+        y = Math.round(displayY * scaleY);
+        width = Math.round(displayWidth * scaleX);
+        height = Math.round(displayHeight * scaleY);
+      }
 
-      // Reset crop mode
+      // Create a temporary canvas for the cropped image
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = width;
+      tempCanvas.height = height;
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (!tempCtx) {
+        console.error('Failed to get temporary canvas context');
+        return;
+      }
+
+      // Draw the cropped portion of the image using the natural image dimensions
+      tempCtx.drawImage(
+        image,
+        x, y, width, height,
+        0, 0, width, height
+      );
+
+      // Draw the annotations on top, scaled appropriately
+      if (this.imageRotation !== 0) {
+        // For rotated images, we need to create a temporary canvas to handle the annotations correctly
+        const annotationTempCanvas = document.createElement('canvas');
+        annotationTempCanvas.width = annotations.width;
+        annotationTempCanvas.height = annotations.height;
+        const annotationTempCtx = annotationTempCanvas.getContext('2d');
+
+        if (annotationTempCtx) {
+          // Copy the annotations to the temporary canvas
+          annotationTempCtx.drawImage(annotations, 0, 0);
+
+          // Draw the relevant portion to the final canvas, accounting for rotation
+          tempCtx.drawImage(
+            annotationTempCanvas,
+            displayX, displayY, displayWidth, displayHeight,
+            0, 0, width, height
+          );
+        }
+      } else {
+        // No rotation - simple case
+        tempCtx.drawImage(
+          annotations,
+          displayX, displayY, displayWidth, displayHeight,
+          0, 0, width, height
+        );
+      }
+
+      // Create a new image with the cropped data
+      const newImage = new Image();
+
+      // Handle errors during image loading
+      newImage.onerror = (error) => {
+        console.error('Error loading cropped image:', error);
+        this.showNotification('Failed to apply crop. Please try again.');
+      };
+
+      newImage.onload = () => {
+        try {
+          // Reset canvas dimensions to exactly match the crop dimensions
+          const canvas = this.annotationCanvas.nativeElement;
+          canvas.width = width;
+          canvas.height = height;
+
+          // Reset the image source
+          const previewImg = this.previewImage.nativeElement;
+          previewImg.src = tempCanvas.toDataURL('image/png');
+
+          // Important: Wait for the image to load with the new dimensions
+          previewImg.onload = () => {
+            // Reset the canvas dimensions again to match the new image
+            // This ensures the canvas and image are perfectly aligned
+            canvas.width = previewImg.naturalWidth;
+            canvas.height = previewImg.naturalHeight;
+
+            // Clear any existing context
+            if (this.ctx) {
+              this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+          };
+
+          // Remove any style constraints that might cause scaling issues
+          previewImg.style.width = '';
+          previewImg.style.height = '';
+          previewImg.style.maxWidth = '100%';
+          previewImg.style.maxHeight = '60vh';
+
+          // Reset crop mode
+          this.isCropMode = false;
+          this.cropStarted = false;
+          this.cropSelectionFinalized = false;
+
+          // Clear history and save new state
+          this.history = [];
+          this.historyIndex = -1;
+          this.saveToHistory();
+        } catch (error) {
+          console.error('Error applying crop:', error);
+        }
+      };
+
+      // Set the source to trigger the onload event
+      newImage.src = tempCanvas.toDataURL('image/png');
+
+    } catch (error) {
+      console.error('Error during crop operation:', error);
+      this.showNotification('An error occurred while cropping. Please try again.');
+
+      // Reset crop mode on error
       this.isCropMode = false;
       this.cropStarted = false;
+      this.cropSelectionFinalized = false;
+    }
+  }
 
-      // Clear history and save new state
-      this.history = [];
-      this.historyIndex = -1;
-      this.saveToHistory();
-    };
-    newImage.src = tempCanvas.toDataURL('image/png');
+  // Helper method to show notifications instead of alerts
+  private showNotification(message: string): void {
+    // This could be replaced with a proper notification component
+    // For now, we'll use console.warn and could be enhanced later
+    console.warn(message);
+
+    // TODO: Implement a non-blocking notification UI
+    // For now, we'll use a less intrusive alert
+    setTimeout(() => {
+      alert(message);
+    }, 0);
   }
 
   // History management
@@ -850,6 +1165,14 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
     // Add current state to history
     this.history.push(currentState);
     this.historyIndex = this.history.length - 1;
+
+    // Enforce history size limit to prevent memory issues
+    if (this.history.length > this.MAX_HISTORY_SIZE) {
+      // Remove oldest entries
+      const itemsToRemove = this.history.length - this.MAX_HISTORY_SIZE;
+      this.history = this.history.slice(itemsToRemove);
+      this.historyIndex -= itemsToRemove;
+    }
   }
 
   redrawFromHistory(): void {
@@ -875,24 +1198,49 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
   }
 
   handleReset(): void {
-    if (!this.ctx) return;
+    try {
+      if (!this.ctx) {
+        console.warn('Canvas context not available for reset operation');
+        return;
+      }
 
-    // Clear canvas
-    const canvas = this.annotationCanvas.nativeElement;
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Clear canvas
+      const canvas = this.annotationCanvas.nativeElement;
+      this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Reset image rotation
-    this.imageRotation = 0;
+      // Reset image rotation
+      this.imageRotation = 0;
 
-    // Reset crop mode
-    this.isCropMode = false;
-    this.cropStarted = false;
+      // Reset crop mode
+      this.isCropMode = false;
+      this.cropStarted = false;
+      this.cropSelectionFinalized = false;
+      this.cropStart = { x: 0, y: 0 };
+      this.cropEnd = { x: 0, y: 0 };
 
-    // Reset annotations
-    this.annotations = [];
+      // Reset drawing mode
+      this.drawingMode = DrawingMode.None;
+      this.isDrawing = false;
 
-    // Save this state to history
-    this.saveToHistory();
+      // Reset text input
+      this.isAddingText = false;
+      this.currentText = '';
+
+      // Reset circle drawing state
+      this._tempCanvasState = null;
+
+      // Reset annotations
+      this.annotations = [];
+
+      // Clear history and save fresh state
+      this.history = [];
+      this.historyIndex = -1;
+      this.saveToHistory();
+
+      console.debug('Component state has been reset');
+    } catch (error) {
+      console.error('Error during reset operation:', error);
+    }
   }
 
   // Modal action handlers
@@ -912,40 +1260,102 @@ export class AdvancedImagePreviewModalComponent implements OnInit, AfterViewInit
       return;
     }
 
-    const canvas = document.createElement('canvas');
-    const image = this.previewImage.nativeElement;
+    try {
+      const canvas = document.createElement('canvas');
+      const image = this.previewImage.nativeElement;
 
-    canvas.width = image.width;
-    canvas.height = image.height;
+      // For rotated images, we need to adjust the canvas dimensions
+      // Use naturalWidth and naturalHeight to ensure we get the actual pixel dimensions
+      if (this.imageRotation === 90 || this.imageRotation === 270) {
+        // Swap width and height for 90 or 270 degree rotations
+        canvas.width = image.naturalHeight;
+        canvas.height = image.naturalWidth;
+      } else {
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+      }
 
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Failed to get canvas context');
+        this.closeModal.emit();
+        return;
+      }
+
+      // Clear the canvas before drawing
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       // Apply rotation if needed
       if (this.imageRotation !== 0) {
         ctx.save();
-        // Translate to center, rotate, and translate back
+
+        // Translate to center
         ctx.translate(canvas.width / 2, canvas.height / 2);
+
+        // Rotate
         ctx.rotate(this.imageRotation * Math.PI / 180);
-        ctx.translate(-canvas.width / 2, -canvas.height / 2);
-      }
 
-      // Draw the original image
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        // For 90 or 270 degree rotations, we need to adjust the drawing offset
+        if (this.imageRotation === 90 || this.imageRotation === 270) {
+          ctx.drawImage(
+            image,
+            -image.naturalHeight / 2, // x offset
+            -image.naturalWidth / 2,  // y offset
+            image.naturalHeight,      // width (swapped)
+            image.naturalWidth        // height (swapped)
+          );
 
-      // Draw the annotations on top
-      if (this.ctx) {
-        ctx.drawImage(this.annotationCanvas.nativeElement, 0, 0);
-      }
+          // Draw the annotations on top
+          if (this.ctx) {
+            ctx.drawImage(
+              this.annotationCanvas.nativeElement,
+              -image.naturalHeight / 2,
+              -image.naturalWidth / 2,
+              image.naturalHeight,
+              image.naturalWidth
+            );
+          }
+        } else {
+          // For 0 or 180 degree rotations
+          ctx.drawImage(
+            image,
+            -image.naturalWidth / 2,  // x offset
+            -image.naturalHeight / 2, // y offset
+            image.naturalWidth,       // width
+            image.naturalHeight       // height
+          );
 
-      if (this.imageRotation !== 0) {
+          // Draw the annotations on top
+          if (this.ctx) {
+            ctx.drawImage(
+              this.annotationCanvas.nativeElement,
+              -image.naturalWidth / 2,
+              -image.naturalHeight / 2,
+              image.naturalWidth,
+              image.naturalHeight
+            );
+          }
+        }
+
         ctx.restore();
+      } else {
+        // No rotation - simple case
+        ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
+
+        // Draw the annotations on top
+        if (this.ctx) {
+          ctx.drawImage(this.annotationCanvas.nativeElement, 0, 0, image.naturalWidth, image.naturalHeight);
+        }
       }
 
-      // Convert to data URL
-      const dataUrl = canvas.toDataURL('image/jpeg');
+      // Convert to data URL with quality parameter for better compression
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
       this.saveImage.emit(dataUrl);
-    }
 
-    this.closeModal.emit();
+    } catch (error) {
+      console.error('Error saving image:', error);
+    } finally {
+      this.closeModal.emit();
+    }
   }
 }

@@ -18,7 +18,7 @@
   }
 
   &--collapsed {
-    width: 52px;
+    width: 64px;
 
     #{$self}__link-text,
     #{$self}__section-title,
@@ -32,7 +32,7 @@
     }
 
     .sidebar__toggle {
-      right: -14px;
+      right: -20px;
     }
   }
 
@@ -46,7 +46,7 @@
 
   &__nav {
     flex: 1;
-    padding: 16px 0;
+    padding: 10px 0;
   }
 
   &__top {
