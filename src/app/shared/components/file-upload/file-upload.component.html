@@ -47,11 +47,9 @@
             <div class="file-size">{{ formatFileSize(file.size) }}</div>
 
             <!-- Upload Progress -->
-            @if (file.status === 'uploading') {
               <div class="upload-progress">
                 <div class="progress-bar" [style.width.%]="file.progress"></div>
               </div>
-            }
 
             <!-- Error Message -->
             @if (file.status === 'error') {

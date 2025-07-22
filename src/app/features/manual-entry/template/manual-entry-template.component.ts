@@ -20,8 +20,8 @@ import { AuthService } from '@core/auth/auth.service';
 import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
 import { SpreadsheetComponent } from '@shared/components/spreadsheet/spreadsheet.component';
 import { SpreadsheetRow } from '@shared/components/spreadsheet/spreadsheet.interface';
-import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
 import { Part } from '@models/part.mode';
+import {FileUploadComponent} from '@shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-manual-entry-template',
