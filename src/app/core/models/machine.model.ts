@@ -37,3 +37,34 @@ export interface MachineType {
   name: string;
   checked: boolean;
 }
+
+
+export interface MachineCollection {
+  member: Machine[];
+  totalItems: number;
+  view?: PaginationView;
+  search?: SearchConfig;
+}
+
+export interface PaginationView {
+  '@id': string;
+  '@type': string;
+  first?: string;
+  last?: string;
+  previous?: string;
+  next?: string;
+}
+
+export interface SearchConfig {
+  '@type': string;
+  template: string;
+  variableRepresentation: string;
+  mapping: SearchMapping[];
+}
+
+export interface SearchMapping {
+  '@type': string;
+  variable: string;
+  property: string;
+  required: boolean;
+}

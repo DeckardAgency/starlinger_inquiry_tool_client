@@ -1,75 +1,116 @@
-import { Component, OnInit, HostListener, ElementRef, Pipe, PipeTransform, ViewChild } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { SearchResult } from '@core/models';
-
-@Pipe({
-  name: 'filterResults',
-  standalone: true
-})
-export class FilterResultsPipe implements PipeTransform {
-  transform(items: SearchResult[], searchQuery: string): SearchResult[] {
-    if (!items) return [];
-    if (!searchQuery || searchQuery.trim() === '') return items;
-
-    const query = searchQuery.toLowerCase().trim();
-    return items.filter(item => item.title.toLowerCase().includes(query));
-  }
-}
+import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
+import { SearchService, SearchResultItem, SearchResults } from '@core/services/search.service';
 
 @Component({
-    selector: 'app-search',
-    imports: [CommonModule, FormsModule, FilterResultsPipe],
-    templateUrl: './search.component.html',
-    styleUrls: ['./search.component.scss']
+  selector: 'app-search',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './search.component.html',
+  styleUrls: ['./search.component.scss']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput!: ElementRef;
 
   searchQuery: string = '';
   showResults: boolean = false;
-  minSearchLength: number = 1;
-  searchPlaceholder: string = '';
+  minSearchLength: number = 2;
+  searchPlaceholder: string = 'Search';
+  isLoading: boolean = false;
 
-  mockResults: SearchResult[] = [
-    { id: '1', title: 'AIVV-01152 Power Panel T30 4,3" WQVGA Colour Touch', type: 'Machine part', badge: 'Machine part', active: true },
-    { id: '2', title: 'AIVV-01210 Power Panel T30 2,7" LCD Screen', type: 'Machine part', badge: 'Machine part' },
-    { id: '3', title: 'AIVV-0120001 Power Panel T10 7,0" LED Screen', type: 'Machine part', badge: 'Machine part' },
-    { id: '4', title: 'AIVV-01152-back.jpg', type: 'Photo', badge: 'Photo' },
-    { id: '5', title: 'AIVV-01152-instructions.pdf', type: 'File', badge: 'File' },
-    { id: '6', title: 'AIVV Machine name', type: 'Machine', badge: 'Machine' },
-    { id: '7', title: 'Inquiry AIVV-2024', type: 'Order', badge: 'Order' }
-  ];
+  searchResults: SearchResultItem[] = [];
+  activeIndex: number = 0;
 
-  constructor(private router: Router, private elementRef: ElementRef) {
+  // Counts for different types
+  machineCounts: number = 0;
+  productCounts: number = 0;
+  orderCounts: number = 0;
+
+  private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private router: Router,
+    private elementRef: ElementRef,
+    private searchService: SearchService
+  ) {
     this.setSearchPlaceholder();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Set up debounced search
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(query => {
+        if (query.length < this.minSearchLength) {
+          this.showResults = false;
+          return [];
+        }
+        this.isLoading = true;
+        return this.searchService.searchAll(query);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (results: SearchResults) => {
+        this.handleSearchResults(results);
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.showResults = false;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   // Search functionality
   search(): void {
-    if (this.searchQuery.trim().length >= this.minSearchLength) {
-      const filteredResults = this.getFilteredResults();
+    this.searchSubject.next(this.searchQuery);
+  }
 
-      if (filteredResults.length > 0) {
-        this.showResults = true;
-        this.resetActiveStates();
-        filteredResults[0].active = true;
-      } else {
-        this.showResults = false;
-      }
+  private handleSearchResults(results: SearchResults): void {
+    // Combine all results
+    this.searchResults = [
+      ...results.machines,
+      ...results.products,
+      ...results.orders
+    ];
+
+    // Update counts
+    this.machineCounts = results.totalMachines;
+    this.productCounts = results.totalProducts;
+    this.orderCounts = results.totalOrders;
+
+    // Show results if we have any
+    if (this.searchResults.length > 0) {
+      this.showResults = true;
+      this.activeIndex = 0;
     } else {
       this.showResults = false;
     }
   }
 
-  selectResult(result: SearchResult): void {
+  selectResult(result: SearchResultItem): void {
     console.log('Selected:', result);
     this.showResults = false;
-    // In a real app, navigate to the selected result
-    // this.router.navigate(['/details', result.id]);
+    this.searchQuery = '';
+
+    // Navigate to the result
+    this.router.navigate([result.route]);
+  }
+
+  selectByIndex(index: number): void {
+    if (index >= 0 && index < this.searchResults.length) {
+      this.selectResult(this.searchResults[index]);
+    }
   }
 
   focusSearchInput(): void {
@@ -89,45 +130,30 @@ export class SearchComponent implements OnInit {
 
   @HostListener('document:keydown.arrowup', ['$event'])
   handleArrowUp(event: KeyboardEvent) {
-    if (!this.showResults) return;
+    if (!this.showResults || this.searchResults.length === 0) return;
 
     event.preventDefault();
-    const filteredResults = this.getFilteredResults();
-    const currentIndex = filteredResults.findIndex(result => result.active);
-
-    if (currentIndex > 0) {
-      this.resetActiveStates();
-      filteredResults[currentIndex - 1].active = true;
+    if (this.activeIndex > 0) {
+      this.activeIndex--;
     }
   }
 
   @HostListener('document:keydown.arrowdown', ['$event'])
   handleArrowDown(event: KeyboardEvent) {
-    if (!this.showResults) return;
+    if (!this.showResults || this.searchResults.length === 0) return;
 
     event.preventDefault();
-    const filteredResults = this.getFilteredResults();
-    const currentIndex = filteredResults.findIndex(result => result.active);
-
-    if (currentIndex < filteredResults.length - 1) {
-      this.resetActiveStates();
-      filteredResults[currentIndex + 1].active = true;
+    if (this.activeIndex < this.searchResults.length - 1) {
+      this.activeIndex++;
     }
   }
 
   @HostListener('document:keydown.enter', ['$event'])
   handleEnterKey(event: KeyboardEvent) {
-    if (!this.showResults) return;
+    if (!this.showResults || this.searchResults.length === 0) return;
 
-    const activeResult = this.mockResults.find(result => result.active);
-    if (activeResult) {
-      this.selectResult(activeResult);
-    } else {
-      const filteredResults = this.getFilteredResults();
-      if (filteredResults.length > 0) {
-        this.selectResult(filteredResults[0]);
-      }
-    }
+    event.preventDefault();
+    this.selectByIndex(this.activeIndex);
   }
 
   @HostListener('document:keydown.escape', ['$event'])
@@ -144,27 +170,25 @@ export class SearchComponent implements OnInit {
   }
 
   // Helper methods
-  private getFilteredResults(): SearchResult[] {
-    if (!this.searchQuery || this.searchQuery.trim() === '') return this.mockResults;
-
-    const query = this.searchQuery.toLowerCase().trim();
-    return this.mockResults.filter(item => item.title.toLowerCase().includes(query));
-  }
-
-  private resetActiveStates(): void {
-    this.mockResults.forEach(result => result.active = false);
+  getBadgeClass(type: string): string {
+    switch(type) {
+      case 'machine':
+        return 'search__badge--machine';
+      case 'product':
+        return 'search__badge--file';
+      case 'order':
+        return 'search__badge--order';
+      default:
+        return '';
+    }
   }
 
   private setSearchPlaceholder(): void {
-    // Default to Windows/Linux shortcut
     this.searchPlaceholder = "Search";
+  }
 
-    // Check for macOS in a way that's safe for SSR
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-      const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-      if (isMac) {
-        this.searchPlaceholder = "Search";
-      }
-    }
+  // Template helper to check if result is active
+  isResultActive(index: number): boolean {
+    return index === this.activeIndex;
   }
 }
