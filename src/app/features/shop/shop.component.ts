@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { ProductCardComponent } from '@shared/components/product/product-card/product-card.component';
@@ -32,7 +33,7 @@ import { ProductCardShimmerComponent } from '@shared/components/product/product-
   templateUrl: 'shop.component.html',
   styleUrls: ['shop.component.scss']
 })
-export class ShopComponent implements OnInit {
+export class ShopComponent implements OnInit, OnDestroy {
   environment = environment;
   products: Product[] = [];
   filteredProducts: Product[] = [];
@@ -58,6 +59,8 @@ export class ShopComponent implements OnInit {
     { label: 'All Parts', link: '/shop' },
   ];
 
+  private destroy$ = new Subject<void>();
+
   constructor(
     private productService: ProductService,
     private cartService: CartService,
@@ -65,10 +68,13 @@ export class ShopComponent implements OnInit {
   ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
     ).subscribe(value => this.filterProducts());
 
-    this.discountedControl.valueChanges.subscribe(() => this.filterProducts());
+    this.discountedControl.valueChanges.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => this.filterProducts());
 
     // Get the client name if available
     const clientInfo = this.authService.getClientInfo();
@@ -84,7 +90,32 @@ export class ShopComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // First load products
     this.loadProducts();
+
+    // Then subscribe to selected product ID from search
+    this.productService.selectedProductId$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(productId => {
+        if (productId) {
+          // Wait a bit to ensure products are loaded
+          setTimeout(() => {
+            if (this.products.length > 0) {
+              this.selectProductById(productId);
+            } else {
+              // If products aren't loaded yet, store the ID to check later
+              console.log('Products not loaded yet, will check after loading');
+            }
+          }, 100);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    // Clear any selected product ID when leaving the shop
+    this.productService.clearSelectedProductId();
   }
 
   @HostListener('document:click', ['$event'])
@@ -92,6 +123,24 @@ export class ShopComponent implements OnInit {
     const filterElement = document.querySelector('.shop__machine-filter');
     if (!filterElement?.contains(event.target as Node)) {
       this.isFilterOpen = false;
+    }
+  }
+
+  private selectProductById(productId: string): void {
+    const product = this.products.find(p => p.id === productId);
+    if (product) {
+      // Select the product
+      this.selectProduct(product);
+
+      // Clear the selected product ID so it doesn't persist
+      this.productService.clearSelectedProductId();
+
+      // Scroll to top to show the selected product
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Product not found
+      console.warn(`Product with ID ${productId} not found in current product list`);
+      this.productService.clearSelectedProductId();
     }
   }
 
@@ -118,6 +167,12 @@ export class ShopComponent implements OnInit {
           this.totalItems = response.totalItems;
           this.filteredProducts = this.products;
           this.loading = false;
+
+          // Check if there's a selected product ID after loading
+          const selectedProductId = this.productService.getSelectedProductId();
+          if (selectedProductId) {
+            this.selectProductById(selectedProductId);
+          }
         },
         error: (err) => {
           this.error = 'Failed to load products. Please try again later.';
@@ -153,6 +208,12 @@ export class ShopComponent implements OnInit {
           this.filteredProducts = this.products;
           this.extractMachinesFromProducts(this.products);
           this.loading = false;
+
+          // Check if there's a selected product ID after loading
+          const selectedProductId = this.productService.getSelectedProductId();
+          if (selectedProductId) {
+            this.selectProductById(selectedProductId);
+          }
         },
         error: (err) => {
           this.error = 'Failed to load products. Please try again later.';
@@ -191,6 +252,12 @@ export class ShopComponent implements OnInit {
         }
 
         this.loading = false;
+
+        // Check if there's a selected product ID after loading
+        const selectedProductId = this.productService.getSelectedProductId();
+        if (selectedProductId) {
+          this.selectProductById(selectedProductId);
+        }
       },
       error: (err) => {
         this.error = 'Failed to load products. Please try again later.';

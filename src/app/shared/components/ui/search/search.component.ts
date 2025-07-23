@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
 import { SearchService, SearchResultItem, SearchResults } from '@core/services/search.service';
+import { ProductService } from '@services/http/product.service';
 
 @Component({
   selector: 'app-search',
@@ -35,7 +36,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private elementRef: ElementRef,
-    private searchService: SearchService
+    private searchService: SearchService,
+    private productService: ProductService
   ) {
     this.setSearchPlaceholder();
   }
@@ -103,8 +105,24 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.showResults = false;
     this.searchQuery = '';
 
-    // Navigate to the result
-    this.router.navigate([result.route]);
+    // Check if it's a product result
+    if (result.type === 'product' && result.id) {
+      // Store the selected product ID in ProductService
+      this.productService.setSelectedProductId(result.id);
+
+      // Navigate to shop page
+      this.router.navigate(['/shop']);
+    } else if (result.type === 'machine' && result.id) {
+      // For machine results, navigate to appropriate page
+      // You can modify this based on your requirements
+      this.router.navigate(['/my-machines']);
+    } else if (result.type === 'order' && result.id) {
+      // For order results, navigate to order details
+      this.router.navigate(['/my-inquiries/active/order', result.id, 'view']);
+    } else {
+      // Fallback to the route property if available
+      this.router.navigate([result.route]);
+    }
   }
 
   selectByIndex(index: number): void {

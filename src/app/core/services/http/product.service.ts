@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, BehaviorSubject, map } from 'rxjs';
 import { environment } from '@env/environment';
 import { ProductResponse } from '@core/models';
 
@@ -11,6 +11,10 @@ export class ProductService {
   private readonly apiUrl: string;
   private readonly clientApiUrl: string;
 
+  // Add this for search selection functionality
+  private selectedProductIdSubject = new BehaviorSubject<string | null>(null);
+  public selectedProductId$ = this.selectedProductIdSubject.asObservable();
+
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -19,6 +23,19 @@ export class ProductService {
     this.apiUrl = `${environment.apiBaseUrl}${environment.apiPath}/products`;
     // Base API URL for client-specific products
     this.clientApiUrl = `${environment.apiBaseUrl}${environment.apiPath}/client`;
+  }
+
+  // Methods for search selection
+  setSelectedProductId(productId: string | null): void {
+    this.selectedProductIdSubject.next(productId);
+  }
+
+  getSelectedProductId(): string | null {
+    return this.selectedProductIdSubject.value;
+  }
+
+  clearSelectedProductId(): void {
+    this.selectedProductIdSubject.next(null);
   }
 
   /**
