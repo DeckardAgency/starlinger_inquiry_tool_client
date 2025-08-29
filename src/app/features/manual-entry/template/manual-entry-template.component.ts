@@ -1,30 +1,44 @@
-import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
+import { Component, OnInit, HostListener, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, startWith, catchError } from 'rxjs/operators';
+import { Subscription, of } from 'rxjs';
 
 // Components
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { MachineArticleItemComponent } from '@shared/components/machine/machine-article-item/machine-article-item.component';
 import { AdvancedImagePreviewModalComponent } from '@shared/components/modals/advanced-image-preview-modal/advanced-image-preview-modal.component';
-import { MachineType } from '@models/machine-type.model';
-import { MachineService } from '@services/http/machine.service';
-import {ManualCartItem, UploadedFile} from '@models/manual-cart-item.model';
-import { Breadcrumb } from '@core/models';
-import { Machine } from '@core/models/machine.model';
 import { MachineArticleItemShimmerComponent } from '@shared/components/machine/machine-article-item/machine-article-item-shimmer.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { environment } from '@env/environment';
-import { AuthService } from '@core/auth/auth.service';
-import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
 import { SpreadsheetComponent } from '@shared/components/spreadsheet/spreadsheet.component';
+import { FileUploadComponent } from '@shared/components/file-upload/file-upload.component';
+
+// Services
+import { MachineService } from '@services/http/machine.service';
+import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
+import { AuthService } from '@core/auth/auth.service';
+import { InquiryService, InquiryRequest } from '@services/http/inquiry.service';
+
+// Models and Types
+import { ManualCartItem } from '@models/manual-cart-item.model';
+import { UploadedFile } from '@models/manual-cart-item.model';
+import { Breadcrumb } from '@core/models';
+import { Machine } from '@core/models/machine.model';
 import { SpreadsheetRow } from '@shared/components/spreadsheet/spreadsheet.interface';
 import { Part } from '@models/part.mode';
-import {FileUploadComponent} from '@shared/components/file-upload/file-upload.component';
+import { environment } from '@env/environment';
+
+// Define MachineType interface if not imported
+interface MachineType {
+  id: string;
+  name: string;
+  checked: boolean;
+}
 
 @Component({
   selector: 'app-manual-entry-template',
+  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -41,7 +55,7 @@ import {FileUploadComponent} from '@shared/components/file-upload/file-upload.co
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']
 })
-export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
+export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDestroy {
   // Machine data properties
   machines: Machine[] = [];
   filteredMachines: Machine[] = [];
@@ -49,6 +63,11 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   loading = true;
   error: string | null = null;
   totalItems = 0;
+
+  // Search state
+  searchLoading = false;
+  searchError: string | null = null;
+  private searchSubscription?: Subscription;
 
   // Image preview modal properties
   showImagePreview = false;
@@ -83,51 +102,14 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     { label: 'Manual Entry', link: '/manual-entry' }
   ];
 
-  // Simplified part methods - no longer need additional fields
-  addPart(): void {
-    const newPart: Part = {
-      id: this.generateUniqueId(),
-      files: [],
-      spreadsheetData: []
-    };
-
-    this.parts.push(newPart);
-
-    // Also update the stored parts for the selected machine
-    if (this.selectedMachine) {
-      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-    }
-  }
-
-  // Method to handle spreadsheet data changes
-  onSpreadsheetDataChanged(data: SpreadsheetRow[], partIndex: number): void {
-    console.log('Spreadsheet data changed for part', partIndex, ':', data);
-    console.log('Number of non-empty rows:', data.filter(row =>
-      row.productName || row.shortDescription || row.additionalNotes
-    ).length);
-
-    if (partIndex >= 0 && partIndex < this.parts.length) {
-      this.parts[partIndex].spreadsheetData = data;
-
-      // Update the stored parts for the selected machine
-      if (this.selectedMachine) {
-        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-      }
-    }
-  }
-
-  private generateUniqueId(): string {
-    return 'part_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-  }
-
   constructor(
     private machineService: MachineService,
     private authService: AuthService,
+    private inquiryService: InquiryService,
+    private manualQuickCartService: ManualQuickCartService
   ) {
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(value => this.filterMachines());
+    // Set up search functionality
+    this.setupSearch();
   }
 
   ngOnInit(): void {
@@ -139,11 +121,104 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     // Component initialization complete
   }
 
+  ngOnDestroy(): void {
+    // Clean up search subscription
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+
+    // Clean up file URLs to prevent memory leaks
+    this.machinePartsMap.forEach(parts => {
+      parts.forEach(part => {
+        part.files.forEach(file => {
+          if (file.previewUrl) {
+            URL.revokeObjectURL(file.previewUrl);
+          }
+        });
+      });
+    });
+
+    // Also clean up current parts
+    this.parts.forEach(part => {
+      part.files.forEach(file => {
+        if (file.previewUrl) {
+          URL.revokeObjectURL(file.previewUrl);
+        }
+      });
+    });
+  }
+
+  /**
+   * Set up reactive search functionality
+   */
+  private setupSearch(): void {
+    this.searchSubscription = this.searchControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(searchTerm => {
+        this.searchLoading = true;
+        this.searchError = null;
+
+        if (!searchTerm?.trim()) {
+          return this.machineService.getMachines().pipe(
+            catchError(error => {
+              console.error('Error loading machines:', error);
+              this.searchError = 'Failed to load machines. Please try again.';
+              return of({ member: [], totalItems: 0, '@context': '', '@id': '', '@type': '', view: null });
+            })
+          );
+        }
+
+        return this.machineService.searchMachines(searchTerm.trim()).pipe(
+          catchError(error => {
+            console.error('Error searching machines:', error);
+            this.searchError = `Failed to search for "${searchTerm}". Please try again.`;
+            return of({ member: [], totalItems: 0, '@context': '', '@id': '', '@type': '', view: null });
+          })
+        );
+      })
+    ).subscribe({
+      next: (response) => {
+        this.machines = response.member;
+        this.totalItems = response.totalItems;
+        this.searchLoading = false;
+        this.applyLocalFilters();
+      },
+      error: (error) => {
+        console.error('Search subscription error:', error);
+        this.searchError = 'Search failed. Please try again.';
+        this.searchLoading = false;
+      }
+    });
+  }
+
+  /**
+   * Apply local filters (machine types) to the search results
+   */
+  private applyLocalFilters(): void {
+    let filtered = this.machines;
+
+    if (this.activeFilters.length > 0) {
+      filtered = filtered.filter(machine =>
+        this.activeFilters.some(filter =>
+          machine.articleDescription.toLowerCase().includes(filter.toLowerCase())
+        )
+      );
+    }
+
+    this.filteredMachines = filtered;
+  }
+
+  /**
+   * Load initial machines
+   */
   private loadMachines(): void {
     this.loading = true;
+    this.error = null;
+
     this.machineService.getMachines().subscribe({
       next: (response) => {
-        // Use machines instead of products
         this.machines = response.member;
         this.totalItems = response.totalItems;
         this.filteredMachines = this.machines;
@@ -157,8 +232,28 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Part management methods
+  addPart(): void {
+    const newPart: Part = {
+      id: this.generateUniqueId(),
+      files: [],
+      spreadsheetData: []
+    };
+
+    this.parts.push(newPart);
+
+    if (this.selectedMachine) {
+      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+    }
+  }
+
+  private generateUniqueId(): string {
+    return 'part_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  }
+
+  // Machine selection
   selectMachine(machine: Machine): void {
-    // Save the current parts state if a machine is already selected
+    // Save current parts state
     if (this.selectedMachine) {
       this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
     }
@@ -171,12 +266,10 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
         { label: machine.articleDescription }
       ];
 
-      // Check if we have saved parts for this machine
+      // Restore saved parts or initialize new
       if (this.machinePartsMap.has(machine.id)) {
-        // Restore the saved parts
         this.parts = [...this.machinePartsMap.get(machine.id)!];
       } else {
-        // Initialize with a single part for a new machine
         this.parts = [];
         this.addPart();
       }
@@ -184,7 +277,6 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
   }
 
   closeDetails(): void {
-    // Save the current parts state before closing
     if (this.selectedMachine) {
       this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
     }
@@ -196,17 +288,14 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     ];
   }
 
+  // Filter methods
   removeFilter(filter: string): void {
-    // Remove from activeFilters
     this.activeFilters = this.activeFilters.filter(f => f !== filter);
-
-    // Update machine type checked state
     const machineType = this.machineTypes.find(m => m.name === filter);
     if (machineType) {
       machineType.checked = false;
     }
-
-    this.filterMachines();
+    this.applyLocalFilters();
   }
 
   toggleFilter(): void {
@@ -217,276 +306,301 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     machineType.checked = !machineType.checked;
 
     if (machineType.checked) {
-      // Add to activeFilters if not already present
       if (!this.activeFilters.includes(machineType.name)) {
         this.activeFilters.push(machineType.name);
       }
     } else {
-      // Remove from activeFilters
       this.activeFilters = this.activeFilters.filter(filter => filter !== machineType.name);
     }
 
-    this.filterMachines();
+    this.applyLocalFilters();
   }
 
-  private filterMachines(): void {
-    let filtered = this.machines;
+  // Search methods
+  clearSearch(): void {
+    this.searchControl.setValue('');
+  }
 
-    const searchTerm = this.searchControl.value?.toLowerCase();
-    if (searchTerm) {
-      filtered = filtered.filter(machine =>
-        machine.articleDescription.toLowerCase().includes(searchTerm) ||
-        machine.articleNumber.toLowerCase().includes(searchTerm) ||
-        machine.ibSerialNumber.toString().includes(searchTerm) ||
-        machine.ibStationNumber.toString().includes(searchTerm)
-      );
+  onSearchFocus(): void {
+    // Optional: Add focus behavior
+  }
+
+  onSearchBlur(): void {
+    // Optional: Add blur behavior
+  }
+
+  // Spreadsheet data handler
+  onSpreadsheetDataChanged(data: SpreadsheetRow[], partIndex: number): void {
+    console.log('Spreadsheet data changed for part', partIndex, ':', data);
+
+    if (partIndex >= 0 && partIndex < this.parts.length) {
+      this.parts[partIndex].spreadsheetData = data;
+
+      if (this.selectedMachine) {
+        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+      }
     }
+  }
 
-    // Use activeFilters for machine type filtering
-    if (this.activeFilters.length > 0) {
-      // Simple filtering by machine name containing filter text
-      filtered = filtered.filter(machine =>
-        this.activeFilters.some(filter => machine.articleDescription.includes(filter))
-      );
+  // File handlers
+  onFilesChanged(files: UploadedFile[], partIndex: number): void {
+    if (partIndex >= 0 && partIndex < this.parts.length) {
+      this.parts[partIndex].files = files;
+
+      if (this.selectedMachine) {
+        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+      }
     }
-
-    this.filteredMachines = filtered;
   }
 
-  // Updated validation methods - check for files only
-  isCurrentPartValid(): boolean {
-    if (this.parts.length === 0) return false;
-
-    const currentPart = this.parts[this.parts.length - 1];
-
-    // At least one successful file upload is required
-    return currentPart.files.some(file => file.status === 'success');
-  }
-
-  isFormValid(): boolean {
-    // For each part, check if there's valid data
-    // return this.parts.every(part => {
-    //   return part.files.some(file => file.status === 'success');
-    // });
-    return true;
+  onFilePreviewRequested(file: UploadedFile): void {
+    if (file.previewUrl) {
+      this.previewImageSrc = file.previewUrl;
+      this.previewImageAlt = file.name;
+      this.previewImageFileName = file.name;
+      this.showImagePreview = true;
+    }
   }
 
   closeImagePreview(): void {
     this.showImagePreview = false;
   }
 
+  // Validation methods
+  isCurrentPartValid(): boolean {
+    if (this.parts.length === 0) return false;
+
+    const currentPart = this.parts[this.parts.length - 1];
+
+    const hasValidSpreadsheetData = currentPart.spreadsheetData?.some(row =>
+      row.productName || row.shortDescription || row.additionalNotes
+    ) || false;
+
+    const hasSuccessfulUpload = currentPart.files.some(file => file.status === 'success');
+
+    return hasValidSpreadsheetData || hasSuccessfulUpload;
+  }
+
+  isFormValid(): boolean {
+    return this.parts.some(part => {
+      const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
+        row.productName || row.shortDescription || row.additionalNotes
+      ) || false;
+
+      const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
+
+      return hasValidSpreadsheetData || hasSuccessfulUpload;
+    });
+  }
+
+  // Form submission
   onSubmit(): void {
     if (this.isFormValid() && this.selectedMachine) {
+      console.log('Template form submission - parts:', this.parts);
 
-      console.log('parts', this.parts);
-      // console.log('parts spreadsheetData', this.parts[0].spreadsheetData);
+      // Create cart items from all machines
+      const allManualCartItems: ManualCartItem[] = [];
 
-      // Map parts to ManualCartItems for the cart service
-      const manualCartItems: ManualCartItem[] = this.parts.flatMap(part => {
-        // Get all non-empty rows from spreadsheet data
+      // Process current machine
+      const currentMachineItems = this.createCartItemsFromParts(this.parts, this.selectedMachine);
+      allManualCartItems.push(...currentMachineItems);
+
+      // Process saved machines
+      this.machinePartsMap.forEach((parts, machineId) => {
+        if (machineId !== this.selectedMachine?.id) {
+          const machine = this.machines.find(m => m.id === machineId);
+          if (machine && parts.length > 0) {
+            const machineItems = this.createCartItemsFromParts(parts, machine);
+            allManualCartItems.push(...machineItems);
+          }
+        }
+      });
+
+      // Add to cart
+      console.log('Adding to cart:', allManualCartItems);
+      this.manualQuickCartService.addToCart(allManualCartItems);
+
+      // Create inquiry data
+      const inquiryData = this.createInquiryData();
+      console.log('Inquiry data:', inquiryData);
+
+      // Clean up after submission
+      if (this.selectedMachine) {
+        this.machinePartsMap.delete(this.selectedMachine.id);
+      }
+
+      this.parts = [];
+      this.addPart();
+    }
+  }
+
+  /**
+   * Create cart items from parts
+   */
+  private createCartItemsFromParts(parts: Part[], machine: Machine): ManualCartItem[] {
+    return parts.flatMap(part => {
+      const spreadsheetRows = part.spreadsheetData?.filter(row =>
+        row.productName || row.shortDescription || row.additionalNotes
+      ) || [];
+
+      if (spreadsheetRows.length > 0) {
+        return spreadsheetRows.map(row => ({
+          id: this.generateUniqueId(),
+          machineId: machine.id,
+          machineName: machine.articleDescription,
+          partData: {
+            partName: row.productName || '',
+            partNumber: '',
+            shortDescription: row.shortDescription || '',
+            additionalNotes: row.additionalNotes || '',
+            mediaItems: part.files
+              .filter(file => file.status === 'success' && file.mediaItem)
+              .map(file => file.mediaItem!)
+          },
+          files: part.files.filter(file => file.status === 'success')
+        }));
+      } else if (part.files.some(file => file.status === 'success')) {
+        return [{
+          id: this.generateUniqueId(),
+          machineId: machine.id,
+          machineName: machine.articleDescription,
+          partData: {
+            partName: '',
+            partNumber: '',
+            shortDescription: '',
+            additionalNotes: '',
+            mediaItems: part.files
+              .filter(file => file.status === 'success' && file.mediaItem)
+              .map(file => file.mediaItem!)
+          },
+          files: part.files.filter(file => file.status === 'success')
+        }];
+      }
+
+      return [];
+    });
+  }
+
+  /**
+   * Create inquiry data for API
+   */
+  private createInquiryData(): InquiryRequest {
+    const currentUser = this.authService.getCurrentUser();
+    const userId = currentUser?.id || 'current-user';
+
+    const machineEntries = [];
+
+    // Current machine
+    if (this.selectedMachine && this.parts.length > 0) {
+      machineEntries.push(this.createMachineEntry(this.selectedMachine, this.parts));
+    }
+
+    // Saved machines
+    this.machinePartsMap.forEach((parts, machineId) => {
+      if (machineId !== this.selectedMachine?.id) {
+        const machine = this.machines.find(m => m.id === machineId);
+        if (machine && parts.length > 0 && this.hasValidPartsData(parts)) {
+          machineEntries.push(this.createMachineEntry(machine, parts));
+        }
+      }
+    });
+
+    return {
+      status: "pending",
+      notes: "Inquiry created via manual entry template",
+      contactEmail: currentUser?.email || "string",
+      contactPhone: 'string',
+      isDraft: false,
+      user: `${environment.apiBaseUrl}${environment.apiPath}/users/${userId}`,
+      machines: machineEntries
+    };
+  }
+
+  /**
+   * Create machine entry for inquiry
+   */
+  private createMachineEntry(machine: Machine, parts: Part[]) {
+    return {
+      machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${machine.id}`,
+      notes: "string",
+      products: parts.flatMap(part => {
         const spreadsheetRows = part.spreadsheetData?.filter(row =>
           row.productName || row.shortDescription || row.additionalNotes
         ) || [];
 
         if (spreadsheetRows.length > 0) {
-          // Create a cart item for each spreadsheet row
           return spreadsheetRows.map(row => ({
-            id: this.generateUniqueId(),
-            machineId: this.selectedMachine!.id,
-            machineName: this.selectedMachine!.articleDescription,
-            // Only include successfully uploaded files
-            files: part.files.filter(file => file.status === 'success'),
-            // Include MediaItem references
+            partName: row.productName || '',
+            partNumber: '',
+            shortDescription: row.shortDescription || '',
+            additionalNotes: row.additionalNotes || '',
             mediaItems: part.files
               .filter(file => file.status === 'success' && file.mediaItem)
-              .map(file => file.mediaItem!),
-            // Include spreadsheet data
-            productName: row.productName,
-            shortDescription: row.shortDescription,
-            additionalNotes: row.additionalNotes
-          } as unknown as ManualCartItem));
-        } else {
-          // No spreadsheet data, create single cart item
+              .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+          }));
+        } else if (part.files.some(file => file.status === 'success')) {
           return [{
-            id: this.generateUniqueId(),
-            machineId: this.selectedMachine!.id,
-            machineName: this.selectedMachine!.articleDescription,
-            // Only include successfully uploaded files
-            files: part.files.filter(file => file.status === 'success'),
-            // Include MediaItem references
+            partName: '',
+            partNumber: '',
+            shortDescription: '',
+            additionalNotes: '',
             mediaItems: part.files
               .filter(file => file.status === 'success' && file.mediaItem)
-              .map(file => file.mediaItem!)
-          } as unknown as ManualCartItem];
-        }
-      });
-
-      // Create an array for all machines in the submission
-      const machineEntries = [];
-
-      // Add the currently selected machine
-      machineEntries.push({
-        machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${this.selectedMachine.id}`,
-        notes: "string",
-        products: this.parts.flatMap(part => {
-          // Get all non-empty spreadsheet rows
-          const spreadsheetRows = part.spreadsheetData?.filter(row =>
-            row.productName || row.shortDescription || row.additionalNotes
-          ) || [];
-
-          // If there are spreadsheet rows, create a product for each
-          if (spreadsheetRows.length > 0) {
-            return spreadsheetRows.map(row => ({
-              partName: row.productName || '',
-              partNumber: '', // Keep empty as requested
-              shortDescription: row.shortDescription || '',
-              additionalNotes: row.additionalNotes || '',
-              mediaItems: part.files
-                .filter(file => file.status === 'success' && file.mediaItem)
-                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
-            }));
-          } else {
-            // If no spreadsheet data, create one product with empty fields but with files
-            return [{
-              partName: '',
-              partNumber: '',
-              shortDescription: '',
-              additionalNotes: '',
-              mediaItems: part.files
-                .filter(file => file.status === 'success' && file.mediaItem)
-                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
-            }];
-          }
-        })
-      });
-
-      // Add other machines from the machinePartsMap
-      this.machinePartsMap.forEach((parts, machineId) => {
-        // Skip the current machine as we've already added it
-        if (machineId === this.selectedMachine?.id) {
-          return;
+              .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+          }];
         }
 
-        // Only add machines that have at least one part with files
-        if (parts.length > 0 && parts.some(part => part.files.length > 0)) {
-          machineEntries.push({
-            machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${machineId}`,
-            notes: "string",
-            products: parts.map(part => {
-              // Get the first row of spreadsheet data if available
-              const spreadsheetRow = part.spreadsheetData && part.spreadsheetData.length > 0
-                ? part.spreadsheetData[0]
-                : null;
-
-              return {
-                // Map spreadsheet data to product fields
-                partName: spreadsheetRow?.productName || '',
-                partNumber: '', // Keep empty as requested
-                shortDescription: spreadsheetRow?.shortDescription || '',
-                additionalNotes: spreadsheetRow?.additionalNotes || '',
-
-                mediaItems: part.files
-                  .filter(file => file.status === 'success' && file.mediaItem)
-                  .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
-              };
-            })
-          });
-        }
-      });
-
-      // Get the current user ID from an auth service
-      const currentUser = this.authService.getCurrentUser();
-      const userId = currentUser?.id || 'current-user';
-
-      // Add parts to the manual cart and open the inquiry overview
-      //this.manualQuickCartService.addToCart(manualCartItems);
-
-      const inquiryData: InquiryRequest = {
-        status: "pending",
-        notes: "Inquiry created via manual entry form",
-        contactEmail: currentUser?.email || "string",
-        contactPhone: 'string',
-        isDraft: false,
-        user: `${environment.apiBaseUrl}${environment.apiPath}/users/${userId}`,
-        machines: machineEntries
-      };
-
-      console.log('Template submission data:', inquiryData);
-
-      // Remove the saved parts for this machine (since they've been submitted)
-      // if (this.selectedMachine) {
-      //   this.machinePartsMap.delete(this.selectedMachine.id);
-      // }
-
-      // Reset the form state but don't close details yet
-      // this.parts = [];
-      // this.addPart();
-    }
+        return [];
+      })
+    };
   }
 
-  // Get the total parts across all machines
-  getTotalPartsCount(): number {
-    let count = 0;
-    this.machinePartsMap.forEach((parts) => {
-      count += parts.length;
+  /**
+   * Check if parts have valid data
+   */
+  private hasValidPartsData(parts: Part[]): boolean {
+    return parts.some(part => {
+      const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
+        row.productName || row.shortDescription || row.additionalNotes
+      ) || false;
+
+      const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
+
+      return hasValidSpreadsheetData || hasSuccessfulUpload;
     });
-    return count;
   }
 
-  ngOnDestroy(): void {
-
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const filterElement = document.querySelector('.manual-entry__machine-filter');
-    if (!filterElement?.contains(event.target as Node)) {
-      this.isFilterOpen = false;
-    }
-  }
-
-  // Image editing methods
+  // Image editing
   saveEditedImage(dataUrl: string): void {
-    // Find the file that's currently being previewed
     if (!this.previewImageSrc) return;
 
     for (const part of this.parts) {
       const fileIndex = part.files.findIndex(f => f.previewUrl === this.previewImageSrc);
       if (fileIndex !== -1) {
-        // Convert the data URL to a Blob
         const blob = this.dataURLToBlob(dataUrl);
-
-        // Create a new File from the Blob
         const editedFile = new File([blob], part.files[fileIndex].name, {
           type: part.files[fileIndex].type
         });
 
-        // Update the file object
         const updatedFile = { ...part.files[fileIndex] };
         updatedFile.file = editedFile;
 
-        // Create new preview URL
         if (updatedFile.previewUrl) {
           URL.revokeObjectURL(updatedFile.previewUrl);
         }
         updatedFile.previewUrl = URL.createObjectURL(editedFile);
 
-        // Update the files array
         const newFiles = [...part.files];
         newFiles[fileIndex] = updatedFile;
 
-        // Emit the change through the proper channel
         this.onFilesChanged(newFiles, this.parts.indexOf(part));
-
-        // Update the preview src to the new URL
         this.previewImageSrc = updatedFile.previewUrl;
         break;
       }
     }
   }
 
-  // Helper function to convert a data URL to a Blob
-  dataURLToBlob(dataURL: string): Blob {
+  private dataURLToBlob(dataURL: string): Blob {
     const parts = dataURL.split(';base64,');
     const contentType = parts[0].split(':')[1];
     const raw = window.atob(parts[1]);
@@ -500,23 +614,26 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit {
     return new Blob([uInt8Array], { type: contentType });
   }
 
-  onFilesChanged(files: UploadedFile[], partIndex: number): void {
-    if (partIndex >= 0 && partIndex < this.parts.length) {
-      this.parts[partIndex].files = files;
+  // Utility methods
+  getTotalPartsCount(): number {
+    let count = 0;
 
-      // Update the stored parts for the selected machine
-      if (this.selectedMachine) {
-        this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
+    count += this.parts.filter(part => this.hasValidPartsData([part])).length;
+
+    this.machinePartsMap.forEach((parts, machineId) => {
+      if (machineId !== this.selectedMachine?.id) {
+        count += parts.filter(part => this.hasValidPartsData([part])).length;
       }
-    }
+    });
+
+    return count;
   }
 
-  onFilePreviewRequested(file: UploadedFile): void {
-    if (file.previewUrl) {
-      this.previewImageSrc = file.previewUrl;
-      this.previewImageAlt = file.name;
-      this.previewImageFileName = file.name;
-      this.showImagePreview = true;
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const filterElement = document.querySelector('.manual-entry__machine-filter');
+    if (!filterElement?.contains(event.target as Node)) {
+      this.isFilterOpen = false;
     }
   }
 }

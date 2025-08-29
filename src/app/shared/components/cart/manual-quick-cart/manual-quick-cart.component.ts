@@ -93,11 +93,9 @@ export class ManualQuickCartComponent implements OnInit, OnDestroy {
     // Here you would implement logic to submit the inquiry
     console.log('Placing inquiry with items:', this.cartItems);
     console.log('Reference number:', this.referenceNumber);
-    // Show a confirmation message or navigate to confirmation page
-    alert('Inquiry placed successfully!');
-    this.manualQuickCartService.clearCart();
+
     this.onClose();
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/manual-entry-cart']);
   }
 
   // Get part count for display
