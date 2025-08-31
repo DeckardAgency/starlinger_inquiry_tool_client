@@ -454,7 +454,8 @@ export class ShopComponent implements OnInit, OnDestroy {
     if (searchTerm) {
       filtered = filtered.filter(product =>
         product.partNo.toLowerCase().includes(searchTerm) ||
-        product.name.toLowerCase().includes(searchTerm)
+        product.name.toLowerCase().includes(searchTerm) ||
+        (product.shortDescription && product.shortDescription.toLowerCase().includes(searchTerm))
       );
     }
 
@@ -473,7 +474,8 @@ export class ShopComponent implements OnInit, OnDestroy {
     if (searchTerm) {
       filtered = filtered.filter(product =>
         product.partNo.toLowerCase().includes(searchTerm) ||
-        product.name.toLowerCase().includes(searchTerm)
+        product.name.toLowerCase().includes(searchTerm) ||
+        (product.shortDescription && product.shortDescription.toLowerCase().includes(searchTerm))
       );
     }
 

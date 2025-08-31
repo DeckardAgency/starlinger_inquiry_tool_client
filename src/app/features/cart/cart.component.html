@@ -57,7 +57,7 @@
             </div>
 
             <div class="cart__price">
-              <div class="cart__original-price">€ {{ item.product.clientPrice.toFixed(2) }}</div>
+              <div class="cart__original-price">{{ item.product.clientPrice | currency:'EUR':true }}</div>
             </div>
 
             <div class="cart__discount">
@@ -85,7 +85,7 @@
             </div>
 
             <div class="cart__item-total">
-              € {{ getItemTotal(item).toFixed(2) }}
+              {{ getItemTotal(item) | currency:'EUR':true }}
             </div>
 
             <div class="cart__item-actions">
@@ -113,7 +113,7 @@
             </span>
             Shipping & handling
           </span>
-          <span>€ {{ shippingCost.toFixed(2) }}</span>
+          <span>{{ shippingCost | currency }}</span>
         </div>
 
         <div class="cart__summary-row">
@@ -123,7 +123,7 @@
             </span>
             Total
           </span>
-          <span>€ {{ totalAmount.toFixed(2) }}</span>
+          <span>{{ totalAmount | currency:'EUR':true }}</span>
         </div>
 
         <!--        <div class="cart__summary-total">-->

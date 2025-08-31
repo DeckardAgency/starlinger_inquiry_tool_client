@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { OrderService } from '@services/http/order.service';
 import { AuthService } from '@core/auth/auth.service';
-import { Order } from '@models/order.model';
+import {CartService} from '@services/cart/cart.service';
 
 interface DraftInquiry {
   id: string;
@@ -19,6 +20,8 @@ interface DraftInquiry {
     avatar?: string;
   };
   status: string;
+  // Store the original order data for later use
+  originalOrder?: any;
 }
 
 @Component({
@@ -42,7 +45,9 @@ export class DraftInquiriesComponent implements OnInit {
 
   constructor(
     private orderService: OrderService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cartService: CartService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -114,7 +119,8 @@ export class DraftInquiriesComponent implements OnInit {
         name: userName,
         avatar: order.user?.avatar // Optional avatar URL if available
       },
-      status: order.status || 'draft'
+      status: order.status || 'draft',
+      originalOrder: order // Store the original order data
     };
   }
 
@@ -180,16 +186,86 @@ export class DraftInquiriesComponent implements OnInit {
   }
 
   onEdit(inquiry: DraftInquiry): void {
-    // Navigate to edit page or open edit modal
-    console.log('Edit inquiry:', inquiry);
-    // this.router.navigate(['/inquiries/edit', inquiry.id]);
+    // First, clear the current cart
+    this.cartService.clearCart();
+
+    // Check if we have the original order data with items
+    if (inquiry.originalOrder && inquiry.originalOrder.items) {
+      // Add each item from the draft order to the cart
+      inquiry.originalOrder.items.forEach((item: any) => {
+        if (item.product) {
+          // Create a product object compatible with the cart service
+          const product = {
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            clientPrice: item.product.price, // Use price as clientPrice if not available
+            // Add any other required product properties here
+            // You may need to adjust these based on your Product model
+          };
+
+          // Add the product to cart with the saved quantity
+          this.cartService.addToCart(product as any, item.quantity);
+        }
+      });
+
+      // Store draft order ID in sessionStorage for reference in cart page
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.setItem('draftOrderId', inquiry.id);
+        sessionStorage.setItem('draftOrderNumber', inquiry.internalReference);
+      }
+
+      // Navigate to cart page
+      this.router.navigate(['/cart']);
+    } else {
+      // If we don't have the order items in memory, fetch them first
+      this.orderService.getOrder(inquiry.id)
+        .pipe(
+          catchError(err => {
+            console.error('Error loading draft order details:', err);
+            alert('Failed to load draft order details. Please try again.');
+            return of(null);
+          })
+        )
+        .subscribe(order => {
+          if (order && order.items) {
+            // Clear cart first
+            this.cartService.clearCart();
+
+            // Add items to cart
+            order.items.forEach((item: any) => {
+              if (item.product) {
+                const product = {
+                  id: item.product.id,
+                  name: item.product.name,
+                  price: item.product.price,
+                  clientPrice: item.product.price,
+                  // Add other required product properties
+                };
+
+                this.cartService.addToCart(product as any, item.quantity);
+              }
+            });
+
+            // Store draft order reference
+            if (typeof window !== 'undefined' && window.sessionStorage) {
+              sessionStorage.setItem('draftOrderId', inquiry.id);
+              sessionStorage.setItem('draftOrderNumber', inquiry.internalReference);
+            }
+
+            // Navigate to cart
+            this.router.navigate(['/cart']);
+          }
+        });
+    }
   }
 
   onDelete(inquiry: DraftInquiry): void {
     // Implement delete functionality with confirmation
     if (confirm(`Are you sure you want to delete this draft inquiry?`)) {
       console.log('Delete inquiry:', inquiry);
-      // Call delete service method here
+      // TODO: Call delete service method here
+      // this.orderService.deleteOrder(inquiry.id).subscribe(...);
     }
   }
 

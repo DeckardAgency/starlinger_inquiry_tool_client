@@ -169,7 +169,8 @@ export class OrderService {
     // Create the query parameters with the user.email filter
     const params = new HttpParams()
       .set('user.email', email)
-      .set('isDraft', 'false');
+      .set('isDraft', 'false')
+      .set('status', 'submitted');
 
     // Use the headers and params for GET requests
     return this.http.get<OrdersCollection>(this.apiUrl, { headers, params });
