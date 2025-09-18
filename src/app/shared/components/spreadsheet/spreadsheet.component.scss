@@ -15,6 +15,9 @@ $text-gray: #71717A;
 // Main Spreadsheet Block
 .spreadsheet {
   margin: 0 auto;
+  position: relative;
+  border: 1px solid #E4E4E7;
+  border-radius: 0.5rem;
 
   // Expanded/Fullscreen state
   &--expanded {
@@ -71,13 +74,14 @@ $text-gray: #71717A;
   &__tabs {
     display: flex;
     border: 1px solid $border-color;
+    justify-content: center;
     background-color: #ffffff;
     border-bottom: none;
     position: relative;
   }
 
   &__tab-button {
-    flex: 1;
+    //flex: 1;
     padding: 12px 24px;
     border: none;
     background-color: $gray-50;
@@ -132,25 +136,27 @@ $text-gray: #71717A;
   // Fullscreen button
   &__fullscreen-btn {
     position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 0;
+    top: 0;
+    transform: translateY(-2.8rem);
     padding: 6px;
-    background: white;
-    border: 1px solid $border-color;
+    background: transparent;
+    border: 0px solid $border-color;
     border-radius: 4px;
     cursor: pointer;
-    color: $gray-600;
+    //color: $gray-600;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     z-index: 10;
+    gap: 0.5rem;
+    font-size: 0.875rem;
 
     &:hover {
       background-color: $gray-50;
       color: $text-dark;
-      transform: translateY(-50%) scale(1.1);
+      //transform: translateY(-50%) scale(1.1);
     }
 
     svg {
@@ -161,7 +167,7 @@ $text-gray: #71717A;
   // Table Container
   &__table-container {
     background-color: white;
-    border: 1px solid $border-color;
+    //border: 1px solid $border-color;
     border-top: none;
     overflow: hidden;
     max-height: 600px;
@@ -247,18 +253,40 @@ $text-gray: #71717A;
 
     // Row header (numbers on left)
     &--row-header {
-      background-color: #FAFAFA;
       padding: 8px;
       text-align: center;
       font-weight: 500;
       color: $gray-600;
       width: 50px;
       font-size: 12px;
+      position: relative;
+
+      &::before {
+        position: absolute;
+        content: '';
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 4px;
+        background-color: #E4E4E7;
+      }
+
+
+      &::after {
+        position: absolute;
+        content: '';
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        height: 100%;
+        background-color: #E4E4E7;
+      }
     }
 
     // Column header (A, B, C)
     &--column-header {
-      background-color: #FAFAFA;
       padding: 8px;
       text-align: center;
       font-weight: 500;

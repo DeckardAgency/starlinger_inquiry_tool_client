@@ -9,33 +9,6 @@
     </button>
   </div>
 
-  <!-- Tab Navigation -->
-  <div class="spreadsheet__tabs">
-    <button
-      class="spreadsheet__tab-button"
-      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
-      [class.spreadsheet__tab-button--client]="activeTab === 'client'"
-      (click)="switchTab('client')">
-      Client data
-    </button>
-    <button
-      class="spreadsheet__tab-button"
-      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
-      [class.spreadsheet__tab-button--demo]="activeTab === 'demo'"
-      (click)="switchTab('demo')">
-      Demo example
-    </button>
-    <!-- Fullscreen Toggle Button -->
-    <button class="spreadsheet__fullscreen-btn" (click)="toggleFullscreen()" title="Toggle fullscreen">
-      <svg *ngIf="!isExpanded" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-      </svg>
-      <svg *ngIf="isExpanded" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
-      </svg>
-    </button>
-  </div>
-
   <!-- Spreadsheet Table -->
   <div class="spreadsheet__table-container" [class.spreadsheet__table-container--expanded]="isExpanded">
     <table class="spreadsheet__table">
@@ -112,6 +85,37 @@
       </ng-container>
       </tbody>
     </table>
+  </div>
+
+  <!-- Fullscreen Toggle Button -->
+  <button class="spreadsheet__fullscreen-btn" (click)="toggleFullscreen()" title="Toggle fullscreen">
+    <svg *ngIf="!isExpanded" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M14 14L10 10M14 14V10.8M14 14H10.8M2 10.8V14M2 14H5.2M2 14L6 10M14 5.2V2M14 2H10.8M14 2L10 6M2 5.2V2M2 2H5.2M2 2L6 6" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <svg *ngIf="isExpanded" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+    </svg>
+    <span>
+      Expand view
+    </span>
+  </button>
+
+  <!-- Tab Navigation -->
+  <div class="spreadsheet__tabs">
+    <button
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
+      [class.spreadsheet__tab-button--client]="activeTab === 'client'"
+      (click)="switchTab('client')">
+      Client data
+    </button>
+    <button
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
+      [class.spreadsheet__tab-button--demo]="activeTab === 'demo'"
+      (click)="switchTab('demo')">
+      Demo example
+    </button>
   </div>
 
   <!-- Status Message -->
