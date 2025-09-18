@@ -19,34 +19,36 @@ export class SpreadsheetComponent implements OnInit {
   isSuccess: boolean = false;
   isExpanded: boolean = false;
 
+  // Demo data matching the design image
   demoData: SpreadsheetRow[] = [
-    {
-      id: 1,
-      productName: 'Power panel T30 4,3" WQVGA color touch',
-      shortDescription: 'Hello! I need a replacement part for my 200XE Winding Machine. Not sure about the exact part needed, please check the attached files for more info.',
-      additionalNotes: 'Please get back to us ASAP, we need this part urgent, production stopped!'
-    },
-    {
-      id: 2,
-      productName: 'Control Unit CU-500',
-      shortDescription: 'Need replacement control unit for the extrusion line. Current unit showing error codes.',
-      additionalNotes: 'Error codes: E101, E205. Machine serial: EX-2019-0456'
-    },
-    {
-      id: 3,
-      productName: 'Servo Motor SM-200',
-      shortDescription: 'Servo motor for winding station 3 needs replacement due to overheating issues.',
-      additionalNotes: 'Motor specifications: 200W, 3000RPM, 24V DC'
-    }
+    { pieces: '8', item: 'ANCS-05001', name: 'Hexagon screw' },
+    { pieces: '16', item: 'ANSK-03000', name: 'Washer' },
+    { pieces: '24', item: 'ANSK-12345', name: 'Power panel T30' },
+    { pieces: '10', item: 'ANSK-90000', name: 'DC converter' },
+    { pieces: '300', item: 'POUBM-1231', name: 'Power module 5000W' }
   ];
 
+  // Client data - starts with empty rows
   clientData: SpreadsheetRow[] = [];
 
   ngOnInit(): void {
     this.initializeClientData();
-    this.clearStatusMessage();
-    // Emit initial data
     this.emitData();
+  }
+
+  /**
+   * Initialize client data with empty rows
+   */
+  private initializeClientData(): void {
+    this.clientData = [];
+    // Create initial empty rows for client data entry
+    for (let i = 0; i < 10; i++) {
+      this.clientData.push({
+        pieces: '',
+        item: '',
+        name: ''
+      });
+    }
   }
 
   /**
@@ -54,27 +56,11 @@ export class SpreadsheetComponent implements OnInit {
    */
   private emitData(): void {
     const currentData = this.getCurrentData();
-    // Filter out empty rows before emitting
+    // Filter out completely empty rows before emitting
     const filteredData = currentData.filter(row =>
-      row.productName || row.shortDescription || row.additionalNotes
+      row.pieces || row.item || row.name
     );
     this.dataChanged.emit(filteredData);
-  }
-
-  /**
-   * Initialize client data with 25 product groups (each with 3 fields)
-   */
-  private initializeClientData(): void {
-    this.clientData = [];
-    // Create 25 product entries instead of 100 separate rows
-    for (let i = 1; i <= 25; i++) {
-      this.clientData.push({
-        id: i,
-        productName: '',
-        shortDescription: '',
-        additionalNotes: ''
-      });
-    }
   }
 
   /**
@@ -83,12 +69,6 @@ export class SpreadsheetComponent implements OnInit {
   switchTab(tab: TabType): void {
     this.activeTab = tab;
     this.clearStatusMessage();
-
-    // If switching to demo tab and it's using the demo data, emit it immediately
-    if (tab === 'demo') {
-      console.log('Switched to demo tab, emitting demo data:', this.demoData);
-    }
-
     this.emitData();
   }
 
@@ -96,17 +76,90 @@ export class SpreadsheetComponent implements OnInit {
    * Get current data based on active tab
    */
   getCurrentData(): SpreadsheetRow[] {
-    return this.activeTab === 'demo' ? this.demoData : this.clientData;
+    return this.activeTab === 'demo' ? [...this.demoData] : [...this.clientData];
   }
 
   /**
-   * Clear all client data
+   * Handle data changes and auto-add rows
    */
-  clearData(): void {
-    if (this.activeTab === 'client') {
-      this.initializeClientData();
-      this.showStatusMessage('Client data cleared successfully!', true);
+  onDataChange(rowIndex?: number): void {
+    // Check if we need to add more rows (when user is typing in penultimate row)
+    if (this.activeTab === 'client' && rowIndex !== undefined) {
+      this.checkAndAddRow(rowIndex);
+    }
+
+    // Use setTimeout to ensure the model is updated before emitting
+    setTimeout(() => {
       this.emitData();
+    }, 0);
+  }
+
+  /**
+   * Check if user is entering data in penultimate row and add a new row if needed
+   */
+  private checkAndAddRow(currentRowIndex: number): void {
+    const totalRows = this.clientData.length;
+    const penultimateRowIndex = totalRows - 2;
+
+    // If user is typing in the penultimate row
+    if (currentRowIndex === penultimateRowIndex) {
+      const currentRow = this.clientData[currentRowIndex];
+
+      // Check if the current row has any data
+      if (currentRow.pieces || currentRow.item || currentRow.name) {
+        // Check if the last row is empty (to avoid adding duplicate empty rows)
+        const lastRow = this.clientData[totalRows - 1];
+        if (lastRow.pieces || lastRow.item || lastRow.name) {
+          // Last row has data, so add a new empty row
+          this.addRow();
+        }
+      }
+    }
+  }
+
+  /**
+   * Add new row (internal use only)
+   */
+  private addRow(): void {
+    if (this.activeTab === 'client') {
+      this.clientData.push({
+        pieces: '',
+        item: '',
+        name: ''
+      });
+    }
+  }
+
+  /**
+   * Remove row (client data only) - keeping for potential future use
+   */
+  removeRow(index: number): void {
+    if (this.activeTab === 'client' && this.clientData.length > 1) {
+      this.clientData.splice(index, 1);
+      this.emitData();
+    }
+  }
+
+  /**
+   * Toggle fullscreen/expanded view
+   */
+  toggleFullscreen(): void {
+    this.isExpanded = !this.isExpanded;
+
+    // Add or remove fullscreen class to body to handle scrolling
+    if (this.isExpanded) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  /**
+   * Exit fullscreen with Escape key
+   */
+  onEscapeKey(): void {
+    if (this.isExpanded) {
+      this.toggleFullscreen();
     }
   }
 
@@ -124,9 +177,9 @@ export class SpreadsheetComponent implements OnInit {
 
       // Set column widths for better formatting
       ws['!cols'] = [
+        { width: 15 },
         { width: 20 },
-        { width: 30 },
-        { width: 50 }
+        { width: 30 }
       ];
 
       // Add worksheet to workbook
@@ -153,23 +206,16 @@ export class SpreadsheetComponent implements OnInit {
     const exportData: any[][] = [];
 
     // Add header
-    exportData.push(['Starlinger Part Request Template']);
-    exportData.push([]);
+    exportData.push(['Starlinger part request template', '', '']);
+    exportData.push(['Piece(s)', 'Item', 'Name']);
 
     // Add data entries - filter out completely empty entries
     const nonEmptyData = data.filter(row =>
-      row.productName || row.shortDescription || row.additionalNotes
+      row.pieces || row.item || row.name
     );
 
-    nonEmptyData.forEach((row, index) => {
-      exportData.push(['Product (part) name', row.productName]);
-      exportData.push(['Short description', row.shortDescription]);
-      exportData.push(['Additional notes', row.additionalNotes]);
-
-      // Add empty row between groups (except for the last entry)
-      if (index < nonEmptyData.length - 1) {
-        exportData.push([]);
-      }
+    nonEmptyData.forEach(row => {
+      exportData.push([row.pieces || '', row.item || '', row.name || '']);
     });
 
     return exportData;
@@ -200,31 +246,10 @@ export class SpreadsheetComponent implements OnInit {
   }
 
   /**
-   * Toggle expanded/fullscreen view
-   */
-  toggleExpandedView(): void {
-    this.isExpanded = !this.isExpanded;
-    this.showStatusMessage(
-      this.isExpanded ? 'Expanded to full view' : 'Returned to compact view',
-      true
-    );
-  }
-
-  /**
    * Clear status message
    */
   private clearStatusMessage(): void {
     this.statusMessage = '';
     this.isSuccess = false;
-  }
-
-  /**
-   * Handle data changes
-   */
-  onDataChange(): void {
-    // Use setTimeout to ensure the model is updated before emitting
-    setTimeout(() => {
-      this.emitData();
-    }, 0);
   }
 }

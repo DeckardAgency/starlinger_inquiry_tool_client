@@ -1,7 +1,40 @@
-<div class="spreadsheet" [class.spreadsheet--expanded]="isExpanded">
-  <!-- Header Section -->
-  <!--  <div class="spreadsheet__header">-->
-  <!--  </div>-->
+<div class="spreadsheet" [class.spreadsheet--expanded]="isExpanded" (keydown.escape)="onEscapeKey()">
+  <!-- Fullscreen Header (only visible in expanded mode) -->
+  <div class="spreadsheet__fullscreen-header" *ngIf="isExpanded">
+    <h2 class="spreadsheet__fullscreen-title">Starlinger Part Request Template</h2>
+    <button class="spreadsheet__close-fullscreen" (click)="toggleFullscreen()" title="Exit fullscreen (ESC)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="spreadsheet__tabs">
+    <button
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
+      [class.spreadsheet__tab-button--client]="activeTab === 'client'"
+      (click)="switchTab('client')">
+      Client data
+    </button>
+    <button
+      class="spreadsheet__tab-button"
+      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
+      [class.spreadsheet__tab-button--demo]="activeTab === 'demo'"
+      (click)="switchTab('demo')">
+      Demo example
+    </button>
+    <!-- Fullscreen Toggle Button -->
+    <button class="spreadsheet__fullscreen-btn" (click)="toggleFullscreen()" title="Toggle fullscreen">
+      <svg *ngIf="!isExpanded" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+      </svg>
+      <svg *ngIf="isExpanded" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+      </svg>
+    </button>
+  </div>
 
   <!-- Spreadsheet Table -->
   <div class="spreadsheet__table-container" [class.spreadsheet__table-container--expanded]="isExpanded">
@@ -11,115 +44,75 @@
         <th class="spreadsheet__cell spreadsheet__cell--row-header"></th>
         <th class="spreadsheet__cell spreadsheet__cell--column-header">A</th>
         <th class="spreadsheet__cell spreadsheet__cell--column-header">B</th>
+        <th class="spreadsheet__cell spreadsheet__cell--column-header">C</th>
       </tr>
       </thead>
       <tbody class="spreadsheet__table-body">
       <!-- Main Header Row -->
       <tr class="spreadsheet__table-row spreadsheet__table-row--header">
         <td class="spreadsheet__cell spreadsheet__cell--row-number">1</td>
-        <td class="spreadsheet__cell spreadsheet__cell--main-header" colspan="2">
+        <td class="spreadsheet__cell spreadsheet__cell--main-header" colspan="3">
           Starlinger part request template
         </td>
       </tr>
 
-      <!-- Dynamic Rows for Each Product Group -->
+      <!-- Column Headers Row -->
+      <tr class="spreadsheet__table-row spreadsheet__table-row--subheader">
+        <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
+        <td class="spreadsheet__cell spreadsheet__cell--column-title">Piece(s)</td>
+        <td class="spreadsheet__cell spreadsheet__cell--column-title">Item</td>
+        <td class="spreadsheet__cell spreadsheet__cell--column-title">Name</td>
+      </tr>
+
+      <!-- Data Rows -->
       <ng-container *ngFor="let row of getCurrentData(); let i = index">
-        <!-- Product Name Row -->
-        <tr class="spreadsheet__table-row">
-          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 2 }}</td>
-          <td class="spreadsheet__cell spreadsheet__cell--field-label">
-            Product (part) name
+        <tr class="spreadsheet__table-row spreadsheet__table-row--data">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ i + 3 }}</td>
+          <td class="spreadsheet__cell spreadsheet__cell--input">
+            <input
+              type="text"
+              class="spreadsheet__input"
+              [(ngModel)]="row.pieces"
+              [readonly]="activeTab === 'demo'"
+              placeholder=""
+              (input)="onDataChange(i)">
           </td>
           <td class="spreadsheet__cell spreadsheet__cell--input">
             <input
               type="text"
               class="spreadsheet__input"
-              [(ngModel)]="row.productName"
+              [(ngModel)]="row.item"
               [readonly]="activeTab === 'demo'"
-              placeholder="Enter product name"
-              (input)="onDataChange()">
-          </td>
-        </tr>
-
-        <!-- Short Description Row -->
-        <tr class="spreadsheet__table-row">
-          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 3 }}</td>
-          <td class="spreadsheet__cell spreadsheet__cell--field-label">
-            Short description
+              placeholder=""
+              (input)="onDataChange(i)">
           </td>
           <td class="spreadsheet__cell spreadsheet__cell--input">
-              <textarea
-                class="spreadsheet__input spreadsheet__input--textarea"
-                [(ngModel)]="row.shortDescription"
-                [readonly]="activeTab === 'demo'"
-                placeholder="Enter short description"
-                rows="3"
-                (input)="onDataChange()"></textarea>
+            <input
+              type="text"
+              class="spreadsheet__input"
+              [(ngModel)]="row.name"
+              [readonly]="activeTab === 'demo'"
+              placeholder=""
+              (input)="onDataChange(i)">
           </td>
         </tr>
+      </ng-container>
 
-        <!-- Additional Notes Row -->
-        <tr class="spreadsheet__table-row">
-          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 4 }}</td>
-          <td class="spreadsheet__cell spreadsheet__cell--field-label">
-            Additional notes
+      <!-- Empty rows for visual padding if needed (only in demo mode) -->
+      <ng-container *ngIf="activeTab === 'demo' && getCurrentData().length < 10">
+        <tr *ngFor="let i of [].constructor(10 - getCurrentData().length); let j = index"
+            class="spreadsheet__table-row spreadsheet__table-row--empty">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">
+            {{ getCurrentData().length + j + 3 }}
           </td>
-          <td class="spreadsheet__cell spreadsheet__cell--input">
-              <textarea
-                class="spreadsheet__input spreadsheet__input--textarea"
-                [(ngModel)]="row.additionalNotes"
-                [readonly]="activeTab === 'demo'"
-                placeholder="Enter additional notes"
-                rows="4"
-                (input)="onDataChange()"></textarea>
-          </td>
-        </tr>
-
-        <!-- Empty Row Between Groups -->
-        <tr class="spreadsheet__table-row">
-          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ (i * 4) + 5 }}</td>
-          <td class="spreadsheet__cell" colspan="2" style="height: 20px; background-color: #f8f9fa;"></td>
+          <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+          <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+          <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
         </tr>
       </ng-container>
       </tbody>
     </table>
   </div>
-
-  <!-- Tab Navigation -->
-  <div class="spreadsheet__tabs">
-    <button
-      class="spreadsheet__tab-button spreadsheet__tab-button--client"
-      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
-      (click)="switchTab('client')">
-      Client data
-    </button>
-    <button
-      class="spreadsheet__tab-button spreadsheet__tab-button--demo"
-      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
-      (click)="switchTab('demo')">
-      Demo example
-    </button>
-  </div>
-
-  <!-- Action Buttons -->
-  <!--  <div class="spreadsheet__actions">-->
-  <!--    <button-->
-  <!--      class="spreadsheet__button spreadsheet__button&#45;&#45;secondary"-->
-  <!--      (click)="toggleExpandedView()">-->
-  <!--      {{ isExpanded ? 'Exit Full View' : 'Expand View' }}-->
-  <!--    </button>-->
-  <!--    <button-->
-  <!--      class="spreadsheet__button spreadsheet__button&#45;&#45;danger"-->
-  <!--      (click)="clearData()"-->
-  <!--      [disabled]="activeTab === 'demo'">-->
-  <!--      Clear All-->
-  <!--    </button>-->
-  <!--    <button-->
-  <!--      class="spreadsheet__button spreadsheet__button&#45;&#45;primary"-->
-  <!--      (click)="exportToExcel()">-->
-  <!--      Finish & Export to Excel-->
-  <!--    </button>-->
-  <!--  </div>-->
 
   <!-- Status Message -->
   <div

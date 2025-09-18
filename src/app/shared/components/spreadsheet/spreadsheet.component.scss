@@ -1,19 +1,7 @@
 // SCSS Variables
-$primary-color: #1976d2;
-$primary-hover: #1565c0;
-$secondary-color: #6c757d;
-$secondary-hover: #5a6268;
-$danger-color: #dc3545;
-$danger-hover: #c82333;
-
-$success-bg: #d4edda;
-$success-color: #155724;
-$success-border: #c3e6cb;
-
-$error-bg: #f8d7da;
-$error-color: #721c24;
-$error-border: #f5c6cb;
-
+$primary-color: #237804;
+$demo-color: #3B0075;
+$border-color: #E4E4E7;
 $gray-50: #f8f9fa;
 $gray-100: #f1f3f4;
 $gray-200: #e9ecef;
@@ -21,134 +9,186 @@ $gray-300: #dadce0;
 $gray-500: #6c757d;
 $gray-600: #5f6368;
 $gray-700: #495057;
-
-$blue-50: #e3f2fd;
-$blue-100: #e8f0fe;
-$blue-600: #1a73e8;
-
-$font-size-sm: 14px;
-$font-size-base: 16px;
-
-$border-radius: 0.375rem;
-$box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-$breakpoint-tablet: 768px;
+$text-dark: #232323;
+$text-gray: #71717A;
 
 // Main Spreadsheet Block
 .spreadsheet {
   margin: 0 auto;
 
-  // Modifier for expanded/fullscreen mode
+  // Expanded/Fullscreen state
   &--expanded {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: 9999;
     background-color: white;
     max-width: none;
     margin: 0;
-    padding: 20px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    animation: expandIn 0.3s ease-out;
   }
 
-  // Header Element
-  &__header {
-    text-align: center;
-    margin-bottom: 20px;
+  // Fullscreen header (only shown in expanded mode)
+  &__fullscreen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: white;
+    border-bottom: 1px solid $border-color;
   }
 
-  &__title {
-    color: #2c3e50;
+  &__fullscreen-title {
     margin: 0;
+    font-size: 20px;
     font-weight: 600;
-    font-size: 24px;
+    color: $text-dark;
+  }
+
+  &__close-fullscreen {
+    padding: 8px;
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    cursor: pointer;
+    color: $gray-600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $gray-50;
+      color: $text-dark;
+    }
   }
 
   // Tabs Element
   &__tabs {
     display: flex;
-    justify-content: center;
-    border: 1px solid $gray-300;
+    border: 1px solid $border-color;
     background-color: #ffffff;
+    border-bottom: none;
+    position: relative;
   }
 
   &__tab-button {
+    flex: 1;
     padding: 12px 24px;
-    border: 1px solid $gray-300;
-    border-bottom: none;
+    border: none;
     background-color: $gray-50;
     cursor: pointer;
-    font-size: $font-size-sm;
+    font-size: 14px;
     font-weight: 500;
     transition: all 0.2s ease;
     color: $gray-500;
+    position: relative;
 
     &:hover {
       background-color: $gray-200;
     }
 
-    // Modifier for active state
-    &--active {
-      background-color: white;
-      color: $gray-700;
-      border-bottom: 4px solid white;
-      margin-bottom: 0px;
-      z-index: 1;
-      position: relative;
+    &:first-child {
+      border-right: 1px solid $border-color;
     }
 
-    &--client {
+    // Active state for client tab
+    &--active.spreadsheet__tab-button--client {
       background-color: rgba(35, 120, 4, 0.10);
-      color: #232323;
-      border-bottom: 4px solid #237804;
-      margin-bottom: 0px;
-      z-index: 1;
-      position: relative;
+      color: $text-dark;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background-color: $primary-color;
+      }
     }
 
-    &--demo {
+    // Active state for demo tab
+    &--active.spreadsheet__tab-button--demo {
       background-color: rgba(59, 0, 117, 0.10);
-      color: #232323;
-      border-bottom: 4px solid #3B0075;
-      margin-bottom: 0px;
-      z-index: 1;
-      position: relative;
+      color: $text-dark;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background-color: $demo-color;
+      }
     }
   }
 
-  // Table Container Element - Made Scrollable
-  &__table-container {
-    background-color: white;
-    border: 1px solid $gray-300;
-    border-bottom: 0;
-    border-radius: $border-radius;
-    overflow: hidden;
-    //box-shadow: $box-shadow;
-    max-height: 500px; // Limit height to show approximately first product group
-    overflow-y: auto; // Enable vertical scrolling
-    position: relative;
+  // Fullscreen button
+  &__fullscreen-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 6px;
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    cursor: pointer;
+    color: $gray-600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
 
-    // Modifier for expanded view
-    &--expanded {
-      max-height: calc(100vh - 200px); // Full height minus header and buttons
-      height: calc(100vh - 200px);
+    &:hover {
+      background-color: $gray-50;
+      color: $text-dark;
+      transform: translateY(-50%) scale(1.1);
     }
 
-    // Custom scrollbar styling
+    svg {
+      display: block;
+    }
+  }
+
+  // Table Container
+  &__table-container {
+    background-color: white;
+    border: 1px solid $border-color;
+    border-top: none;
+    overflow: hidden;
+    max-height: 600px;
+    overflow-y: auto;
+    position: relative;
+
+    // Expanded view
+    &--expanded {
+      flex: 1;
+      max-height: none;
+      height: auto;
+      border-top: none;
+      border-bottom: none;
+    }
+
+    // Custom scrollbar
     &::-webkit-scrollbar {
-      width: 12px;
+      width: 10px;
     }
 
     &::-webkit-scrollbar-track {
       background: $gray-100;
-      border-radius: 6px;
     }
 
     &::-webkit-scrollbar-thumb {
       background: $gray-300;
-      border-radius: 6px;
+      border-radius: 5px;
 
       &:hover {
         background: $gray-500;
@@ -160,239 +200,193 @@ $breakpoint-tablet: 768px;
   &__table {
     width: 100%;
     border-collapse: collapse;
-    font-size: $font-size-sm;
+    font-size: 14px;
   }
 
   &__table-head {
-    // Sticky header to remain visible while scrolling
     position: sticky;
     top: 0;
     z-index: 10;
     background-color: white;
   }
 
-  &__table-body {
-    // No specific styles needed, inherits from table
-  }
-
+  // Table Row
   &__table-row {
-    // Base row styles
-
-    // Modifier for header row
     &--header {
-      // Sticky main header row
       position: sticky;
-      top: 31px; // Position below the column headers
+      top: 25px;
       z-index: 9;
       background-color: white;
     }
 
-    // Modifier for data rows
+    &--subheader {
+      position: sticky;
+      top: 65px;
+      z-index: 8;
+      background-color: white;
+    }
+
     &--data {
       &:hover {
-        background-color: $gray-50;
+        background-color: rgba(0, 0, 0, 0.02);
       }
+    }
+
+    &--empty {
+      pointer-events: none;
     }
   }
 
   // Cell Element
   &__cell {
-    border: 1px solid $gray-300;
+    border: 1px solid $border-color;
     padding: 0;
     position: relative;
-    min-height: 40px;
-    vertical-align: top;
+    //height: 40px;
+    vertical-align: middle;
 
-    // Modifier for row header
+    // Row header (numbers on left)
     &--row-header {
-      background-color: #ffffff;
+      background-color: #FAFAFA;
       padding: 8px;
       text-align: center;
-      font-weight: 600;
+      font-weight: 500;
       color: $gray-600;
-      min-width: 40px;
+      width: 50px;
+      font-size: 12px;
     }
 
-    // Modifier for column header
+    // Column header (A, B, C)
     &--column-header {
-      background-color: #ffffff;
+      background-color: #FAFAFA;
       padding: 8px;
       text-align: center;
-      font-weight: 600;
+      font-weight: 500;
       color: $gray-600;
-      min-width: 40px;
+      height: 25px;
+      font-size: 12px;
     }
 
-    // Modifier for row number
+    // Row number
     &--row-number {
-      background-color: #ffffff;
-      padding: 8px;
+      padding: 0.5rem;
       text-align: center;
-      font-weight: 600;
+      font-weight: 500;
       color: $gray-600;
-      width: 40px;
+      width: 50px;
+      font-size: 12px;
     }
 
-    // Modifier for main header
+    // Main header
     &--main-header {
-      font-size: 18px;
+      font-size: 1.125rem;
       font-weight: 500;
       text-align: left;
-      padding: 12px;
-      color: #232323;
+      padding: 0.5rem;
+      color: $text-dark;
+      background-color: white;
+      line-height: 1.75rem;
     }
 
-    // Modifier for field label
-    &--field-label {
-      background-color: $gray-50;
-      font-weight: 500;
-      padding: 12px;
-      color: $gray-700;
-      width: 160px; // Fixed width for consistent layout
+    // Column titles (Piece(s), Item, Name)
+    &--column-title {
+      font-weight: 600;
+      padding: 0.5rem;
+      color: $text-dark;
+      font-size: 13px;
     }
 
-    // Modifier for input cells
+    // Input cells
     &--input {
-      // Input cells have no padding since input elements handle it
+      padding: 0;
+      background-color: white;
+    }
+
+    // Empty cells
+    &--empty {
+      background-color: white;
+      height: 40px;
     }
   }
 
   // Input Element
   &__input {
     width: 100%;
+    height: 100%;
     border: none;
-    padding: 12px;
-    font-size: $font-size-sm;
+    padding: 0.5rem;
+    font-size: 13px;
     background: transparent;
-    resize: none;
     outline: none;
-    font-family: inherit;
 
     &:focus {
-      background-color: $blue-50;
-      box-shadow: inset 0 0 0 2px $primary-color;
+      background-color: rgba(35, 120, 4, 0.05);
+      box-shadow: inset 0 0 0 2px rgba(35, 120, 4, 0.2);
     }
 
     &:read-only {
-      background-color: #f5f5f5;
-      color: #666;
+      background-color: transparent;
+      color: $text-dark;
+      cursor: default;
     }
 
-    // Modifier for textarea
-    &--textarea {
-      min-height: 60px;
-      resize: vertical;
-    }
-  }
-
-  // Actions Element
-  &__actions {
-    margin-top: 20px;
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-  }
-
-  // Button Element
-  &__button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: $border-radius;
-    cursor: pointer;
-    font-size: $font-size-sm;
-    font-weight: 500;
-    transition: all 0.2s ease;
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    // Modifier for primary button
-    &--primary {
-      background-color: $primary-color;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background-color: $primary-hover;
-      }
-    }
-
-    // Modifier for secondary button
-    &--secondary {
-      background-color: $secondary-color;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background-color: $secondary-hover;
-      }
-    }
-
-    // Modifier for danger button
-    &--danger {
-      background-color: $danger-color;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background-color: $danger-hover;
-      }
+    &::placeholder {
+      color: $gray-300;
     }
   }
 
   // Status Element
   &__status {
-    margin-top: 15px;
-    padding: 12px;
-    border-radius: $border-radius;
-    font-weight: 500;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
 
-    // Modifier for success status
     &--success {
-      background-color: $success-bg;
-      color: $success-color;
-      border: 1px solid $success-border;
+      background-color: rgba(35, 120, 4, 0.10);
+      color: $primary-color;
+      border: 1px solid rgba(35, 120, 4, 0.20);
     }
 
-    // Modifier for error status
     &--error {
-      background-color: $error-bg;
-      color: $error-color;
-      border: 1px solid $error-border;
+      background-color: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+  }
+
+  // Animations
+  @keyframes expandIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 
   // Responsive Design
-  @media (max-width: $breakpoint-tablet) {
-    padding: 10px;
-
-    &__actions {
-      flex-direction: column;
-    }
-
-    &__button {
-      width: 100%;
-    }
-
-    &__tabs {
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    &__tab-button {
-      flex-shrink: 0;
-    }
-
+  @media (max-width: 768px) {
     &__table-container {
+      max-height: 400px;
       overflow-x: auto;
-      max-height: 400px; // Smaller height on mobile
     }
 
     &__table {
-      min-width: 600px;
+      min-width: 500px;
     }
 
-    &__cell--field-label {
-      width: 150px; // Smaller width on mobile
+    &__fullscreen-btn {
+      right: 4px;
+      padding: 4px;
+    }
+
+    &--expanded {
+      .spreadsheet__table-container {
+        overflow-x: auto;
+      }
     }
   }
 }

@@ -26,10 +26,16 @@ import { UploadedFile } from '@models/manual-cart-item.model';
 import { Breadcrumb } from '@core/models';
 import { Machine } from '@core/models/machine.model';
 import { SpreadsheetRow } from '@shared/components/spreadsheet/spreadsheet.interface';
-import { Part } from '@models/part.mode';
 import { environment } from '@env/environment';
 
-// Define MachineType interface if not imported
+// Define Part interface with updated structure
+interface Part {
+  id: string;
+  files: UploadedFile[];
+  spreadsheetData: SpreadsheetRow[];
+}
+
+// Define MachineType interface
 interface MachineType {
   id: string;
   name: string;
@@ -329,7 +335,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     // Optional: Add blur behavior
   }
 
-  // Spreadsheet data handler
+  // Spreadsheet data handler - Updated for new structure
   onSpreadsheetDataChanged(data: SpreadsheetRow[], partIndex: number): void {
     console.log('Spreadsheet data changed for part', partIndex, ':', data);
 
@@ -366,14 +372,14 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     this.showImagePreview = false;
   }
 
-  // Validation methods
+  // Validation methods - Updated for new structure
   isCurrentPartValid(): boolean {
     if (this.parts.length === 0) return false;
 
     const currentPart = this.parts[this.parts.length - 1];
 
     const hasValidSpreadsheetData = currentPart.spreadsheetData?.some(row =>
-      row.productName || row.shortDescription || row.additionalNotes
+      row.pieces || row.item || row.name
     ) || false;
 
     const hasSuccessfulUpload = currentPart.files.some(file => file.status === 'success');
@@ -384,7 +390,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   isFormValid(): boolean {
     return this.parts.some(part => {
       const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
-        row.productName || row.shortDescription || row.additionalNotes
+        row.pieces || row.item || row.name
       ) || false;
 
       const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
@@ -435,12 +441,12 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   }
 
   /**
-   * Create cart items from parts
+   * Create cart items from parts - Updated for new structure
    */
   private createCartItemsFromParts(parts: Part[], machine: Machine): ManualCartItem[] {
     return parts.flatMap(part => {
       const spreadsheetRows = part.spreadsheetData?.filter(row =>
-        row.productName || row.shortDescription || row.additionalNotes
+        row.pieces || row.item || row.name
       ) || [];
 
       if (spreadsheetRows.length > 0) {
@@ -449,10 +455,11 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
           machineId: machine.id,
           machineName: machine.articleDescription,
           partData: {
-            partName: row.productName || '',
-            partNumber: '',
-            shortDescription: row.shortDescription || '',
-            additionalNotes: row.additionalNotes || '',
+            partName: row.name || '',
+            partNumber: row.item || '',
+            quantity: row.pieces || '',
+            shortDescription: row.pieces ? `${row.pieces} pieces of ${row.item || ''}` : '',
+            additionalNotes: row.name || '',
             mediaItems: part.files
               .filter(file => file.status === 'success' && file.mediaItem)
               .map(file => file.mediaItem!)
@@ -467,6 +474,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
           partData: {
             partName: '',
             partNumber: '',
+            quantity: '',
             shortDescription: '',
             additionalNotes: '',
             mediaItems: part.files
@@ -517,7 +525,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   }
 
   /**
-   * Create machine entry for inquiry
+   * Create machine entry for inquiry - Updated for new structure
    */
   private createMachineEntry(machine: Machine, parts: Part[]) {
     return {
@@ -525,15 +533,16 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
       notes: "string",
       products: parts.flatMap(part => {
         const spreadsheetRows = part.spreadsheetData?.filter(row =>
-          row.productName || row.shortDescription || row.additionalNotes
+          row.pieces || row.item || row.name
         ) || [];
 
         if (spreadsheetRows.length > 0) {
           return spreadsheetRows.map(row => ({
-            partName: row.productName || '',
-            partNumber: '',
-            shortDescription: row.shortDescription || '',
-            additionalNotes: row.additionalNotes || '',
+            partName: row.name || '',
+            partNumber: row.item || '',
+            quantity: row.pieces || '',
+            shortDescription: row.pieces ? `${row.pieces} pieces of ${row.item || ''}` : '',
+            additionalNotes: row.name || '',
             mediaItems: part.files
               .filter(file => file.status === 'success' && file.mediaItem)
               .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
@@ -542,6 +551,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
           return [{
             partName: '',
             partNumber: '',
+            quantity: '',
             shortDescription: '',
             additionalNotes: '',
             mediaItems: part.files
@@ -556,12 +566,12 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   }
 
   /**
-   * Check if parts have valid data
+   * Check if parts have valid data - Updated for new structure
    */
   private hasValidPartsData(parts: Part[]): boolean {
     return parts.some(part => {
       const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
-        row.productName || row.shortDescription || row.additionalNotes
+        row.pieces || row.item || row.name
       ) || false;
 
       const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
