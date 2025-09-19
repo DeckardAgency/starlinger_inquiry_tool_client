@@ -25,7 +25,7 @@ import { ManualCartItem } from '@models/manual-cart-item.model';
 import { UploadedFile } from '@models/manual-cart-item.model';
 import { Breadcrumb } from '@core/models';
 import { Machine } from '@core/models/machine.model';
-import { SpreadsheetRow } from '@shared/components/spreadsheet/spreadsheet.interface';
+import { SpreadsheetRow, TabType } from '@shared/components/spreadsheet/spreadsheet.interface';
 import { environment } from '@env/environment';
 
 // Define Part interface with updated structure
@@ -86,6 +86,10 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
 
   // Simple form for files only
   partForm = new FormGroup({});
+
+  // Spreadsheet state
+  currentSpreadsheetTab: TabType = 'client';
+  hasClientData: boolean = false;
 
   // Parts array (simplified)
   parts: Part[] = [];
@@ -342,10 +346,18 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     if (partIndex >= 0 && partIndex < this.parts.length) {
       this.parts[partIndex].spreadsheetData = data;
 
+      // Update hasClientData flag
+      this.hasClientData = data.some(row => row.pieces || row.item || row.name);
+
       if (this.selectedMachine) {
         this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
       }
     }
+  }
+
+  // Handle spreadsheet tab change
+  onSpreadsheetTabChanged(tab: TabType): void {
+    this.currentSpreadsheetTab = tab;
   }
 
   // File handlers
@@ -388,6 +400,12 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   }
 
   isFormValid(): boolean {
+    // If on demo tab, form is not valid for submission
+    if (this.currentSpreadsheetTab === 'demo') {
+      return false;
+    }
+
+    // Check if any part has valid data (client data tab)
     return this.parts.some(part => {
       const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
         row.pieces || row.item || row.name

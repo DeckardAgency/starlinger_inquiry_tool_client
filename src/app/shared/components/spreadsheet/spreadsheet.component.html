@@ -1,122 +1,232 @@
 <div class="spreadsheet" [class.spreadsheet--expanded]="isExpanded" (keydown.escape)="onEscapeKey()">
-  <!-- Fullscreen Header (only visible in expanded mode) -->
-  <div class="spreadsheet__fullscreen-header" *ngIf="isExpanded">
-    <h2 class="spreadsheet__fullscreen-title">Starlinger Part Request Template</h2>
-    <button class="spreadsheet__close-fullscreen" (click)="toggleFullscreen()" title="Exit fullscreen (ESC)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+  <!-- Normal View -->
+  <ng-container *ngIf="!isExpanded">
+    <!-- Spreadsheet Table -->
+    <div class="spreadsheet__table-container">
+      <table class="spreadsheet__table">
+        <thead class="spreadsheet__table-head">
+        <tr class="spreadsheet__table-row">
+          <th class="spreadsheet__cell spreadsheet__cell--row-header"></th>
+          <th class="spreadsheet__cell spreadsheet__cell--column-header">A</th>
+          <th class="spreadsheet__cell spreadsheet__cell--column-header">B</th>
+          <th class="spreadsheet__cell spreadsheet__cell--column-header">C</th>
+        </tr>
+        </thead>
+        <tbody class="spreadsheet__table-body">
+        <!-- Main Header Row -->
+        <tr class="spreadsheet__table-row spreadsheet__table-row--header">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">1</td>
+          <td class="spreadsheet__cell spreadsheet__cell--main-header" colspan="3">
+            Starlinger part request template
+          </td>
+        </tr>
+
+        <!-- Column Headers Row -->
+        <tr class="spreadsheet__table-row spreadsheet__table-row--subheader">
+          <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
+          <td class="spreadsheet__cell spreadsheet__cell--column-title">Piece(s)</td>
+          <td class="spreadsheet__cell spreadsheet__cell--column-title">Item</td>
+          <td class="spreadsheet__cell spreadsheet__cell--column-title">Name</td>
+        </tr>
+
+        <!-- Data Rows -->
+        <ng-container *ngFor="let row of getCurrentData(); let i = index">
+          <tr class="spreadsheet__table-row spreadsheet__table-row--data">
+            <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ i + 3 }}</td>
+            <td class="spreadsheet__cell spreadsheet__cell--input">
+              <input
+                type="text"
+                class="spreadsheet__input"
+                [(ngModel)]="row.pieces"
+                [readonly]="activeTab === 'demo'"
+                placeholder=""
+                (input)="onDataChange(i)">
+            </td>
+            <td class="spreadsheet__cell spreadsheet__cell--input">
+              <input
+                type="text"
+                class="spreadsheet__input"
+                [(ngModel)]="row.item"
+                [readonly]="activeTab === 'demo'"
+                placeholder=""
+                (input)="onDataChange(i)">
+            </td>
+            <td class="spreadsheet__cell spreadsheet__cell--input">
+              <input
+                type="text"
+                class="spreadsheet__input"
+                [(ngModel)]="row.name"
+                [readonly]="activeTab === 'demo'"
+                placeholder=""
+                (input)="onDataChange(i)">
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- Empty rows for visual padding if needed (only in demo mode) -->
+        <ng-container *ngIf="activeTab === 'demo' && getCurrentData().length < 10">
+          <tr *ngFor="let i of [].constructor(10 - getCurrentData().length); let j = index"
+              class="spreadsheet__table-row spreadsheet__table-row--empty">
+            <td class="spreadsheet__cell spreadsheet__cell--row-number">
+              {{ getCurrentData().length + j + 3 }}
+            </td>
+            <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+            <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+            <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+          </tr>
+        </ng-container>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Fullscreen Toggle Button -->
+    <button class="spreadsheet__fullscreen-btn" (click)="toggleFullscreen()" title="Expand to fullscreen">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M14 14L10 10M14 14V10.8M14 14H10.8M2 10.8V14M2 14H5.2M2 14L6 10M14 5.2V2M14 2H10.8M14 2L10 6M2 5.2V2M2 2H5.2M2 2L6 6"
+              stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
+      <span>Expand view</span>
     </button>
-  </div>
 
-  <!-- Spreadsheet Table -->
-  <div class="spreadsheet__table-container" [class.spreadsheet__table-container--expanded]="isExpanded">
-    <table class="spreadsheet__table">
-      <thead class="spreadsheet__table-head">
-      <tr class="spreadsheet__table-row">
-        <th class="spreadsheet__cell spreadsheet__cell--row-header"></th>
-        <th class="spreadsheet__cell spreadsheet__cell--column-header">A</th>
-        <th class="spreadsheet__cell spreadsheet__cell--column-header">B</th>
-        <th class="spreadsheet__cell spreadsheet__cell--column-header">C</th>
-      </tr>
-      </thead>
-      <tbody class="spreadsheet__table-body">
-      <!-- Main Header Row -->
-      <tr class="spreadsheet__table-row spreadsheet__table-row--header">
-        <td class="spreadsheet__cell spreadsheet__cell--row-number">1</td>
-        <td class="spreadsheet__cell spreadsheet__cell--main-header" colspan="3">
-          Starlinger part request template
-        </td>
-      </tr>
+    <!-- Tab Navigation -->
+    <div class="spreadsheet__tabs">
+      <button
+        class="spreadsheet__tab-button"
+        [class.spreadsheet__tab-button--active]="activeTab === 'client'"
+        [class.spreadsheet__tab-button--client]="activeTab === 'client'"
+        (click)="switchTab('client')">
+        Client data
+      </button>
+      <button
+        class="spreadsheet__tab-button"
+        [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
+        [class.spreadsheet__tab-button--demo]="activeTab === 'demo'"
+        (click)="switchTab('demo')">
+        Demo example
+      </button>
+    </div>
+  </ng-container>
 
-      <!-- Column Headers Row -->
-      <tr class="spreadsheet__table-row spreadsheet__table-row--subheader">
-        <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
-        <td class="spreadsheet__cell spreadsheet__cell--column-title">Piece(s)</td>
-        <td class="spreadsheet__cell spreadsheet__cell--column-title">Item</td>
-        <td class="spreadsheet__cell spreadsheet__cell--column-title">Name</td>
-      </tr>
+  <!-- Fullscreen View -->
+  <ng-container *ngIf="isExpanded">
+    <!-- Fullscreen Header -->
+    <div class="spreadsheet__fullscreen-header">
+      <h2 class="spreadsheet__fullscreen-title">Input data</h2>
+      <button class="spreadsheet__done-editing" (click)="toggleFullscreen()">
+        Done editing
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </button>
+    </div>
 
-      <!-- Data Rows -->
-      <ng-container *ngFor="let row of getCurrentData(); let i = index">
-        <tr class="spreadsheet__table-row spreadsheet__table-row--data">
-          <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ i + 3 }}</td>
-          <td class="spreadsheet__cell spreadsheet__cell--input">
-            <input
-              type="text"
-              class="spreadsheet__input"
-              [(ngModel)]="row.pieces"
-              [readonly]="activeTab === 'demo'"
-              placeholder=""
-              (input)="onDataChange(i)">
-          </td>
-          <td class="spreadsheet__cell spreadsheet__cell--input">
-            <input
-              type="text"
-              class="spreadsheet__input"
-              [(ngModel)]="row.item"
-              [readonly]="activeTab === 'demo'"
-              placeholder=""
-              (input)="onDataChange(i)">
-          </td>
-          <td class="spreadsheet__cell spreadsheet__cell--input">
-            <input
-              type="text"
-              class="spreadsheet__input"
-              [(ngModel)]="row.name"
-              [readonly]="activeTab === 'demo'"
-              placeholder=""
-              (input)="onDataChange(i)">
-          </td>
-        </tr>
-      </ng-container>
+    <!-- Fullscreen Content Wrapper -->
+    <div class="spreadsheet__fullscreen-content">
+      <!-- Spreadsheet Table in Fullscreen -->
+      <div class="spreadsheet__table-container spreadsheet__table-container--expanded">
+        <table class="spreadsheet__table spreadsheet__table--fullscreen">
+          <thead class="spreadsheet__table-head">
+          <tr class="spreadsheet__table-row">
+            <th class="spreadsheet__cell spreadsheet__cell--row-header"></th>
+            <th class="spreadsheet__cell spreadsheet__cell--column-header">A</th>
+            <th class="spreadsheet__cell spreadsheet__cell--column-header">B</th>
+            <th class="spreadsheet__cell spreadsheet__cell--column-header">C</th>
+            <th class="spreadsheet__cell spreadsheet__cell--column-header">D</th>
+          </tr>
+          </thead>
+          <tbody class="spreadsheet__table-body">
+          <!-- Main Header Row -->
+          <tr class="spreadsheet__table-row spreadsheet__table-row--header">
+            <td class="spreadsheet__cell spreadsheet__cell--row-number">1</td>
+            <td class="spreadsheet__cell spreadsheet__cell--main-header" colspan="4">
+              Starlinger part request template
+            </td>
+          </tr>
 
-      <!-- Empty rows for visual padding if needed (only in demo mode) -->
-      <ng-container *ngIf="activeTab === 'demo' && getCurrentData().length < 10">
-        <tr *ngFor="let i of [].constructor(10 - getCurrentData().length); let j = index"
-            class="spreadsheet__table-row spreadsheet__table-row--empty">
-          <td class="spreadsheet__cell spreadsheet__cell--row-number">
-            {{ getCurrentData().length + j + 3 }}
-          </td>
-          <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
-          <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
-          <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
-        </tr>
-      </ng-container>
-      </tbody>
-    </table>
-  </div>
+          <!-- Column Headers Row -->
+          <tr class="spreadsheet__table-row spreadsheet__table-row--subheader">
+            <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
+            <td class="spreadsheet__cell spreadsheet__cell--column-title">Piece(s)</td>
+            <td class="spreadsheet__cell spreadsheet__cell--column-title">Item</td>
+            <td class="spreadsheet__cell spreadsheet__cell--column-title">Name</td>
+            <td class="spreadsheet__cell spreadsheet__cell--column-title"></td>
+          </tr>
 
-  <!-- Fullscreen Toggle Button -->
-  <button class="spreadsheet__fullscreen-btn" (click)="toggleFullscreen()" title="Toggle fullscreen">
-    <svg *ngIf="!isExpanded" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M14 14L10 10M14 14V10.8M14 14H10.8M2 10.8V14M2 14H5.2M2 14L6 10M14 5.2V2M14 2H10.8M14 2L10 6M2 5.2V2M2 2H5.2M2 2L6 6" stroke="#232323" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <svg *ngIf="isExpanded" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
-    </svg>
-    <span>
-      Expand view
-    </span>
-  </button>
+          <!-- Data Rows -->
+          <ng-container *ngFor="let row of getCurrentData(); let i = index">
+            <tr class="spreadsheet__table-row spreadsheet__table-row--data">
+              <td class="spreadsheet__cell spreadsheet__cell--row-number">{{ i + 3 }}</td>
+              <td class="spreadsheet__cell spreadsheet__cell--input">
+                <input
+                  type="text"
+                  class="spreadsheet__input"
+                  [(ngModel)]="row.pieces"
+                  [readonly]="activeTab === 'demo'"
+                  placeholder=""
+                  (input)="onDataChange(i)">
+              </td>
+              <td class="spreadsheet__cell spreadsheet__cell--input">
+                <input
+                  type="text"
+                  class="spreadsheet__input"
+                  [(ngModel)]="row.item"
+                  [readonly]="activeTab === 'demo'"
+                  placeholder=""
+                  (input)="onDataChange(i)">
+              </td>
+              <td class="spreadsheet__cell spreadsheet__cell--input">
+                <input
+                  type="text"
+                  class="spreadsheet__input"
+                  [(ngModel)]="row.name"
+                  [readonly]="activeTab === 'demo'"
+                  placeholder=""
+                  (input)="onDataChange(i)">
+              </td>
+              <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+            </tr>
+          </ng-container>
 
-  <!-- Tab Navigation -->
-  <div class="spreadsheet__tabs">
-    <button
-      class="spreadsheet__tab-button"
-      [class.spreadsheet__tab-button--active]="activeTab === 'client'"
-      [class.spreadsheet__tab-button--client]="activeTab === 'client'"
-      (click)="switchTab('client')">
-      Client data
-    </button>
-    <button
-      class="spreadsheet__tab-button"
-      [class.spreadsheet__tab-button--active]="activeTab === 'demo'"
-      [class.spreadsheet__tab-button--demo]="activeTab === 'demo'"
-      (click)="switchTab('demo')">
-      Demo example
-    </button>
-  </div>
+          <!-- Extra empty rows in fullscreen -->
+          <ng-container *ngIf="getCurrentData().length < 20">
+            <tr *ngFor="let j of [].constructor(20 - getCurrentData().length); let k = index"
+                class="spreadsheet__table-row spreadsheet__table-row--empty">
+              <td class="spreadsheet__cell spreadsheet__cell--row-number">
+                {{ getCurrentData().length + k + 3 }}
+              </td>
+              <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+              <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+              <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+              <td class="spreadsheet__cell spreadsheet__cell--empty"></td>
+            </tr>
+          </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tab Navigation (bottom in fullscreen view) -->
+      <div class="spreadsheet__fullscreen-tabs">
+        <button
+          class="spreadsheet__fullscreen-tab"
+          [class.spreadsheet__fullscreen-tab--active]="activeTab === 'demo'"
+          (click)="switchTab('demo')">
+          Demo example
+          <svg *ngIf="activeTab === 'demo'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 13l3 3 7-7"/>
+          </svg>
+        </button>
+        <button
+          class="spreadsheet__fullscreen-tab"
+          [class.spreadsheet__fullscreen-tab--active]="activeTab === 'client'"
+          (click)="switchTab('client')">
+          Client data
+          <svg *ngIf="activeTab === 'client'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 13l3 3 7-7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </ng-container>
 
   <!-- Status Message -->
   <div

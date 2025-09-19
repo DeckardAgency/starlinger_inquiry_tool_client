@@ -13,6 +13,7 @@ import { SpreadsheetRow, TabType, ExportOptions } from './spreadsheet.interface'
 })
 export class SpreadsheetComponent implements OnInit {
   @Output() dataChanged = new EventEmitter<SpreadsheetRow[]>();
+  @Output() tabChanged = new EventEmitter<TabType>();
 
   activeTab: TabType = 'client';
   statusMessage: string = '';
@@ -34,6 +35,8 @@ export class SpreadsheetComponent implements OnInit {
   ngOnInit(): void {
     this.initializeClientData();
     this.emitData();
+    // Emit initial tab state
+    this.tabChanged.emit(this.activeTab);
   }
 
   /**
@@ -70,6 +73,8 @@ export class SpreadsheetComponent implements OnInit {
     this.activeTab = tab;
     this.clearStatusMessage();
     this.emitData();
+    // Emit tab change event
+    this.tabChanged.emit(tab);
   }
 
   /**
@@ -77,6 +82,15 @@ export class SpreadsheetComponent implements OnInit {
    */
   getCurrentData(): SpreadsheetRow[] {
     return this.activeTab === 'demo' ? [...this.demoData] : [...this.clientData];
+  }
+
+  /**
+   * Check if client data has valid entries
+   */
+  hasValidClientData(): boolean {
+    return this.clientData.some(row =>
+      row.pieces || row.item || row.name
+    );
   }
 
   /**

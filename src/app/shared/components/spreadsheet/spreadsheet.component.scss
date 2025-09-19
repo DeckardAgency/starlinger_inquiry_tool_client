@@ -27,12 +27,13 @@ $text-gray: #71717A;
     right: 0;
     bottom: 0;
     z-index: 9999;
-    background-color: white;
+    background: #2B2B2B;
     max-width: none;
     margin: 0;
     display: flex;
     flex-direction: column;
     animation: expandIn 0.3s ease-out;
+    border-radius: 0;
   }
 
   // Fullscreen header (only shown in expanded mode)
@@ -40,37 +41,97 @@ $text-gray: #71717A;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 24px;
-    background-color: white;
-    border-bottom: 1px solid $border-color;
+    padding: 20px 32px;
+    background: #2B2B2B;
+    border-bottom: 1px solid #404040;
   }
 
   &__fullscreen-title {
     margin: 0;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 600;
-    color: $text-dark;
+    color: #FFFFFF;
   }
 
-  &__close-fullscreen {
-    padding: 8px;
-    background: transparent;
-    border: 1px solid $border-color;
+  &__done-editing {
+    padding: 10px 20px;
+    background: #DC2626;
+    border: none;
     border-radius: 6px;
     cursor: pointer;
-    color: $gray-600;
+    color: white;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
     transition: all 0.2s ease;
 
     &:hover {
-      background-color: $gray-50;
-      color: $text-dark;
+      background: #B91C1C;
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
     }
   }
 
-  // Tabs Element
+  // Fullscreen content wrapper
+  &__fullscreen-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    margin: 32px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  // Fullscreen tabs at bottom
+  &__fullscreen-tabs {
+    display: flex;
+    background: #F7F7F7;
+    border-top: 1px solid $border-color;
+  }
+
+  &__fullscreen-tab {
+    flex: 1;
+    padding: 16px 24px;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: $gray-600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+
+    &:not(:last-child) {
+      border-right: 1px solid $border-color;
+    }
+
+    &:hover {
+      background: white;
+    }
+
+    &--active {
+      background: white;
+      color: $text-dark;
+      font-weight: 600;
+
+      svg {
+        color: $primary-color;
+      }
+    }
+  }
+
+  // Tabs Element (Normal view)
   &__tabs {
     display: flex;
     border: 1px solid $border-color;
@@ -81,7 +142,6 @@ $text-gray: #71717A;
   }
 
   &__tab-button {
-    //flex: 1;
     padding: 12px 24px;
     border: none;
     background-color: $gray-50;
@@ -139,12 +199,11 @@ $text-gray: #71717A;
     right: 0;
     top: 0;
     transform: translateY(-2.8rem);
-    padding: 6px;
+    padding: 6px 12px;
     background: transparent;
-    border: 0px solid $border-color;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
-    //color: $gray-600;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -152,11 +211,10 @@ $text-gray: #71717A;
     z-index: 10;
     gap: 0.5rem;
     font-size: 0.875rem;
+    color: $text-dark;
 
     &:hover {
       background-color: $gray-50;
-      color: $text-dark;
-      //transform: translateY(-50%) scale(1.1);
     }
 
     svg {
@@ -167,7 +225,6 @@ $text-gray: #71717A;
   // Table Container
   &__table-container {
     background-color: white;
-    //border: 1px solid $border-color;
     border-top: none;
     overflow: hidden;
     max-height: 600px;
@@ -179,8 +236,9 @@ $text-gray: #71717A;
       flex: 1;
       max-height: none;
       height: auto;
-      border-top: none;
-      border-bottom: none;
+      border: none;
+      border-radius: 0;
+      background: white;
     }
 
     // Custom scrollbar
@@ -207,6 +265,15 @@ $text-gray: #71717A;
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+
+    // Table in fullscreen
+    &--fullscreen {
+      .spreadsheet__cell {
+        &--column-header:nth-child(5) {
+          width: 200px; // Extra column D in fullscreen
+        }
+      }
+    }
   }
 
   &__table-head {
@@ -248,7 +315,6 @@ $text-gray: #71717A;
     border: 1px solid $border-color;
     padding: 0;
     position: relative;
-    //height: 40px;
     vertical-align: middle;
 
     // Row header (numbers on left)
@@ -272,7 +338,6 @@ $text-gray: #71717A;
         background-color: #E4E4E7;
       }
 
-
       &::after {
         position: absolute;
         content: '';
@@ -285,7 +350,7 @@ $text-gray: #71717A;
       }
     }
 
-    // Column header (A, B, C)
+    // Column header (A, B, C, D)
     &--column-header {
       padding: 8px;
       text-align: center;
@@ -409,9 +474,17 @@ $text-gray: #71717A;
     &__fullscreen-btn {
       right: 4px;
       padding: 4px;
+
+      span {
+        display: none; // Hide text on mobile
+      }
     }
 
     &--expanded {
+      .spreadsheet__fullscreen-content {
+        margin: 16px;
+      }
+
       .spreadsheet__table-container {
         overflow-x: auto;
       }
