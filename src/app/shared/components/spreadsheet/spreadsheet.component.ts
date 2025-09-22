@@ -22,11 +22,11 @@ export class SpreadsheetComponent implements OnInit {
 
   // Demo data matching the design image
   demoData: SpreadsheetRow[] = [
-    { pieces: '8', item: 'ANCS-05001', name: 'Hexagon screw' },
-    { pieces: '16', item: 'ANSK-03000', name: 'Washer' },
-    { pieces: '24', item: 'ANSK-12345', name: 'Power panel T30' },
-    { pieces: '10', item: 'ANSK-90000', name: 'DC converter' },
-    { pieces: '300', item: 'POUBM-1231', name: 'Power module 5000W' }
+    { quantity: '8', partNumber: 'ANCS-05001', partName: 'Hexagon screw' },
+    { quantity: '16', partNumber: 'ANSK-03000', partName: 'Washer' },
+    { quantity: '24', partNumber: 'ANSK-12345', partName: 'Power panel T30' },
+    { quantity: '10', partNumber: 'ANSK-90000', partName: 'DC converter' },
+    { quantity: '300', partNumber: 'POUBM-1231', partName: 'Power module 5000W' }
   ];
 
   // Client data - starts with empty rows
@@ -47,9 +47,9 @@ export class SpreadsheetComponent implements OnInit {
     // Create initial empty rows for client data entry
     for (let i = 0; i < 10; i++) {
       this.clientData.push({
-        pieces: '',
-        item: '',
-        name: ''
+        quantity: '',
+        partNumber: '',
+        partName: ''
       });
     }
   }
@@ -61,7 +61,7 @@ export class SpreadsheetComponent implements OnInit {
     const currentData = this.getCurrentData();
     // Filter out completely empty rows before emitting
     const filteredData = currentData.filter(row =>
-      row.pieces || row.item || row.name
+      row.quantity || row.partNumber || row.partName
     );
     this.dataChanged.emit(filteredData);
   }
@@ -89,7 +89,7 @@ export class SpreadsheetComponent implements OnInit {
    */
   hasValidClientData(): boolean {
     return this.clientData.some(row =>
-      row.pieces || row.item || row.name
+      row.quantity || row.partNumber || row.partName
     );
   }
 
@@ -120,10 +120,10 @@ export class SpreadsheetComponent implements OnInit {
       const currentRow = this.clientData[currentRowIndex];
 
       // Check if the current row has any data
-      if (currentRow.pieces || currentRow.item || currentRow.name) {
+      if (currentRow.quantity || currentRow.partNumber || currentRow.partName) {
         // Check if the last row is empty (to avoid adding duplicate empty rows)
         const lastRow = this.clientData[totalRows - 1];
-        if (lastRow.pieces || lastRow.item || lastRow.name) {
+        if (lastRow.quantity || lastRow.partNumber || lastRow.partName) {
           // Last row has data, so add a new empty row
           this.addRow();
         }
@@ -137,9 +137,9 @@ export class SpreadsheetComponent implements OnInit {
   private addRow(): void {
     if (this.activeTab === 'client') {
       this.clientData.push({
-        pieces: '',
-        item: '',
-        name: ''
+        quantity: '',
+        partNumber: '',
+        partName: ''
       });
     }
   }
@@ -221,15 +221,15 @@ export class SpreadsheetComponent implements OnInit {
 
     // Add header
     exportData.push(['Starlinger part request template', '', '']);
-    exportData.push(['Piece(s)', 'Item', 'Name']);
+    exportData.push(['Quantity', 'Part Number', 'Part Name']);
 
     // Add data entries - filter out completely empty entries
     const nonEmptyData = data.filter(row =>
-      row.pieces || row.item || row.name
+      row.quantity || row.partNumber || row.partName
     );
 
     nonEmptyData.forEach(row => {
-      exportData.push([row.pieces || '', row.item || '', row.name || '']);
+      exportData.push([row.quantity || '', row.partNumber || '', row.partName || '']);
     });
 
     return exportData;

@@ -347,7 +347,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
       this.parts[partIndex].spreadsheetData = data;
 
       // Update hasClientData flag
-      this.hasClientData = data.some(row => row.pieces || row.item || row.name);
+      this.hasClientData = data.some(row => row.quantity || row.partNumber || row.partName);
 
       if (this.selectedMachine) {
         this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
@@ -391,7 +391,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     const currentPart = this.parts[this.parts.length - 1];
 
     const hasValidSpreadsheetData = currentPart.spreadsheetData?.some(row =>
-      row.pieces || row.item || row.name
+      row.quantity || row.partNumber || row.partName
     ) || false;
 
     const hasSuccessfulUpload = currentPart.files.some(file => file.status === 'success');
@@ -408,7 +408,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     // Check if any part has valid data (client data tab)
     return this.parts.some(part => {
       const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
-        row.pieces || row.item || row.name
+        row.quantity || row.partNumber || row.partName
       ) || false;
 
       const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
@@ -464,7 +464,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   private createCartItemsFromParts(parts: Part[], machine: Machine): ManualCartItem[] {
     return parts.flatMap(part => {
       const spreadsheetRows = part.spreadsheetData?.filter(row =>
-        row.pieces || row.item || row.name
+        row.quantity || row.partNumber || row.partName
       ) || [];
 
       if (spreadsheetRows.length > 0) {
@@ -473,11 +473,11 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
           machineId: machine.id,
           machineName: machine.articleDescription,
           partData: {
-            partName: row.name || '',
-            partNumber: row.item || '',
-            quantity: row.pieces || '',
-            shortDescription: row.pieces ? `${row.pieces} pieces of ${row.item || ''}` : '',
-            additionalNotes: row.name || '',
+            partName: row.partName || '',
+            partNumber: row.partNumber || '',
+            quantity: row.quantity || '',
+            shortDescription: row.quantity ? `${row.quantity} pieces of ${row.partNumber || ''}` : '',
+            additionalNotes: row.partName || '',
             mediaItems: part.files
               .filter(file => file.status === 'success' && file.mediaItem)
               .map(file => file.mediaItem!)
@@ -551,16 +551,16 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
       notes: "string",
       products: parts.flatMap(part => {
         const spreadsheetRows = part.spreadsheetData?.filter(row =>
-          row.pieces || row.item || row.name
+          row.quantity || row.partNumber || row.partName
         ) || [];
 
         if (spreadsheetRows.length > 0) {
           return spreadsheetRows.map(row => ({
-            partName: row.name || '',
-            partNumber: row.item || '',
-            quantity: row.pieces || '',
-            shortDescription: row.pieces ? `${row.pieces} pieces of ${row.item || ''}` : '',
-            additionalNotes: row.name || '',
+            partName: row.partName || '',
+            partNumber: row.partNumber || '',
+            quantity: row.quantity || '',
+            shortDescription: row.quantity ? `${row.quantity} pieces of ${row.partNumber || ''}` : '',
+            additionalNotes: row.partName || '',
             mediaItems: part.files
               .filter(file => file.status === 'success' && file.mediaItem)
               .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
@@ -589,7 +589,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   private hasValidPartsData(parts: Part[]): boolean {
     return parts.some(part => {
       const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
-        row.pieces || row.item || row.name
+        row.quantity || row.partNumber || row.partName
       ) || false;
 
       const hasSuccessfulUpload = part.files.some(file => file.status === 'success');

@@ -1,7 +1,7 @@
 export interface SpreadsheetRow {
-  pieces?: string;
-  item?: string;
-  name?: string;
+  quantity?: string;
+  partNumber?: string;
+  partName?: string;
 }
 
 export type TabType = 'demo' | 'client';

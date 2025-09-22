@@ -24,9 +24,9 @@
         <!-- Column Headers Row -->
         <tr class="spreadsheet__table-row spreadsheet__table-row--subheader">
           <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
-          <td class="spreadsheet__cell spreadsheet__cell--column-title">Piece(s)</td>
-          <td class="spreadsheet__cell spreadsheet__cell--column-title">Item</td>
-          <td class="spreadsheet__cell spreadsheet__cell--column-title">Name</td>
+          <td class="spreadsheet__cell spreadsheet__cell--column-title">Quantity</td>
+          <td class="spreadsheet__cell spreadsheet__cell--column-title">Part Number</td>
+          <td class="spreadsheet__cell spreadsheet__cell--column-title">Part Name</td>
         </tr>
 
         <!-- Data Rows -->
@@ -37,7 +37,7 @@
               <input
                 type="text"
                 class="spreadsheet__input"
-                [(ngModel)]="row.pieces"
+                [(ngModel)]="row.quantity"
                 [readonly]="activeTab === 'demo'"
                 placeholder=""
                 (input)="onDataChange(i)">
@@ -46,7 +46,7 @@
               <input
                 type="text"
                 class="spreadsheet__input"
-                [(ngModel)]="row.item"
+                [(ngModel)]="row.partNumber"
                 [readonly]="activeTab === 'demo'"
                 placeholder=""
                 (input)="onDataChange(i)">
@@ -55,7 +55,7 @@
               <input
                 type="text"
                 class="spreadsheet__input"
-                [(ngModel)]="row.name"
+                [(ngModel)]="row.partName"
                 [readonly]="activeTab === 'demo'"
                 placeholder=""
                 (input)="onDataChange(i)">
@@ -146,9 +146,9 @@
           <!-- Column Headers Row -->
           <tr class="spreadsheet__table-row spreadsheet__table-row--subheader">
             <td class="spreadsheet__cell spreadsheet__cell--row-number">2</td>
-            <td class="spreadsheet__cell spreadsheet__cell--column-title">Piece(s)</td>
-            <td class="spreadsheet__cell spreadsheet__cell--column-title">Item</td>
-            <td class="spreadsheet__cell spreadsheet__cell--column-title">Name</td>
+            <td class="spreadsheet__cell spreadsheet__cell--column-title">Quantity</td>
+            <td class="spreadsheet__cell spreadsheet__cell--column-title">Part Number</td>
+            <td class="spreadsheet__cell spreadsheet__cell--column-title">Part Name</td>
             <td class="spreadsheet__cell spreadsheet__cell--column-title"></td>
           </tr>
 
@@ -160,7 +160,7 @@
                 <input
                   type="text"
                   class="spreadsheet__input"
-                  [(ngModel)]="row.pieces"
+                  [(ngModel)]="row.quantity"
                   [readonly]="activeTab === 'demo'"
                   placeholder=""
                   (input)="onDataChange(i)">
@@ -169,7 +169,7 @@
                 <input
                   type="text"
                   class="spreadsheet__input"
-                  [(ngModel)]="row.item"
+                  [(ngModel)]="row.partNumber"
                   [readonly]="activeTab === 'demo'"
                   placeholder=""
                   (input)="onDataChange(i)">
@@ -178,7 +178,7 @@
                 <input
                   type="text"
                   class="spreadsheet__input"
-                  [(ngModel)]="row.name"
+                  [(ngModel)]="row.partName"
                   [readonly]="activeTab === 'demo'"
                   placeholder=""
                   (input)="onDataChange(i)">
