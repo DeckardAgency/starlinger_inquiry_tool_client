@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/starlinger_inquiry_tool_client",
+            "outputPath": "dist/starlinger_inquiry_tool_client/browser",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
