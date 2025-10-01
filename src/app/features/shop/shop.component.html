@@ -276,12 +276,14 @@
             [class.shop__products--list]="viewMode === 'list'"
           >
             @for (product of filteredProducts; track product.id) {
-              <app-article-item
-                [product]="product"
-                [viewMode]="viewMode"
-                [isSelected]="selectedProduct?.id === product.id"
-                (productSelected)="selectProduct($event)"
-              ></app-article-item>
+              @if (product.featuredImage) {
+                <app-article-item
+                  [product]="product"
+                  [viewMode]="viewMode"
+                  [isSelected]="selectedProduct?.id === product.id"
+                  (productSelected)="selectProduct($event)"
+                ></app-article-item>
+              }
             }
           </div>
         }
