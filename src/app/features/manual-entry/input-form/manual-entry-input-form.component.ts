@@ -21,6 +21,9 @@ import { environment } from '@env/environment';
 import { AuthService } from '@core/auth/auth.service';
 import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
 
+// Guard interface
+import { CanComponentDeactivate } from '@core/guards/can-deactivate.guard';
+
 export interface Part {
   id: string;
   data: {
@@ -49,7 +52,7 @@ export interface Part {
   templateUrl: './manual-entry-input-form.component.html',
   styleUrls: ['./manual-entry-input-form.component.scss']
 })
-export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
+export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   // Machine data properties
   machines: Machine[] = [];
   filteredMachines: Machine[] = [];
@@ -167,6 +170,51 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy {
         }
       });
     });
+  }
+
+  /**
+   * CanComponentDeactivate implementation
+   * Returns true if there's no unsaved data, false otherwise
+   */
+  canDeactivate(): boolean {
+    return !this.hasUnsavedData();
+  }
+
+  /**
+   * Get component name for the guard message
+   */
+  getComponentName(): string {
+    return 'Use input form';
+  }
+
+  /**
+   * Check if there's any unsaved data
+   */
+  private hasUnsavedData(): boolean {
+    // Check current parts
+    const hasCurrentData = this.parts.some(part =>
+      part.files.length > 0 ||
+      part.data.partName ||
+      part.data.shortDescription
+    );
+
+    if (hasCurrentData) {
+      return true;
+    }
+
+    // Check parts in machinePartsMap
+    for (const [machineId, parts] of this.machinePartsMap.entries()) {
+      const hasData = parts.some(part =>
+        part.files.length > 0 ||
+        part.data.partName ||
+        part.data.shortDescription
+      );
+      if (hasData) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

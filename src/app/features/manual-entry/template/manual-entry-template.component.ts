@@ -28,6 +28,9 @@ import { Machine } from '@core/models/machine.model';
 import { SpreadsheetRow, TabType } from '@shared/components/spreadsheet/spreadsheet.interface';
 import { environment } from '@env/environment';
 
+// Guard interface
+import { CanComponentDeactivate } from '@core/guards/can-deactivate.guard';
+
 // Define Part interface with updated structure
 interface Part {
   id: string;
@@ -61,7 +64,7 @@ interface MachineType {
   templateUrl: './manual-entry-template.component.html',
   styleUrls: ['./manual-entry-template.component.scss']
 })
-export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDestroy, CanComponentDeactivate {
   // Machine data properties
   machines: Machine[] = [];
   filteredMachines: Machine[] = [];
@@ -156,6 +159,49 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
         }
       });
     });
+  }
+
+  /**
+   * CanComponentDeactivate implementation
+   * Returns true if there's no unsaved data, false otherwise
+   */
+  canDeactivate(): boolean {
+    return !this.hasUnsavedData();
+  }
+
+  /**
+   * Get component name for the guard message
+   */
+  getComponentName(): string {
+    return 'Use template';
+  }
+
+  /**
+   * Check if there's any unsaved data
+   */
+  private hasUnsavedData(): boolean {
+    // Check current parts
+    const hasCurrentData = this.parts.some(part =>
+      part.files.length > 0 ||
+      part.spreadsheetData.length > 0
+    );
+
+    if (hasCurrentData) {
+      return true;
+    }
+
+    // Check parts in machinePartsMap
+    for (const [machineId, parts] of this.machinePartsMap.entries()) {
+      const hasData = parts.some(part =>
+        part.files.length > 0 ||
+        part.spreadsheetData.length > 0
+      );
+      if (hasData) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

@@ -14,9 +14,9 @@ import { DraftInquiriesComponent } from '@features/my-inquiries/drafts/draft-inq
 import { InquiryHistoryComponent } from '@features/my-inquiries/history/inquiry-history.component';
 import { OrderDetailComponent } from '@features/inquiry-detail/shop/order-detail.component';
 import { InquiryDetailComponent } from '@features/inquiry-detail/manual-entry/inquiry-detail.component';
-import {MyMachinesComponent} from '@features/my-machines/my-machines.component';
 import {AllMachinesComponent} from '@features/all-machines/all-machines.component';
 import {MyInquiriesComponent} from '@features/my-inquiries/my-inquiries.component';
+import {CanDeactivateGuard} from '@core/guards/can-deactivate.guard';
 
 export const routes: Routes = [
   {
@@ -45,12 +45,14 @@ export const routes: Routes = [
     path: 'manual-entry/input-form',
     component: ManualEntryInputFormComponent,
     canActivate: [AuthGuard],
+    canDeactivate: [CanDeactivateGuard],
     title: 'Inquiry Tool | Manual Entry - InputForm'
   },
   {
     path: 'manual-entry/template',
     component: ManualEntryTemplateComponent,
     canActivate: [AuthGuard],
+    canDeactivate: [CanDeactivateGuard],
     title: 'Inquiry Tool | Manual Entry - Template'
   },
   {
@@ -111,11 +113,6 @@ export const routes: Routes = [
     component: OrderDetailComponent,
     canActivate: [AuthGuard],
     title: 'Inquiry Tool | Order Details'
-  },
-  {
-    path: 'my-machines',
-    component: MyMachinesComponent,
-    title: 'Inquiry Tool | My Machines'
   },
   {
     path: 'all-machines',
