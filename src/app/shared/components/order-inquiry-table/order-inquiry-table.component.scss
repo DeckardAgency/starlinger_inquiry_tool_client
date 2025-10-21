@@ -486,7 +486,7 @@ $tablet-breakpoint: 1024px;
 
     &:hover:not(:disabled) {
       background: $bg-light;
-      border-color: darken($border-color, 10%);
+      border-color: color-mix(in srgb, $border-color 90%, black);
     }
 
     &:disabled {

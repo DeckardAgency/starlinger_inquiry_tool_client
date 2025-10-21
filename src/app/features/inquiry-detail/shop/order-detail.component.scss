@@ -221,7 +221,7 @@ $color-amber: #FFA500;
     font-weight: 500;
 
     &:hover {
-      background-color: darken($color-primary, 10%);
+      background-color: color-mix(in srgb, $color-primary 90%, black);
     }
   }
 
