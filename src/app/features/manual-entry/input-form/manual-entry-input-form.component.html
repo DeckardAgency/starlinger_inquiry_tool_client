@@ -334,13 +334,13 @@
                                         Delete
                                       </button>
                                     } @else {
-                                      <button type="button" class="delete-btn" (click)="isImageFile(file.name) && file.previewUrl && file.status === 'success' ? openImagePreview(file) : null">
-                                        <app-icon name="trashPart" size="16px"></app-icon>
-                                        Edit
-                                      </button>
                                       <button type="button" class="delete-btn" (click)="removeFile(i, file)">
                                         <app-icon name="trashPart" size="16px"></app-icon>
                                         Delete
+                                      </button>
+                                      <button type="button" class="edit-btn" (click)="isImageFile(file.name) && file.previewUrl && file.status === 'success' ? openImagePreview(file) : null">
+                                        <app-icon name="edit" size="16px"></app-icon>
+                                        Edit
                                       </button>
                                     }
                                   </div>
