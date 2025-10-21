@@ -112,8 +112,8 @@ export class ActivityHistoryComponent implements OnInit {
     // Map API status to component status
     const status = this.mapApiStatusToComponentStatus(order.status);
 
-    // Get total parts ordered
-    const partsOrdered = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+    // Count the number of distinct products (not the sum of quantities)
+    const partsOrdered = order.items ? order.items.length : 0;
 
     // Extract customer info from order (you might need to adjust based on actual data structure)
     const customerName = this.extractCustomerName(order);
