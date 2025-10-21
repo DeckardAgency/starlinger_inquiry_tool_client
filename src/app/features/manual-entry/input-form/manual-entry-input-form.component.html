@@ -116,12 +116,33 @@
             </div>
           } @else {
             @for (machine of filteredMachines; track machine.id) {
-              <app-machine-article-item
-                [machine]="machine"
-                viewMode="list"
-                [isSelected]="selectedMachine?.id === machine.id"
-                (machineSelected)="selectMachine($event)"
-              ></app-machine-article-item>
+              @if (machine.id === 'other') {
+                <div class="machine-other-item"
+                     [class.selected]="selectedMachine?.id === 'other'"
+                     (click)="selectMachine(machine)">
+                  <div class="other-item-content">
+                    <div class="other-item-icon">
+                      <app-icon name="addPlus" size="20px" color="#232323"></app-icon>
+                    </div>
+                    <div class="other-item-text">
+                      <div class="other-item-title">{{ machine.articleDescription }}</div>
+                      <div class="other-item-subtitle">For machines not listed above</div>
+                    </div>
+                  </div>
+                  @if (selectedMachine?.id === 'other') {
+                    <div class="selection-checkmark">
+                      <app-icon name="successCheck" size="20px" color="#237804"></app-icon>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <app-machine-article-item
+                  [machine]="machine"
+                  viewMode="list"
+                  [isSelected]="selectedMachine?.id === machine.id"
+                  (machineSelected)="selectMachine($event)"
+                ></app-machine-article-item>
+              }
             }
           }
         </div>
@@ -170,6 +191,32 @@
                   <!-- Accordion Content -->
                   @if (part.isExpanded) {
                     <div class="part-repeater__item-content">
+
+                      <!-- Machine ID Field (shown only when "Other" is selected) -->
+                      @if (isOtherMachineSelected) {
+                        <div class="form-group">
+                          <label [for]="'machineId' + i">
+                            Machine ID *
+                            <span class="label-info">Required for unlisted machines</span>
+                          </label>
+                          <input
+                            type="text"
+                            [id]="'machineId' + i"
+                            [(ngModel)]="part.data.machineId"
+                            [ngModelOptions]="{standalone: true}"
+                            class="form-control"
+                            placeholder="Enter the machine ID or model number"
+                            (input)="checkPartValidity()"
+                          >
+                          @if (!part.data.machineId && part.touched && isOtherMachineSelected) {
+                            <div class="error-message">Machine ID is required for unlisted machines</div>
+                          }
+                          <div class="field-description">
+                            If you don't know the exact ID, provide any identifying information about your machine
+                            (model number, serial number, or description)
+                          </div>
+                        </div>
+                      }
 
                       <!-- Part Name Field -->
                       <div class="form-group">

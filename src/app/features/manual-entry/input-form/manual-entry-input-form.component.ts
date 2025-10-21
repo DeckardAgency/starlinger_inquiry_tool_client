@@ -31,10 +31,15 @@ export interface Part {
     partNumber: string;
     shortDescription: string;
     additionalNotes: string;
+    machineId?: string; // For "Other" machines
   };
   files: UploadedFile[];
   touched: boolean;
-  isExpanded: boolean; // Added for accordion functionality
+  isExpanded: boolean;
+}
+
+export interface OtherMachine extends Machine {
+  isOther?: boolean;
 }
 
 @Component({
@@ -57,6 +62,7 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
   machines: Machine[] = [];
   filteredMachines: Machine[] = [];
   selectedMachine: Machine | null = null;
+  isOtherMachineSelected = false;
   loading = true;
   error: string | null = null;
   totalItems = 0;
@@ -242,7 +248,8 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
       );
     }
 
-    this.filteredMachines = filtered;
+    // Add "Other" option at the end
+    this.filteredMachines = [...filtered, this.createOtherMachineOption()];
   }
 
   private loadMachines(): void {
@@ -253,7 +260,8 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
       next: (response) => {
         this.machines = response.member;
         this.totalItems = response.totalItems;
-        this.filteredMachines = this.machines;
+        // Include "Other" option
+        this.filteredMachines = [...this.machines, this.createOtherMachineOption()];
         this.loading = false;
       },
       error: (err) => {
@@ -262,6 +270,14 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
         console.error('Error loading machines:', err);
       }
     });
+  }
+
+  private createOtherMachineOption(): OtherMachine {
+    return {
+      id: 'other',
+      articleDescription: 'Other (Not Listed)',
+      isOther: true
+    } as OtherMachine;
   }
 
   clearSearch(): void {
@@ -313,7 +329,8 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
         partName: '',
         partNumber: '',
         shortDescription: '',
-        additionalNotes: ''
+        additionalNotes: '',
+        machineId: ''
       },
       files: [],
       touched: false,
@@ -388,6 +405,8 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
     }
 
     this.selectedMachine = machine;
+    this.isOtherMachineSelected = machine.id === 'other';
+
     if (machine) {
       this.breadcrumbs = [
         { label: 'Dashboard', link: '/dashboard' },
@@ -414,6 +433,7 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
     }
 
     this.selectedMachine = null;
+    this.isOtherMachineSelected = false;
     this.breadcrumbs = [
       { label: 'Dashboard', link: '/dashboard' },
       { label: 'Manual Entry', link: '/manual-entry' }
@@ -434,16 +454,29 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
     if (this.parts.length === 0) return false;
 
     const currentPart = this.parts[this.parts.length - 1];
-
-    return !!currentPart.data.partName &&
+    const hasBasicFields = !!currentPart.data.partName &&
       !!currentPart.data.shortDescription;
+
+    // If "Other" machine, also require machineId
+    if (this.isOtherMachineSelected) {
+      return hasBasicFields && !!currentPart.data.machineId?.trim();
+    }
+
+    return hasBasicFields;
   }
 
   isFormValid(): boolean {
-    return this.parts.every(part =>
+    const baseValid = this.parts.every(part =>
       !!part.data.partName &&
       !!part.data.shortDescription
     );
+
+    // If "Other" machine, all parts must have machineId
+    if (this.isOtherMachineSelected) {
+      return baseValid && this.parts.every(part => !!part.data.machineId?.trim());
+    }
+
+    return baseValid;
   }
 
   triggerFileInput(partIndex: number): void {
@@ -712,21 +745,38 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
         };
       });
 
-      const machineEntries = [];
+      const machineEntries: any[] = [];
 
-      machineEntries.push({
-        machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${this.selectedMachine.id}`,
-        notes: "string",
-        products: this.parts.map(part => ({
-          partName: part.data.partName,
-          partNumber: part.data.partNumber,
-          shortDescription: part.data.shortDescription,
-          additionalNotes: part.data.additionalNotes,
-          mediaItems: part.files
-            .filter(file => file.status === 'success' && file.mediaItem)
-            .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
-        }))
-      });
+      // Handle "Other" machines differently
+      if (this.isOtherMachineSelected) {
+        machineEntries.push({
+          machine: this.parts[0].data.machineId, // Custom machine identifier
+          notes: `Inquiry for unlisted/custom machine: ${this.parts[0].data.machineId}`,
+          products: this.parts.map(part => ({
+            partName: part.data.partName,
+            partNumber: part.data.partNumber,
+            shortDescription: part.data.shortDescription,
+            additionalNotes: part.data.additionalNotes,
+            mediaItems: part.files
+              .filter(file => file.status === 'success' && file.mediaItem)
+              .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+          }))
+        });
+      } else {
+        machineEntries.push({
+          machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${this.selectedMachine.id}`,
+          notes: "string",
+          products: this.parts.map(part => ({
+            partName: part.data.partName,
+            partNumber: part.data.partNumber,
+            shortDescription: part.data.shortDescription,
+            additionalNotes: part.data.additionalNotes,
+            mediaItems: part.files
+              .filter(file => file.status === 'success' && file.mediaItem)
+              .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+          }))
+        });
+      }
 
       this.machinePartsMap.forEach((parts, machineId) => {
         if (machineId === this.selectedMachine?.id) {
@@ -762,7 +812,7 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
         contactPhone: 'string',
         isDraft: false,
         user: `${environment.apiBaseUrl}${environment.apiPath}/users/${userId}`,
-        machines: machineEntries
+        machines: machineEntries as any
       };
 
       console.log('Form submission data:', inquiryData);
@@ -772,6 +822,7 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
       }
 
       this.parts = [];
+      this.isOtherMachineSelected = false;
       this.addPart();
     }
   }

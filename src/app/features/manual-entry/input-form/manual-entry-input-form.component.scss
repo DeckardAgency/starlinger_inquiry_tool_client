@@ -1200,3 +1200,92 @@
     }
   }
 }
+
+// NEW: Styles for "Other" machine option
+.machine-other-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #805AD5;
+    background-color: #f8f7ff;
+    box-shadow: 0 2px 8px rgba(128, 90, 213, 0.1);
+  }
+
+  &.selected {
+    border-color: #805AD5;
+    background-color: #f8f7ff;
+    box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.15);
+  }
+
+  .other-item-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .other-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: #eff6ff;
+    flex-shrink: 0;
+  }
+
+  .other-item-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .other-item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #232323;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .other-item-subtitle {
+    font-size: 12px;
+    color: #71717A;
+    margin-top: 2px;
+  }
+
+  .selection-checkmark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 12px;
+  }
+}
+
+// Label info style for "Other" machine field
+.label-info {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #71717A;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+// Field description style
+.field-description {
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
