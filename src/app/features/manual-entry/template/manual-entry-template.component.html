@@ -103,17 +103,6 @@
             <form [formGroup]="partForm">
               @for (part of parts; track part.id; let i = $index) {
                 <div class="part-repeater__item">
-                  <!-- Part Header -->
-                  <!--                  <div class="part-repeater__item-header">-->
-                  <!--                    @if (parts.length > 1) {-->
-                  <!--                      <h4 class="part-repeater__item-title">Part {{ i + 1 }}</h4>-->
-                  <!--                      <button type="button" class="part-repeater__remove-btn" (click)="removePart(i)">-->
-                  <!--                        <app-icon name="trashPart" size="16px"></app-icon>-->
-                  <!--                        Remove-->
-                  <!--                      </button>-->
-                  <!--                    }-->
-                  <!--                  </div>-->
-
                   <!-- Spreadsheet -->
                   <div class="form-group">
                     <app-spreadsheet
