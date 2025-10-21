@@ -133,6 +133,10 @@ const ICONS: {[key: string]: string} = {
     <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`,
 
+  chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 7" fill="none">
+    <path d="M0.9375 0.9375L5.9375 5.9375L10.9375 0.9375" stroke="#232323" stroke-width="1.875" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+
   save: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
     <path d="M2.66657 9.9326C2.17126 9.42654 1.79761 8.81441 1.57392 8.14256C1.35023 7.47071 1.28237 6.75676 1.37547 6.0548C1.46858 5.35284 1.7202 4.68127 2.1113 4.09096C2.50239 3.50064 3.02269 3.00708 3.63279 2.64763C4.24289 2.28819 4.92678 2.0723 5.63268 2.01632C6.33857 1.96033 7.04795 2.06572 7.70708 2.32451C8.36621 2.58329 8.9578 2.98867 9.43706 3.50996C9.91631 4.03124 10.2706 4.65475 10.4732 5.33327H11.6666C12.3102 5.33319 12.9369 5.54015 13.4539 5.92356C13.9709 6.30697 14.3509 6.84651 14.5377 7.46247C14.7246 8.07843 14.7084 8.73815 14.4915 9.34418C14.2746 9.95021 13.8685 10.4704 13.3332 10.8279M8 7.99992V13.9999M8 7.99992L10.6667 10.6666M8 7.99992L5.33333 10.6666" stroke="currentColor" stroke-width="1.33" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`,
