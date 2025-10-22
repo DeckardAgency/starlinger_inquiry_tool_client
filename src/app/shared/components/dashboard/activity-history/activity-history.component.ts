@@ -34,7 +34,7 @@ export class ActivityHistoryComponent implements OnInit {
   currentDataSource: DataSource = DATA_SOURCE.BOTH;
 
   tableConfig: Partial<OrderInquiryTableConfig> = {
-    loadDataOnTabChange: false, // Set to false since we're loading all data at once
+    loadDataOnTabChange: false,
     dataSource: DATA_SOURCE.BOTH,
     enableSorting: true,
     enableFiltering: true,
@@ -106,16 +106,16 @@ export class ActivityHistoryComponent implements OnInit {
   }
 
   private mapOrderToInquiryItem(order: OrderResponse): OrderInquiryItem {
-    // Determine the type based on some logic (you might need to adjust this)
-    const type = order.items && order.items.length > 1 ? INQUIRY_TYPE.ORDER : INQUIRY_TYPE.ORDER;
+    // Orders are always type ORDER
+    const type = INQUIRY_TYPE.ORDER;
 
     // Map API status to component status
     const status = this.mapApiStatusToComponentStatus(order.status);
 
-    // Count the number of distinct products (not the sum of quantities)
+    // Count the number of distinct products
     const partsOrdered = order.items ? order.items.length : 0;
 
-    // Extract customer info from order (you might need to adjust based on actual data structure)
+    // Extract customer info from order
     const customerName = this.extractCustomerName(order);
 
     return {
@@ -136,8 +136,8 @@ export class ActivityHistoryComponent implements OnInit {
   }
 
   private mapInquiryToInquiryItem(inquiry: InquiryResponse): OrderInquiryItem {
-    // Determine the type based on inquiry data
-    const type = inquiry.isDraft ? INQUIRY_TYPE.MANUAL : INQUIRY_TYPE.ORDER;
+    // Inquiries are always type INQUIRY (Manual)
+    const type = INQUIRY_TYPE.INQUIRY;
 
     // Map inquiry status to component status
     const status = this.mapApiStatusToComponentStatus(inquiry.status);
@@ -175,6 +175,7 @@ export class ActivityHistoryComponent implements OnInit {
       'dispatched': ORDER_STATUS.DISPATCHED,
       'confirmed': ORDER_STATUS.CONFIRMED,
       'submitted': ORDER_STATUS.SUBMITTED,
+      'draft': ORDER_STATUS.SUBMITTED,
     };
 
     return statusMap[apiStatus.toLowerCase()] || ORDER_STATUS.SUBMITTED;
@@ -182,9 +183,7 @@ export class ActivityHistoryComponent implements OnInit {
 
   private extractCustomerName(order: OrderResponse): string {
     // Try to extract customer name from order data
-    // This is a placeholder - adjust based on your actual data structure
     if (order.shippingAddress) {
-      // Parse shipping address to get name
       const addressLines = order.shippingAddress.split('\n');
       if (addressLines.length > 0) {
         return addressLines[0];

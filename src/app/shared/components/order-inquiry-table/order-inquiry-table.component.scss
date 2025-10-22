@@ -265,6 +265,10 @@ $tablet-breakpoint: 1024px;
     &--manual {
       background: $type-manual-bg;
     }
+
+    &--inquiry {
+      background: $type-manual-bg;
+    }
   }
 
   // Element: Customer cell

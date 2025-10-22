@@ -7,14 +7,19 @@ import { ManualCartItem } from '@models/manual-cart-item.model';
 import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 
 @Component({
-    selector: 'app-manual-quick-cart',
-    imports: [CommonModule, FormsModule],
-    templateUrl: './manual-quick-cart.component.html',
-    styleUrls: ['./manual-quick-cart.component.scss']
+  selector: 'app-manual-quick-cart',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './manual-quick-cart.component.html',
+  styleUrls: ['./manual-quick-cart.component.scss']
 })
 export class ManualQuickCartComponent implements OnInit, OnDestroy {
   @Input() isOpen = false;
   cartItems$: Observable<ManualCartItem[]> = new Observable<ManualCartItem[]>();
+  loading$: Observable<boolean>;
+  notificationVisible$: Observable<boolean>;
+  notificationMessage$: Observable<string>;
+  notificationType$: Observable<'success' | 'remove' | 'error'>;
+
   private cartItems: ManualCartItem[] = [];
   private subscriptions: Subscription[] = [];
 
@@ -27,7 +32,12 @@ export class ManualQuickCartComponent implements OnInit, OnDestroy {
   constructor(
     public manualQuickCartService: ManualQuickCartService,
     private router: Router
-  ) {}
+  ) {
+    this.loading$ = this.manualQuickCartService.loading$;
+    this.notificationVisible$ = this.manualQuickCartService.notificationVisible$;
+    this.notificationMessage$ = this.manualQuickCartService.notificationMessage$;
+    this.notificationType$ = this.manualQuickCartService.notificationType$;
+  }
 
   ngOnInit(): void {
     // Initialize the observable in ngOnInit
@@ -56,7 +66,6 @@ export class ManualQuickCartComponent implements OnInit, OnDestroy {
   }
 
   removeItem(index: number): void {
-    // The service will now handle showing the notification
     this.manualQuickCartService.removeFromCart(index);
   }
 
@@ -74,28 +83,97 @@ export class ManualQuickCartComponent implements OnInit, OnDestroy {
     return this.openSections.has(sectionId);
   }
 
-  // Navigate to dashboard and close cart
+  // Navigate back and close cart
   goBack(): void {
     this.onClose();
-    // this.router.navigate(['/dashboard']);
   }
 
-  // Save draft action
+  /**
+   * Save inquiry as draft
+   * Validates and sends to backend
+   */
   saveDraft(): void {
-    // Here you would implement logic to save the draft
-    console.log('Saving draft of inquiry items with reference:', this.referenceNumber);
-    // Show a confirmation message or notification
-    alert('Draft saved successfully!');
+    if (!this.validateInput()) {
+      return;
+    }
+
+    // Call the service to save draft
+    this.subscriptions.push(
+      this.manualQuickCartService.saveDraft(
+        this.cartItems,
+        this.referenceNumber || undefined
+      ).subscribe({
+        next: (response) => {
+          console.log('Inquiry saved as draft:', response);
+          // Clear inputs after successful save
+          this.referenceNumber = '';
+
+          // Optionally navigate after a delay
+          setTimeout(() => {
+            // this.router.navigate(['/inquiries/drafts']);
+          }, 2000);
+        },
+        error: (error) => {
+          console.error('Error saving draft:', error);
+          // Error is handled by the service and shown via notification
+        }
+      })
+    );
   }
 
-  // Submit the inquiry
+  /**
+   * Submit the inquiry (creates submitted inquiry)
+   * Validates and sends to backend
+   */
   placeInquiry(): void {
-    // Here you would implement logic to submit the inquiry
-    console.log('Placing inquiry with items:', this.cartItems);
-    console.log('Reference number:', this.referenceNumber);
+    if (!this.validateInput()) {
+      return;
+    }
 
-    this.onClose();
-    this.router.navigate(['/manual-entry-cart']);
+    // Confirm submission
+    if (!confirm('Are you sure you want to submit this inquiry? You can save it as draft instead.')) {
+      return;
+    }
+
+    // Call the service to submit inquiry
+    this.subscriptions.push(
+      this.manualQuickCartService.submitInquiry(
+        this.cartItems,
+        this.referenceNumber || undefined
+      ).subscribe({
+        next: (response) => {
+          console.log('Inquiry submitted:', response);
+
+          // Close the cart
+          this.onClose();
+
+          // Navigate to inquiries page after a delay
+          setTimeout(() => {
+            this.router.navigate(['/inquiries']);
+          }, 2000);
+        },
+        error: (error) => {
+          console.error('Error submitting inquiry:', error);
+          // Error is handled by the service and shown via notification
+        }
+      })
+    );
+  }
+
+  /**
+   * Validate required input fields
+   */
+  private validateInput(): boolean {
+    // Check if cart is empty
+    if (this.cartItems.length === 0) {
+      this.manualQuickCartService.showNotification(
+        'Your inquiry is empty. Please add parts before saving.',
+        'error'
+      );
+      return false;
+    }
+
+    return true;
   }
 
   // Get part count for display

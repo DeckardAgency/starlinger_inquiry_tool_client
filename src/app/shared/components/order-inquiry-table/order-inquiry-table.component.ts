@@ -5,7 +5,6 @@ import {
   EventEmitter,
   computed,
   signal,
-  effect,
   ChangeDetectionStrategy,
   OnInit,
   DestroyRef,
@@ -170,6 +169,7 @@ export class OrderInquiryTableComponent implements OnInit {
       });
     }
 
+    console.log(items);
     return items;
   });
 

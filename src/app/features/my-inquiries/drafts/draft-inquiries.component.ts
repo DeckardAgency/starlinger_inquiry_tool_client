@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BreadcrumbsComponent } from '@shared/components/ui/breadcrumbs/breadcrumbs.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { catchError, finalize, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
 import { OrderService } from '@services/http/order.service';
 import { AuthService } from '@core/auth/auth.service';
-import {CartService} from '@services/cart/cart.service';
+import { CartService } from '@services/cart/cart.service';
+import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
+import { InquiryService } from '@services/http/inquiry.service';
 
-interface DraftInquiry {
+interface DraftItem {
   id: string;
   dateCreated: string;
   type: 'Order' | 'Inquiry';
@@ -20,8 +22,8 @@ interface DraftInquiry {
     avatar?: string;
   };
   status: string;
-  // Store the original order data for later use
-  originalOrder?: any;
+  // Store the original data for later use
+  originalData?: any;
 }
 
 @Component({
@@ -37,7 +39,7 @@ export class DraftInquiriesComponent implements OnInit {
     { label: 'Drafts' }
   ];
 
-  draftInquiries: DraftInquiry[] = [];
+  draftItems: DraftItem[] = [];
   isLoading = false;
   error: string | null = null;
   sortField: string = 'dateCreated';
@@ -45,16 +47,18 @@ export class DraftInquiriesComponent implements OnInit {
 
   constructor(
     private orderService: OrderService,
+    private inquiryService: InquiryService,
     private authService: AuthService,
     private cartService: CartService,
+    private manualQuickCartService: ManualQuickCartService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadDraftOrders();
+    this.loadDraftItems();
   }
 
-  loadDraftOrders(): void {
+  loadDraftItems(): void {
     this.isLoading = true;
     this.error = null;
 
@@ -74,11 +78,10 @@ export class DraftInquiriesComponent implements OnInit {
       return;
     }
 
-    // Use the getDraftOrdersByUserEmail method which already filters by isDraft=true
-    this.orderService.getDraftOrdersByUserEmail(currentUser.email)
-      .pipe(
+    // Fetch both draft orders and draft inquiries using forkJoin
+    forkJoin({
+      orders: this.orderService.getDraftOrdersByUserEmail(currentUser.email).pipe(
         catchError(err => {
-          this.error = 'Failed to load draft orders. Please try again later.';
           console.error('Error loading draft orders:', err);
           return of({
             '@context': '',
@@ -89,38 +92,87 @@ export class DraftInquiriesComponent implements OnInit {
             'view': { '@id': '', '@type': '' },
             'search': { '@type': '', 'template': '', 'variableRepresentation': '', 'mapping': [] }
           });
-        }),
+        })
+      ),
+      inquiries: this.inquiryService.getDraftInquiriesByUserEmail(currentUser.email).pipe(
+        catchError(err => {
+          console.error('Error loading draft inquiries:', err);
+          return of({
+            '@context': '',
+            '@id': '',
+            '@type': '',
+            'totalItems': 0,
+            'member': [],
+            'view': { '@id': '', '@type': '' },
+            'search': { '@type': '', 'template': '', 'variableRepresentation': '', 'mapping': [] }
+          });
+        })
+      )
+    })
+      .pipe(
         finalize(() => {
           this.isLoading = false;
         })
       )
-      .subscribe(ordersCollection => {
-        if (ordersCollection.member && ordersCollection.member.length > 0) {
-          this.draftInquiries = ordersCollection.member.map(order => this.mapOrderToDraftInquiry(order));
-          this.sortInquiries();
-        } else {
-          this.draftInquiries = [];
+      .subscribe(({ orders, inquiries }) => {
+        this.draftItems = [];
+
+        // Add draft orders to the array
+        if (orders.member && orders.member.length > 0) {
+          const mappedOrders = orders.member.map(order => this.mapOrderToDraftItem(order));
+          this.draftItems.push(...mappedOrders);
         }
+
+        // Add draft inquiries to the array
+        if (inquiries.member && inquiries.member.length > 0) {
+          const mappedInquiries = inquiries.member.map(inquiry => this.mapInquiryToDraftItem(inquiry));
+          this.draftItems.push(...mappedInquiries);
+        }
+
+        // If there was an error loading either orders or inquiries, show warning
+        if (this.draftItems.length === 0) {
+          this.error = 'No draft items found';
+        }
+
+        this.sortItems();
       });
   }
 
-  private mapOrderToDraftInquiry(order: any): DraftInquiry {
-    // Get user initials from the order user data
+  private mapOrderToDraftItem(order: any): DraftItem {
     const userName = order.user?.name || order.user?.email || 'Unknown User';
     const initials = this.getInitials(userName);
 
     return {
       id: order.id,
       dateCreated: order.createdAt,
-      type: 'Order', // Based on the table image, all entries are 'Order' type
+      type: 'Order',
       internalReference: order.orderNumber || '-',
       customer: {
         initials: initials,
         name: userName,
-        avatar: order.user?.avatar // Optional avatar URL if available
+        avatar: order.user?.avatar
       },
       status: order.status || 'draft',
-      originalOrder: order // Store the original order data
+      originalData: order
+    };
+  }
+
+  private mapInquiryToDraftItem(inquiry: any): DraftItem {
+    const userName = inquiry.user?.name || inquiry.user?.email || 'Unknown User';
+    const initials = this.getInitials(userName);
+
+    return {
+      id: inquiry.id,
+      dateCreated: inquiry.createdAt,
+      type: 'Inquiry',
+      internalReference: inquiry.inquiryNumber || '-',
+      customer: {
+        initials: initials,
+        name: userName,
+        avatar: inquiry.user?.avatar
+      },
+      status: inquiry.status || 'draft',
+      originalData: inquiry
     };
   }
 
@@ -141,13 +193,13 @@ export class DraftInquiriesComponent implements OnInit {
       this.sortField = field;
       this.sortDirection = 'asc';
     }
-    this.sortInquiries();
+    this.sortItems();
   }
 
-  private sortInquiries(): void {
-    this.draftInquiries.sort((a, b) => {
-      let aValue: any = a[this.sortField as keyof DraftInquiry];
-      let bValue: any = b[this.sortField as keyof DraftInquiry];
+  private sortItems(): void {
+    this.draftItems.sort((a, b) => {
+      let aValue: any = a[this.sortField as keyof DraftItem];
+      let bValue: any = b[this.sortField as keyof DraftItem];
 
       // Handle nested customer property
       if (this.sortField === 'customer') {
@@ -185,41 +237,45 @@ export class DraftInquiriesComponent implements OnInit {
     return `${day}-${month}-${year}`;
   }
 
-  onEdit(inquiry: DraftInquiry): void {
-    // First, clear the current cart
-    this.cartService.clearCart();
+  onEdit(item: DraftItem): void {
+    if (item.type === 'Order') {
+      this.editDraftOrder(item);
+    } else if (item.type === 'Inquiry') {
+      this.editDraftInquiry(item);
+    }
+  }
 
+  private editDraftOrder(item: DraftItem): void {
     // Check if we have the original order data with items
-    if (inquiry.originalOrder && inquiry.originalOrder.items) {
+    if (item.originalData && item.originalData.items) {
+      // Clear the current cart
+      this.cartService.clearCart();
+
       // Add each item from the draft order to the cart
-      inquiry.originalOrder.items.forEach((item: any) => {
-        if (item.product) {
-          // Create a product object compatible with the cart service
+      item.originalData.items.forEach((orderItem: any) => {
+        if (orderItem.product) {
           const product = {
-            id: item.product.id,
-            name: item.product.name,
-            price: item.product.price,
-            clientPrice: item.product.price, // Use price as clientPrice if not available
-            // Add any other required product properties here
-            // You may need to adjust these based on your Product model
+            id: orderItem.product.id,
+            name: orderItem.product.name,
+            price: orderItem.product.price,
+            clientPrice: orderItem.product.price,
           };
 
-          // Add the product to cart with the saved quantity
-          this.cartService.addToCart(product as any, item.quantity);
+          this.cartService.addToCart(product as any, orderItem.quantity);
         }
       });
 
-      // Store draft order ID in sessionStorage for reference in cart page
+      // Store draft order ID in sessionStorage
       if (typeof window !== 'undefined' && window.sessionStorage) {
-        sessionStorage.setItem('draftOrderId', inquiry.id);
-        sessionStorage.setItem('draftOrderNumber', inquiry.internalReference);
+        sessionStorage.setItem('draftOrderId', item.id);
+        sessionStorage.setItem('draftOrderNumber', item.internalReference);
       }
 
       // Navigate to cart page
       this.router.navigate(['/cart']);
     } else {
-      // If we don't have the order items in memory, fetch them first
-      this.orderService.getOrder(inquiry.id)
+      // Fetch the order details
+      this.orderService.getOrder(item.id)
         .pipe(
           catchError(err => {
             console.error('Error loading draft order details:', err);
@@ -229,48 +285,122 @@ export class DraftInquiriesComponent implements OnInit {
         )
         .subscribe(order => {
           if (order && order.items) {
-            // Clear cart first
             this.cartService.clearCart();
 
-            // Add items to cart
-            order.items.forEach((item: any) => {
-              if (item.product) {
+            order.items.forEach((orderItem: any) => {
+              if (orderItem.product) {
                 const product = {
-                  id: item.product.id,
-                  name: item.product.name,
-                  price: item.product.price,
-                  clientPrice: item.product.price,
-                  // Add other required product properties
+                  id: orderItem.product.id,
+                  name: orderItem.product.name,
+                  price: orderItem.product.price,
+                  clientPrice: orderItem.product.price,
                 };
 
-                this.cartService.addToCart(product as any, item.quantity);
+                this.cartService.addToCart(product as any, orderItem.quantity);
               }
             });
 
-            // Store draft order reference
             if (typeof window !== 'undefined' && window.sessionStorage) {
-              sessionStorage.setItem('draftOrderId', inquiry.id);
-              sessionStorage.setItem('draftOrderNumber', inquiry.internalReference);
+              sessionStorage.setItem('draftOrderId', item.id);
+              sessionStorage.setItem('draftOrderNumber', item.internalReference);
             }
 
-            // Navigate to cart
             this.router.navigate(['/cart']);
           }
         });
     }
   }
 
-  onDelete(inquiry: DraftInquiry): void {
-    // Implement delete functionality with confirmation
-    if (confirm(`Are you sure you want to delete this draft inquiry?`)) {
-      console.log('Delete inquiry:', inquiry);
-      // TODO: Call delete service method here
-      // this.orderService.deleteOrder(inquiry.id).subscribe(...);
+  private editDraftInquiry(item: DraftItem): void {
+    // Check if we have the original inquiry data with machines
+    if (item.originalData && item.originalData.machines) {
+      const cartItems = this.transformInquiryToCartItems(item.originalData);
+
+      if (cartItems.length > 0) {
+        this.manualQuickCartService.addToCart(cartItems);
+
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+          sessionStorage.setItem('draftInquiryId', item.id);
+          sessionStorage.setItem('draftInquiryNumber', item.internalReference);
+        }
+
+        this.router.navigate(['/manual-entry']);
+      } else {
+        alert('No items found in this draft inquiry.');
+      }
+    } else {
+      // Fetch the inquiry details
+      this.inquiryService.getInquiryById(item.id)
+        .pipe(
+          catchError(err => {
+            console.error('Error loading draft inquiry details:', err);
+            alert('Failed to load draft inquiry details. Please try again.');
+            return of(null);
+          })
+        )
+        .subscribe(inquiryData => {
+          if (inquiryData && inquiryData.machines) {
+            const cartItems = this.transformInquiryToCartItems(inquiryData);
+
+            if (cartItems.length > 0) {
+              this.manualQuickCartService.addToCart(cartItems);
+
+              if (typeof window !== 'undefined' && window.sessionStorage) {
+                sessionStorage.setItem('draftInquiryId', item.id);
+                sessionStorage.setItem('draftInquiryNumber', item.internalReference);
+              }
+
+              this.router.navigate(['/manual-entry']);
+            } else {
+              alert('No items found in this draft inquiry.');
+            }
+          }
+        });
     }
   }
 
-  onMoreOptions(inquiry: DraftInquiry): void {
-    // Open context menu or dropdown with more options
-    console.log('More options for inquiry:', inquiry);
+  private transformInquiryToCartItems(inquiry: any): any[] {
+    const cartItems: any[] = [];
+
+    if (!inquiry.machines || inquiry.machines.length === 0) {
+      return cartItems;
+    }
+
+    inquiry.machines.forEach((machine: any) => {
+      const machineId = machine.machine?.id || machine.machine;
+      const machineName = machine.machine?.articleDescription || 'Unknown Machine';
+
+      if (machine.products && machine.products.length > 0) {
+        machine.products.forEach((product: any, index: number) => {
+          const cartItem = {
+            id: `${machineId}-${index}`,
+            machineId: machineId,
+            machineName: machineName,
+            partData: {
+              partName: product.partName,
+              partNumber: product.partNumber,
+              shortDescription: product.shortDescription,
+              additionalNotes: product.additionalNotes
+            },
+            files: []
+          };
+
+          cartItems.push(cartItem);
+        });
+      }
+    });
+
+    return cartItems;
+  }
+
+  onDelete(item: DraftItem): void {
+    if (confirm(`Are you sure you want to delete this draft ${item.type.toLowerCase()}?`)) {
+      console.log('Delete item:', item);
+      // TODO: Implement delete functionality
+    }
+  }
+
+  onMoreOptions(item: DraftItem): void {
+    console.log('More options for item:', item);
   }
 }

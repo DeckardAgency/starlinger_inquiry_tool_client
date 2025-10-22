@@ -87,16 +87,17 @@
     color: #64748b;
     display: block;
     font-weight: 400;
-    margin-bottom: 4px;
+    //margin-bottom: 4px;
   }
 
   &__name {
-    margin: 0 0 8px;
+    margin: 0 0 0;
     font-size: 1rem;
     color: #1e293b;
   }
 
   &__machine {
+    margin-bottom: 0.25rem;
     &-name {
       margin: 0;
       padding: 0;

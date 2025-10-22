@@ -62,6 +62,7 @@ export interface InquiryResponse {
   contactEmail: string;
   contactPhone: string;
   isDraft: boolean;
+  lastSavedAt: string;
   createdAt: string;
   updatedAt: string;
   machines: InquiryMachineResponse[];
@@ -103,12 +104,10 @@ export class InquiryService {
    * Create a new inquiry
    */
   createInquiry(inquiryData: InquiryRequest): Observable<InquiryResponse> {
-    // Define headers explicitly for this request
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/ld+json')
       .set('Accept', 'application/ld+json');
 
-    // Pass the headers with the correct content type
     return this.http.post<InquiryResponse>(this.apiUrl, inquiryData, { headers });
   }
 
@@ -120,25 +119,37 @@ export class InquiryService {
     inquiryData.status = 'draft';
     inquiryData.isDraft = true;
 
-    // Define headers explicitly for this request
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/ld+json')
       .set('Accept', 'application/ld+json');
 
-    // Pass the headers with the correct content type
     return this.http.post<InquiryResponse>(this.apiUrl, inquiryData, { headers });
+  }
+
+  /**
+   * Submit a draft inquiry (converts it to submitted status)
+   */
+  submitDraft(inquiryId: string): Observable<InquiryResponse> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/ld+json')
+      .set('Accept', 'application/ld+json');
+
+    // Call the submit endpoint
+    return this.http.post<InquiryResponse>(
+      `${this.apiUrl}/${inquiryId}/submit`,
+      {},
+      { headers }
+    );
   }
 
   /**
    * Get inquiry details by ID
    */
   getInquiryById(inquiryId: string): Observable<InquiryResponse> {
-    // Define headers explicitly for this request
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/ld+json')
       .set('Accept', 'application/ld+json');
 
-    // Use the headers for GET requests
     return this.http.get<InquiryResponse>(`${this.apiUrl}/${inquiryId}`, { headers });
   }
 
@@ -146,15 +157,12 @@ export class InquiryService {
    * Get all inquiries by user email
    */
   getInquiriesByUserEmail(email: string): Observable<InquiriesCollection> {
-    // Define headers explicitly for this request
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/ld+json')
       .set('Accept', 'application/ld+json');
 
-    // Create the query parameters with the user.email filter
     const params = new HttpParams().set('user.email', email);
 
-    // Use the headers and params for GET requests
     return this.http.get<InquiriesCollection>(this.apiUrl, { headers, params });
   }
 
@@ -162,17 +170,30 @@ export class InquiryService {
    * Get draft inquiries by user email
    */
   getDraftInquiriesByUserEmail(email: string): Observable<InquiriesCollection> {
-    // Define headers explicitly for this request
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/ld+json')
       .set('Accept', 'application/ld+json');
 
-    // Create the query parameters with user.email and status=draft filters
     const params = new HttpParams()
       .set('user.email', email)
       .set('status', 'draft');
 
-    // Use the headers and params for GET requests
+    return this.http.get<InquiriesCollection>(this.apiUrl, { headers, params });
+  }
+
+  /**
+   * Get submitted inquiries by user email
+   */
+  getSubmittedInquiriesByUserEmail(email: string): Observable<InquiriesCollection> {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/ld+json')
+      .set('Accept', 'application/ld+json');
+
+    const params = new HttpParams()
+      .set('user.email', email)
+      .set('isDraft', 'false')
+      .set('status', 'submitted');
+
     return this.http.get<InquiriesCollection>(this.apiUrl, { headers, params });
   }
 }

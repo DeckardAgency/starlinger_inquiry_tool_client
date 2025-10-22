@@ -23,7 +23,7 @@ export type OrderInquiryTab = typeof ORDER_INQUIRY_TABS[keyof typeof ORDER_INQUI
 // Type of inquiry/order
 export const INQUIRY_TYPE = {
   ORDER: 'Order',
-  MANUAL: 'Manual'
+  INQUIRY: 'Inquiry'
 } as const;
 
 export type InquiryType = typeof INQUIRY_TYPE[keyof typeof INQUIRY_TYPE];
@@ -59,12 +59,10 @@ export interface BaseOrderInquiry {
 // Specific interfaces for different sources
 export interface Inquiry extends BaseOrderInquiry {
   source: 'inquiry';
-  inquirySpecificField?: string; // Add any inquiry-specific fields
 }
 
 export interface Order extends BaseOrderInquiry {
   source: 'order';
-  orderSpecificField?: string; // Add any order-specific fields
 }
 
 // Union type for mixed data

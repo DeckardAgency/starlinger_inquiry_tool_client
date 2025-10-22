@@ -119,6 +119,8 @@
       &.sortable {
         cursor: pointer;
         user-select: none;
+        display: flex;
+        align-items: center;
 
         &:hover {
           background-color: #F4F4F5;
@@ -128,6 +130,10 @@
           display: inline-flex;
           align-items: center;
           gap: 4px;
+        }
+
+        app-icon {
+          margin-left: 0.5rem;
         }
       }
 

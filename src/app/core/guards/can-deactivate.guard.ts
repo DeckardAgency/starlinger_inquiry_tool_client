@@ -30,7 +30,7 @@ export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate>
 
     // Show confirmation dialog
     const confirmed = confirm(
-      `If you switch to ${destination} you lose all inserted data.`
+      `If you switch to ${destination} you lose all inserted data from ${destination}`
     );
 
     return confirmed;
