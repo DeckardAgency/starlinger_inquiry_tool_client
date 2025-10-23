@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {InquiryShimmerComponent} from '@shared/components/inquiry-table/inquiry-shimmer.component';
 
@@ -16,12 +16,12 @@ interface InquiryHistory {
 }
 
 @Component({
-    selector: 'app-inquiry-table',
-    imports: [CommonModule, InquiryShimmerComponent],
-    templateUrl: './inquiry-table.component.html',
-    styleUrls: ['./inquiry-table.component.scss']
+  selector: 'app-inquiry-table',
+  imports: [CommonModule, InquiryShimmerComponent],
+  templateUrl: './inquiry-table.component.html',
+  styleUrls: ['./inquiry-table.component.scss']
 })
-export class InquiryTableComponent implements OnInit {
+export class InquiryTableComponent implements OnInit, OnChanges {
   @Input() inquiries: InquiryHistory[] = [];
   @Input() loading: boolean = false;
 
@@ -31,6 +31,12 @@ export class InquiryTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.filterInquiries();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['inquiries']) {
+      this.filterInquiries();
+    }
   }
 
   selectTab(tab: string): void {
