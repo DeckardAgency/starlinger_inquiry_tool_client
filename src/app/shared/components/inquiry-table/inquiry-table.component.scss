@@ -119,13 +119,13 @@
   font-weight: 500;
 
   &--completed {
-    background: #FFA500;
-    color: white;
+    background: #DCFCE7;
+    color: #16A34A;
   }
 
   &--confirmed {
-    background: #DCFCE7;
-    color: #16A34A;
+    background: #FFA500;
+    color: white;
   }
 
   &--processing {

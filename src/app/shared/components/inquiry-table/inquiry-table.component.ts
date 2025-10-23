@@ -42,8 +42,7 @@ export class InquiryTableComponent implements OnInit {
     if (this.activeTab === 'Latest') {
       this.filteredInquiries = [...this.inquiries];
     } else {
-      // Convert tab name to status (e.g., 'Completed' to 'Completed')
-      const status = this.activeTab as 'Completed' | 'Cancelled' | 'Rejected' | 'Archived';
+      const status = this.activeTab as 'Latest' | 'Completed' | 'Cancelled';
       this.filteredInquiries = this.inquiries.filter(inquiry => inquiry.status === status);
     }
   }
