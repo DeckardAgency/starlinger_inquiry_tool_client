@@ -19,6 +19,7 @@ import { MachineService } from '@services/http/machine.service';
 import { ManualQuickCartService } from '@services/cart/manual-quick-cart.service';
 import { AuthService } from '@core/auth/auth.service';
 import { InquiryService, InquiryRequest } from '@services/http/inquiry.service';
+import { ManualEntryStateService } from '@services/manual-entry-state.service';
 
 // Models and Types
 import { ManualCartItem } from '@models/manual-cart-item.model';
@@ -128,7 +129,8 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     private machineService: MachineService,
     private authService: AuthService,
     private inquiryService: InquiryService,
-    private manualQuickCartService: ManualQuickCartService
+    private manualQuickCartService: ManualQuickCartService,
+    private manualEntryStateService: ManualEntryStateService
   ) {
     // Set up search functionality
     this.setupSearch();
@@ -296,6 +298,9 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
         this.totalItems = response.totalItems + 1;
         this.applyLocalFilters();
         this.loading = false;
+
+        // FIX: Restore machine selection AFTER machines are loaded
+        this.restoreSelectedMachine();
       },
       error: (error) => {
         console.error('Error loading machines:', error);
@@ -303,6 +308,19 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
         this.loading = false;
       }
     });
+  }
+
+  /**
+   * Restore previously selected machine if it exists
+   */
+  private restoreSelectedMachine(): void {
+    const savedMachine = this.manualEntryStateService.getSelectedMachine();
+    if (savedMachine && this.machines.length > 0) {
+      const foundMachine = this.machines.find(m => m.id === savedMachine.id);
+      if (foundMachine) {
+        this.selectMachine(foundMachine);
+      }
+    }
   }
 
   /**
@@ -342,6 +360,9 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
         data: { machineId: '' }
       }];
     }
+
+    // Save selected machine to service for persistence across routes
+    this.manualEntryStateService.setSelectedMachine(machine);
   }
 
   /**
@@ -375,6 +396,9 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     }
     this.selectedMachine = null;
     this.isOtherMachineSelected = false;
+
+    // Clear selected machine from service when closing details
+    this.manualEntryStateService.clearSelectedMachine();
   }
 
   /**
@@ -450,51 +474,25 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     this.applyLocalFilters();
   }
 
-  // Form submission
-  onSubmit(): void {
-    if (this.isFormValid() && this.selectedMachine) {
-      console.log('Template form submission - parts:', this.parts);
+  /**
+   * Check if parts have valid data
+   */
+  private hasValidPartsData(parts: Part[]): boolean {
+    return parts.some(part => {
+      const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
+        row.quantity || row.partNumber || row.partName
+      ) || false;
 
-      // Create cart items from all machines
-      const allManualCartItems: ManualCartItem[] = [];
+      const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
 
-      // Process current machine
-      const currentMachineItems = this.createCartItemsFromParts(this.parts, this.selectedMachine);
-      allManualCartItems.push(...currentMachineItems);
-
-      // Process saved machines
-      this.machinePartsMap.forEach((parts, machineId) => {
-        if (machineId !== this.selectedMachine?.id) {
-          const machine = this.machines.find(m => m.id === machineId);
-          if (machine && parts.length > 0) {
-            const machineItems = this.createCartItemsFromParts(parts, machine);
-            allManualCartItems.push(...machineItems);
-          }
-        }
-      });
-
-      // Add to cart
-      console.log('Adding to cart:', allManualCartItems);
-      this.manualQuickCartService.addToCart(allManualCartItems);
-
-      // Create inquiry data
-      const inquiryData = this.createInquiryData();
-      console.log('Inquiry data:', inquiryData);
-
-      // Clean up after submission
-      if (this.selectedMachine) {
-        this.machinePartsMap.delete(this.selectedMachine.id);
-      }
-
-      this.parts = [];
-      this.addPart();
-    }
+      return hasValidSpreadsheetData || hasSuccessfulUpload;
+    });
   }
 
   /**
-   * Create cart items from parts - Updated for new structure
+   * Create manual cart items from parts
    */
-  private createCartItemsFromParts(parts: Part[], machine: Machine): ManualCartItem[] {
+  private createManualCartItems(machine: Machine, parts: Part[]): ManualCartItem[] {
     return parts.flatMap(part => {
       const spreadsheetRows = part.spreadsheetData?.filter(row =>
         row.quantity || row.partNumber || row.partName
@@ -657,18 +655,27 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   }
 
   /**
-   * Check if parts have valid data - Updated for new structure
+   * Submit the form
    */
-  private hasValidPartsData(parts: Part[]): boolean {
-    return parts.some(part => {
-      const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
-        row.quantity || row.partNumber || row.partName
-      ) || false;
+  onSubmit(): void {
+    if (!this.isFormValid() || !this.selectedMachine) {
+      return;
+    }
 
-      const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
+    const manualCartItems = this.createManualCartItems(this.selectedMachine, this.parts);
+    this.manualQuickCartService.addToCart(manualCartItems);
 
-      return hasValidSpreadsheetData || hasSuccessfulUpload;
-    });
+    const inquiryData = this.createInquiryData();
+    console.log('Form submission data:', inquiryData);
+
+    // Clear state after submission
+    if (this.selectedMachine) {
+      this.machinePartsMap.delete(this.selectedMachine.id);
+    }
+
+    this.parts = [];
+    this.isOtherMachineSelected = false;
+    this.addPart();
   }
 
   // Image editing

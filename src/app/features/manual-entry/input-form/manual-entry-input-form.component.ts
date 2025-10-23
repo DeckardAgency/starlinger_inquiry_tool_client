@@ -20,6 +20,7 @@ import { MachineArticleItemShimmerComponent } from '@shared/components/machine/m
 import { environment } from '@env/environment';
 import { AuthService } from '@core/auth/auth.service';
 import { InquiryRequest, InquiryService } from '@services/http/inquiry.service';
+import { ManualEntryStateService } from '@services/manual-entry-state.service';
 
 // Guard interface
 import { CanComponentDeactivate } from '@core/guards/can-deactivate.guard';
@@ -122,7 +123,8 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
     private authService: AuthService,
     private inquiryService: InquiryService,
     private mediaService: MediaService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private manualEntryStateService: ManualEntryStateService
   ) {
     this.setupSearch();
   }
@@ -263,6 +265,9 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
         // Include "Other" option
         this.filteredMachines = [...this.machines, this.createOtherMachineOption()];
         this.loading = false;
+
+        // FIX: Restore machine selection AFTER machines are loaded
+        this.restoreSelectedMachine();
       },
       error: (err) => {
         this.error = 'Failed to load machines. Please try again later.';
@@ -270,6 +275,19 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
         console.error('Error loading machines:', err);
       }
     });
+  }
+
+  /**
+   * Restore previously selected machine if it exists
+   */
+  private restoreSelectedMachine(): void {
+    const savedMachine = this.manualEntryStateService.getSelectedMachine();
+    if (savedMachine && this.machines.length > 0) {
+      const foundMachine = this.machines.find(m => m.id === savedMachine.id);
+      if (foundMachine) {
+        this.selectMachine(foundMachine);
+      }
+    }
   }
 
   private createOtherMachineOption(): OtherMachine {
@@ -425,6 +443,9 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
         this.addPart();
       }
     }
+
+    // Save selected machine to service for persistence across routes
+    this.manualEntryStateService.setSelectedMachine(machine);
   }
 
   closeDetails(): void {
@@ -438,6 +459,9 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
       { label: 'Dashboard', link: '/dashboard' },
       { label: 'Manual Entry', link: '/manual-entry' }
     ];
+
+    // Clear selected machine from service when closing details
+    this.manualEntryStateService.clearSelectedMachine();
   }
 
   checkPartValidity(): void {
