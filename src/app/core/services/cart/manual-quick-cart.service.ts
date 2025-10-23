@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, finalize, catchError, tap } from 'rxjs';
-import { ManualCartService } from './manual-cart.service';
-import { ManualCartItem } from '@models/manual-cart-item.model';
-import { of } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, catchError, Observable, tap} from 'rxjs';
+import {ManualCartService} from './manual-cart.service';
+import {ManualCartItem} from '@models/manual-cart-item.model';
 import {InquiryRequest, InquiryResponse, InquiryService} from '@services/http/inquiry.service';
 import {AuthService} from '@core/auth/auth.service';
 
@@ -230,7 +229,7 @@ export class ManualQuickCartService {
       };
     });
 
-    const inquiryRequest: InquiryRequest = {
+    return {
       status,
       notes: referenceNumber ? `Reference: ${referenceNumber}` : '',
       contactEmail: '',
@@ -239,7 +238,5 @@ export class ManualQuickCartService {
       user: `/api/v1/users/${user.id}`,
       machines
     };
-
-    return inquiryRequest;
   }
 }
