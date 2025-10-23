@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/compodoc/compodoc/master/schema.json",
+  "tsconfig": "tsconfig.app.json",
+  "name": "Starlinger Inquiry Tool — Client",
+  "hideGenerator": true,
+  "disableCoverage": true,
+  "output": "docs",
+  "port": 6006,
+  "theme": "material"
+}

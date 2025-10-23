@@ -2,6 +2,17 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.8.
 
+## Documentation
+
+This repository includes full, auto-generated technical documentation using Compodoc.
+
+- Generate documentation:
+  - npm run docs
+- Serve documentation locally (opens http://localhost:6006 by default):
+  - npm run docs:serve
+- Output location:
+  - docs/ (open docs/index.html in a browser or use the serve script above)
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

@@ -275,7 +275,7 @@ export class ManualEntryInputFormComponent implements OnInit, OnDestroy, CanComp
   private createOtherMachineOption(): OtherMachine {
     return {
       id: 'other',
-      articleDescription: 'Other (Not Listed)',
+      articleDescription: 'Other/Older (Not Listed)',
       isOther: true
     } as OtherMachine;
   }

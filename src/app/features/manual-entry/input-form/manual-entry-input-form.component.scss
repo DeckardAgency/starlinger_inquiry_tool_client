@@ -1215,6 +1215,7 @@
 
 // NEW: Styles for "Other" machine option
 .machine-other-item {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1225,16 +1226,29 @@
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
-    border-color: #805AD5;
-    background-color: #f8f7ff;
-    box-shadow: 0 2px 8px rgba(128, 90, 213, 0.1);
+  &::before {
+    content: "->";
+    position: absolute;
+    right: calc(16px);
+    top: calc(50% - 16px);
+    background-color: black;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
   }
 
-  &.selected {
-    border-color: #805AD5;
-    background-color: #f8f7ff;
-    box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.15);
+  &:hover {
+    border-color: #232323;
+  }
+
+  &:hover::before {
+    opacity: 1;
   }
 
   .other-item-content {

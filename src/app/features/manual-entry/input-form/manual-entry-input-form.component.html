@@ -168,7 +168,7 @@
                       <button type="button" class="accordion-toggle" [attr.aria-expanded]="part.isExpanded">
                         <app-icon
                           name="chevronDown"
-                          size="20px"
+                          size="14px"
                           color="#232323"
                           [class.rotated]="part.isExpanded"
                         ></app-icon>
@@ -197,7 +197,7 @@
                         <div class="form-group">
                           <label [for]="'machineId' + i">
                             Machine ID *
-                            <span class="label-info">Required for unlisted machines</span>
+                            <span class="label-info">Required for unlisted/older machines</span>
                           </label>
                           <input
                             type="text"

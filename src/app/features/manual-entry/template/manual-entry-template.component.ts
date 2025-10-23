@@ -36,6 +36,9 @@ interface Part {
   id: string;
   files: UploadedFile[];
   spreadsheetData: SpreadsheetRow[];
+  data?: {
+    machineId?: string; // For "Other" machines
+  };
 }
 
 // Define MachineType interface
@@ -43,6 +46,11 @@ interface MachineType {
   id: string;
   name: string;
   checked: boolean;
+}
+
+// OtherMachine interface extending Machine
+export interface OtherMachine extends Machine {
+  isOther?: boolean;
 }
 
 @Component({
@@ -69,6 +77,7 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   machines: Machine[] = [];
   filteredMachines: Machine[] = [];
   selectedMachine: Machine | null = null;
+  isOtherMachineSelected = false;
   loading = true;
   error: string | null = null;
   totalItems = 0;
@@ -237,7 +246,15 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     ).subscribe({
       next: (response) => {
         this.machines = response.member;
-        this.totalItems = response.totalItems;
+
+        // Add "Other" machine option at the end
+        this.machines.push({
+          id: 'other',
+          articleDescription: 'Other/Older (Not Listed)',
+          machineType: []
+        } as unknown as Machine);
+
+        this.totalItems = response.totalItems + 1;
         this.searchLoading = false;
         this.applyLocalFilters();
       },
@@ -250,24 +267,16 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
   }
 
   /**
-   * Apply local filters (machine types) to the search results
+   * Apply local filters to machines list
    */
   private applyLocalFilters(): void {
-    let filtered = this.machines;
-
-    if (this.activeFilters.length > 0) {
-      filtered = filtered.filter(machine =>
-        this.activeFilters.some(filter =>
-          machine.articleDescription.toLowerCase().includes(filter.toLowerCase())
-        )
-      );
-    }
-
-    this.filteredMachines = filtered;
+    // For template component, no machine type filtering needed
+    // Just return all machines as filtered machines
+    this.filteredMachines = this.machines;
   }
 
   /**
-   * Load initial machines
+   * Load machines from service
    */
   private loadMachines(): void {
     this.loading = true;
@@ -276,149 +285,134 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     this.machineService.getMachines().subscribe({
       next: (response) => {
         this.machines = response.member;
-        this.totalItems = response.totalItems;
-        this.filteredMachines = this.machines;
+
+        // Add "Other" machine option at the end
+        this.machines.push({
+          id: 'other',
+          articleDescription: 'Other/Unlisted Machine',
+          machineType: []
+        } as unknown as Machine);
+
+        this.totalItems = response.totalItems + 1;
+        this.applyLocalFilters();
         this.loading = false;
       },
-      error: (err) => {
-        this.error = 'Failed to load machines. Please try again later.';
+      error: (error) => {
+        console.error('Error loading machines:', error);
+        this.error = 'Failed to load machines. Please try again.';
         this.loading = false;
-        console.error('Error loading machines:', err);
       }
     });
   }
 
-  // Part management methods
+  /**
+   * Select a machine and initialize parts for it
+   */
+  selectMachine(machine: Machine): void {
+    this.selectedMachine = machine;
+
+    // Check if "Other" machine is selected
+    this.isOtherMachineSelected = machine.id === 'other';
+
+    // Initialize parts data structure if not exists
+    if (!this.parts[0]) {
+      this.parts[0] = {
+        id: this.generateUniqueId(),
+        files: [],
+        spreadsheetData: [],
+        data: { machineId: '' }
+      };
+    }
+
+    // Restore previously saved parts for this machine if they exist
+    if (this.machinePartsMap.has(machine.id)) {
+      this.parts = this.machinePartsMap.get(machine.id) || [];
+      // Ensure all parts have data object initialized
+      this.parts.forEach(part => {
+        if (!part.data) {
+          part.data = { machineId: '' };
+        }
+      });
+    } else {
+      // Reset parts for new machine selection
+      this.parts = [{
+        id: this.generateUniqueId(),
+        files: [],
+        spreadsheetData: [],
+        data: { machineId: '' }
+      }];
+    }
+  }
+
+  /**
+   * Add a new part to the current machine
+   */
   addPart(): void {
-    const newPart: Part = {
+    this.parts.push({
       id: this.generateUniqueId(),
       files: [],
-      spreadsheetData: []
-    };
-
-    this.parts.push(newPart);
-
-    if (this.selectedMachine) {
-      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-    }
+      spreadsheetData: [],
+      data: { machineId: '' }
+    });
   }
 
-  private generateUniqueId(): string {
-    return 'part_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  /**
+   * Check if form is valid
+   */
+  isFormValid(): boolean {
+    return this.parts.some(part =>
+      part.files.length > 0 ||
+      part.spreadsheetData.some(row => row.quantity || row.partNumber || row.partName)
+    );
   }
 
-  // Machine selection
-  selectMachine(machine: Machine): void {
-    // Save current parts state
-    if (this.selectedMachine) {
-      this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
-    }
-
-    this.selectedMachine = machine;
-    if (machine) {
-      this.breadcrumbs = [
-        { label: 'Dashboard', link: '/dashboard' },
-        { label: 'Manual Entry', link: '/manual-entry' },
-        { label: machine.articleDescription }
-      ];
-
-      // Restore saved parts or initialize new
-      if (this.machinePartsMap.has(machine.id)) {
-        this.parts = [...this.machinePartsMap.get(machine.id)!];
-      } else {
-        this.parts = [];
-        this.addPart();
-      }
-    }
-  }
-
+  /**
+   * Close the details panel and save current parts
+   */
   closeDetails(): void {
     if (this.selectedMachine) {
       this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
     }
-
     this.selectedMachine = null;
-    this.breadcrumbs = [
-      { label: 'Dashboard', link: '/dashboard' },
-      { label: 'Manual Entry', link: '/manual-entry' }
-    ];
+    this.isOtherMachineSelected = false;
   }
 
-  // Filter methods
-  removeFilter(filter: string): void {
-    this.activeFilters = this.activeFilters.filter(f => f !== filter);
-    const machineType = this.machineTypes.find(m => m.name === filter);
-    if (machineType) {
-      machineType.checked = false;
-    }
-    this.applyLocalFilters();
-  }
-
-  toggleFilter(): void {
-    this.isFilterOpen = !this.isFilterOpen;
-  }
-
-  toggleMachineType(machineType: MachineType): void {
-    machineType.checked = !machineType.checked;
-
-    if (machineType.checked) {
-      if (!this.activeFilters.includes(machineType.name)) {
-        this.activeFilters.push(machineType.name);
-      }
-    } else {
-      this.activeFilters = this.activeFilters.filter(filter => filter !== machineType.name);
-    }
-
-    this.applyLocalFilters();
-  }
-
-  // Search methods
-  clearSearch(): void {
-    this.searchControl.setValue('');
-  }
-
-  onSearchFocus(): void {
-    // Optional: Add focus behavior
-  }
-
-  onSearchBlur(): void {
-    // Optional: Add blur behavior
-  }
-
-  // Spreadsheet data handler - Updated for new structure
+  /**
+   * Handle spreadsheet data changes
+   */
   onSpreadsheetDataChanged(data: SpreadsheetRow[], partIndex: number): void {
-    console.log('Spreadsheet data changed for part', partIndex, ':', data);
-
-    if (partIndex >= 0 && partIndex < this.parts.length) {
+    if (this.parts[partIndex]) {
       this.parts[partIndex].spreadsheetData = data;
-
-      // Update hasClientData flag
-      this.hasClientData = data.some(row => row.quantity || row.partNumber || row.partName);
-
       if (this.selectedMachine) {
         this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
       }
     }
   }
 
-  // Handle spreadsheet tab change
+  /**
+   * Handle spreadsheet tab changes
+   */
   onSpreadsheetTabChanged(tab: TabType): void {
     this.currentSpreadsheetTab = tab;
   }
 
-  // File handlers
+  /**
+   * Handle file changes
+   */
   onFilesChanged(files: UploadedFile[], partIndex: number): void {
-    if (partIndex >= 0 && partIndex < this.parts.length) {
+    if (this.parts[partIndex]) {
       this.parts[partIndex].files = files;
-
       if (this.selectedMachine) {
         this.machinePartsMap.set(this.selectedMachine.id, [...this.parts]);
       }
     }
   }
 
+  /**
+   * Handle file preview request
+   */
   onFilePreviewRequested(file: UploadedFile): void {
-    if (file.previewUrl) {
+    if (this.isImageFile(file.name) && file.previewUrl) {
       this.previewImageSrc = file.previewUrl;
       this.previewImageAlt = file.name;
       this.previewImageFileName = file.name;
@@ -426,41 +420,34 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
     }
   }
 
+  /**
+   * Check if file is an image
+   */
+  isImageFile(fileName: string): boolean {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(extension || '');
+  }
+
+  /**
+   * Close image preview modal
+   */
   closeImagePreview(): void {
     this.showImagePreview = false;
   }
 
-  // Validation methods - Updated for new structure
-  isCurrentPartValid(): boolean {
-    if (this.parts.length === 0) return false;
-
-    const currentPart = this.parts[this.parts.length - 1];
-
-    const hasValidSpreadsheetData = currentPart.spreadsheetData?.some(row =>
-      row.quantity || row.partNumber || row.partName
-    ) || false;
-
-    const hasSuccessfulUpload = currentPart.files.some(file => file.status === 'success');
-
-    return hasValidSpreadsheetData || hasSuccessfulUpload;
+  /**
+   * Generate unique ID for parts
+   */
+  private generateUniqueId(): string {
+    return Math.random().toString(36).substr(2, 9);
   }
 
-  isFormValid(): boolean {
-    // If on demo tab, form is not valid for submission
-    if (this.currentSpreadsheetTab === 'demo') {
-      return false;
-    }
-
-    // Check if any part has valid data (client data tab)
-    return this.parts.some(part => {
-      const hasValidSpreadsheetData = part.spreadsheetData?.some(row =>
-        row.quantity || row.partNumber || row.partName
-      ) || false;
-
-      const hasSuccessfulUpload = part.files.some(file => file.status === 'success');
-
-      return hasValidSpreadsheetData || hasSuccessfulUpload;
-    });
+  /**
+   * Remove a filter
+   */
+  removeFilter(filter: string): void {
+    this.activeFilters = this.activeFilters.filter(f => f !== filter);
+    this.applyLocalFilters();
   }
 
   // Form submission
@@ -592,6 +579,46 @@ export class ManualEntryTemplateComponent implements OnInit, AfterViewInit, OnDe
    * Create machine entry for inquiry - Updated for new structure
    */
   private createMachineEntry(machine: Machine, parts: Part[]) {
+    // Handle "Other" machines differently
+    if (this.isOtherMachineSelected && machine.id === 'other') {
+      return {
+        machine: this.parts[0].data?.machineId || 'Custom machine', // Custom machine identifier
+        notes: `Inquiry for unlisted/custom machine: ${this.parts[0].data?.machineId}`,
+        products: parts.flatMap(part => {
+          const spreadsheetRows = part.spreadsheetData?.filter(row =>
+            row.quantity || row.partNumber || row.partName
+          ) || [];
+
+          if (spreadsheetRows.length > 0) {
+            return spreadsheetRows.map(row => ({
+              partName: row.partName || '',
+              partNumber: row.partNumber || '',
+              quantity: row.quantity || '',
+              shortDescription: row.quantity ? `${row.quantity} pieces of ${row.partNumber || ''}` : '',
+              additionalNotes: row.partName || '',
+              mediaItems: part.files
+                .filter(file => file.status === 'success' && file.mediaItem)
+                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+            }));
+          } else if (part.files.some(file => file.status === 'success')) {
+            return [{
+              partName: '',
+              partNumber: '',
+              quantity: '',
+              shortDescription: '',
+              additionalNotes: '',
+              mediaItems: part.files
+                .filter(file => file.status === 'success' && file.mediaItem)
+                .map(file => '/api/v1/media_items/' + file.mediaItem!.id)
+            }];
+          }
+
+          return [];
+        })
+      };
+    }
+
+    // Regular machine entry
     return {
       machine: `${environment.apiBaseUrl}${environment.apiPath}/machines/${machine.id}`,
       notes: "string",
