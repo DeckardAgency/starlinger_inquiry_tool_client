@@ -22,7 +22,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 export class ManualNotificationComponent implements OnInit, OnDestroy, OnChanges {
   @Input() visible = false;
   @Input() message = 'Part removed from inquiry.';
-  @Input() type: 'success' | 'remove' = 'remove';
+  @Input() type: 'success' | 'remove' | 'error' = 'success';
   @Output() viewInquiry = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 

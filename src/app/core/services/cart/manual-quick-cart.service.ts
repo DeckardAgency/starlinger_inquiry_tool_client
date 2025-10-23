@@ -65,7 +65,7 @@ export class ManualQuickCartService {
     this.notificationVisibleSubject.next(true);
 
     // Auto-hide after 5 seconds
-    setTimeout(() => this.hideNotification(), 5000);
+    // setTimeout(() => this.hideNotification(), 5000);
   }
 
   // Hide notification

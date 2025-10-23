@@ -192,25 +192,6 @@
     </div>
   </div>
 
-  <!-- Notifications -->
-  @if (notificationVisible$ | async) {
-    <div class="manual-quick-cart__notification" [class]="'notification--' + (notificationType$ | async)">
-      <div class="notification__content">
-        {{ notificationMessage$ | async }}
-      </div>
-    </div>
-  }
-
-  <!-- Loading Overlay -->
-  @if (loading$ | async) {
-    <div class="manual-quick-cart__overlay">
-      <div class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Processing your inquiry...</p>
-      </div>
-    </div>
-  }
-
   <!-- Footer Actions -->
   <div class="manual-quick-cart__footer">
     <div class="manual-quick-cart__actions">

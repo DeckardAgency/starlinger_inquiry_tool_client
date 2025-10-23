@@ -105,7 +105,7 @@ export class ManualQuickCartComponent implements OnInit, OnDestroy {
       ).subscribe({
         next: (response) => {
           console.log('Inquiry saved as draft:', response);
-          // Clear inputs after successful save
+          // Clear inputs after a successful save
           this.referenceNumber = '';
 
           // Optionally navigate after a delay
