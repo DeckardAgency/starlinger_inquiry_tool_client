@@ -214,32 +214,32 @@
               >
             </div>
 
-            <div class="shop__machine-filter">
-              <button class="shop__filter-btn" (click)="toggleFilter()">
-                <span class="material-icons">
-                  <app-icon name="filter" size="16px" color="#232323 "></app-icon>
-                </span>
-                Filter by machine
-                <app-icon name="arrowDown" size="16px" color="#232323 "></app-icon>
-              </button>
+<!--            <div class="shop__machine-filter">-->
+<!--              <button class="shop__filter-btn" (click)="toggleFilter()">-->
+<!--                <span class="material-icons">-->
+<!--                  <app-icon name="filter" size="16px" color="#232323 "></app-icon>-->
+<!--                </span>-->
+<!--                Filter by machine-->
+<!--                <app-icon name="arrowDown" size="16px" color="#232323 "></app-icon>-->
+<!--              </button>-->
 
-              @if (isFilterOpen) {
-                <div class="shop__filter-dropdown">
-                  @for (machine of machines; track machine.id) {
-                    <label class="shop__filter-option">
-                      <input
-                        type="checkbox"
-                        [checked]="machine.checked"
-                        (change)="toggleMachine(machine)"
-                      >
-                      <span class="shop__filter-checkbox"></span>
-                      <span class="shop__filter-label">{{ machine.name }}</span>
-                    </label>
-                  }
-                </div>
-              }
+<!--              @if (isFilterOpen) {-->
+<!--                <div class="shop__filter-dropdown">-->
+<!--                  @for (machine of machines; track machine.id) {-->
+<!--                    <label class="shop__filter-option">-->
+<!--                      <input-->
+<!--                        type="checkbox"-->
+<!--                        [checked]="machine.checked"-->
+<!--                        (change)="toggleMachine(machine)"-->
+<!--                      >-->
+<!--                      <span class="shop__filter-checkbox"></span>-->
+<!--                      <span class="shop__filter-label">{{ machine.name }}</span>-->
+<!--                    </label>-->
+<!--                  }-->
+<!--                </div>-->
+<!--              }-->
 
-            </div>
+<!--            </div>-->
           </div>
         }
 
