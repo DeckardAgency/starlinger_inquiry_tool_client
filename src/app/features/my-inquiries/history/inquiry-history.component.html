@@ -7,7 +7,31 @@
       Activity / History
     </h2>
   </div>
+
   <div class="inquiries-history__body">
-    <app-inquiry-table [inquiries]="allInquiries" [loading]="loading"></app-inquiry-table>
+    @if (loading) {
+      <div class="inquiries-history__loading">
+        <div class="inquiries-history__loading-spinner"></div>
+        <p>Loading history...</p>
+      </div>
+    } @else if (error) {
+      <div class="inquiries-history__error">
+        <app-icon name="alertTriangle" size="24px" color="#DC2626"></app-icon>
+        <p>{{ error }}</p>
+        <button (click)="retry()" class="inquiries-history__retry-btn">
+          <app-icon name="refresh" size="16px" color="#ffffff"></app-icon>
+          Try Again
+        </button>
+      </div>
+    } @else {
+      @if (currentTabInquiries.length === 0) {
+        <div class="inquiries-history__empty">
+          <app-icon name="inbox" size="32px" color="#71717A"></app-icon>
+          <p>No {{ currentTabLabel | lowercase }} items found.</p>
+        </div>
+      } @else {
+        <app-inquiry-table [inquiries]="currentTabInquiries" [loading]="loading"></app-inquiry-table>
+      }
+    }
   </div>
 </div>
