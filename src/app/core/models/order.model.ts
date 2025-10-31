@@ -7,6 +7,7 @@ export interface OrderProduct {
     '@type': string;
     id: string;
     name: string;
+    shortDescription: string;
     partNo: string;
     weight: string;
     price: number;

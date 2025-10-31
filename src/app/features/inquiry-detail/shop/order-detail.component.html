@@ -128,7 +128,7 @@
             <tbody>
             <tr class="order-detail__table-row" *ngFor="let item of order?.items">
               <td class="order-detail__table-cell">{{ item.product.partNo }}</td>
-              <td class="order-detail__table-cell">{{ item.product.name }}</td>
+              <td class="order-detail__table-cell">{{ item.product.shortDescription }}</td>
               <td class="order-detail__table-cell">{{ item.product.weight }}</td>
               <td class="order-detail__table-cell">{{ item.quantity }}</td>
               <td class="order-detail__table-cell">€ {{ item.unitPrice | priceFilterAdvanced }}</td>
